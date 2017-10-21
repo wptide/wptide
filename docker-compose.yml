@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+
+### Sync Server ###########################
+    sync-server:
+        build:
+            context: ./docker/sync-server
+        volumes:
+          - .:/go/src/github.com/xwp/go-tide
+          - ./bin:/go/bin
+        working_dir: /go/src/github.com/xwp/go-tide

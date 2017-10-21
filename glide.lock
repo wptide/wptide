@@ -1,0 +1,8 @@
+hash: 53907d8364e42109425007c2cbc760f801d16a720bf66161a8b8e206c63b83e1
+updated: 2017-10-21T13:09:23.947351037Z
+imports:
+- name: github.com/jcelliott/lumber
+  version: dd349441af25132d146d7095c6693a15431fc9b1
+- name: github.com/nanobox-io/golang-scribble
+  version: da3a159a462297745592fd615d4bcebec94b54c6
+testImports: []
