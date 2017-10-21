@@ -1,0 +1,3 @@
+package: github.com/xwp/go-tide
+import:
+- package: github.com/nanobox-io/golang-scribble
