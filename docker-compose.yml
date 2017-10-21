@@ -8,5 +8,5 @@ services:
             context: ./docker/sync-server
         volumes:
           - .:/go/src/github.com/xwp/go-tide
-          - ./bin:/go/bin
-        working_dir: /go/src/github.com/xwp/go-tide
+        working_dir: /go/bin
+        command: "sync-wp-repo"
