@@ -6,7 +6,5 @@ services:
     sync-server:
         build:
             context: ./docker/sync-server
-        volumes:
-          - .:/go/src/github.com/xwp/go-tide
         working_dir: /go/bin
         command: "sync-wp-repo"
