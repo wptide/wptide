@@ -33,7 +33,7 @@ func workerFetchFromRepo(plugins chan repo.Plugin, perPage int) {
 			}
 
 			totalPages = repoPlugins.Info.Pages
-			fmt.Printf(" [%d/%d] ", currentPage, totalPages)
+			fmt.Printf("\n processing page %d of %d\n", currentPage, totalPages)
 
 			for _, plugin := range repoPlugins.Plugins {
 				plugins <- plugin
