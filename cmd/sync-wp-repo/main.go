@@ -42,6 +42,10 @@ func workerFetchFromRepo(plugins chan repo.Plugin, perPage int) {
 			}
 		}
 
+		// Reset counts
+		currentPage = 0
+		totalPages = 1
+
 		fmt.Print("\nDone.\nWaiting for next sync.\n")
 
 		// Wait before we go again.
