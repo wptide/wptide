@@ -8,6 +8,7 @@ import (
 	"github.com/nanobox-io/golang-scribble"
 	"github.com/xwp/go-tide/queue"
 	"os"
+	"strconv"
 )
 
 // workerFetchFromRepo will periodically run through all the plugins in the WordPress.org repository
@@ -15,6 +16,7 @@ func workerFetchFromRepo(plugins chan repo.Plugin, perPage int) {
 
 	currentPage := 0
 	totalPages := 1
+	syncDelay, _ := strconv.Atoi(getEnv("GO_TIDE_DELAY", "10"))
 
 	fmt.Println("Getting plugin data from WordPress.org repo.")
 
@@ -43,7 +45,7 @@ func workerFetchFromRepo(plugins chan repo.Plugin, perPage int) {
 		fmt.Print("\nDone.\nWaiting for next sync.\n")
 
 		// Wait before we go again.
-		time.Sleep(time.Minute * 10)
+		time.Sleep(time.Minute * time.Duration(syncDelay))
 	}
 }
 
