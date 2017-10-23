@@ -14,18 +14,18 @@ import (
 // Key names are camel-case thought they appear lowercase in the API.
 // json.Unmarshal will deal with this appropriately.
 type Info struct {
-	Page    int
-	Pages   int
-	Results int
+	Page    int `json:"page"`
+	Pages   int `json:"pages"`
+	Results int `json:"results"`
 }
 
 // Plugin struct represents the plugin objects within the plugins array in the API response.
 type Plugin struct {
-	Name         string
-	Slug         string
-	DownloadLink string
-	Version      string
-	LastUpdated  string
+	Name         string `json:"name"`
+	Slug         string `json:"slug"`
+	DownloadLink string `json:"download_link"`
+	Version      string `json:"version"`
+	LastUpdated  string `json:"last_updated"`
 }
 
 // PluginsResponse struct represents the response from the API.

@@ -1,3 +1,7 @@
 package: github.com/xwp/go-tide
 import:
 - package: github.com/nanobox-io/golang-scribble
+- package: github.com/aws/aws-sdk-go
+  version: v1.12.15
+  subpackages:
+  - aws/...
