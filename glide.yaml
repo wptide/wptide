@@ -1,0 +1,10 @@
+package: github.com/xwp/go-tide
+import:
+- package: github.com/aws/aws-sdk-go
+  version: ^1.12.50
+  subpackages:
+  - aws
+  - aws/credentials
+  - aws/session
+  - service/sqs
+#- package: github.com/nanobox-io/golang-scribble

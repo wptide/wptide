@@ -1,0 +1,11 @@
+hash: 193b7224c8f6deb71c3b1b6c371f8209e3bf93d230627b552468366e442065bd
+updated: 2018-01-16T14:23:57.457325415+11:00
+imports:
+- name: github.com/aws/aws-sdk-go
+  version: fe3adbda9bc845e750e3e5767c0a14dff202b2cc
+  subpackages:
+  - aws
+  - aws/credentials
+  - aws/session
+  - service/sqs
+testImports: []
