@@ -25,8 +25,19 @@ TAG=wptide/lighthouse:${VERSION}
 LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 
 default:
-	@echo "Please supply one of:\n\tclean\n\tbuild\n\tpackage\n\tall"
-	@echo "Variables: EXECNAME, BINARY, GOOS, LOCAL, LOCALBIN, GO, GOBUILD, GOBUILDLOCAL, PACKAGEPATH, TAG"
+	@echo "Please supply one of:"
+	@echo "\tdep\t- Dependencies"
+	@echo "\tclean\t- Cleanup builds"
+	@echo "\tcert\t- Get root certificates for SSL/TSL"
+	@echo "\tbuild\t- Build binaries"
+	@echo "\tlocal\t- Build binaries to run locally"
+	@echo "\tpackage\t- Build the Docker image"
+	@echo "\ttest\t- Run test suite"
+	@echo "\tall\t- Do everything"
+
+dep:
+	@echo "Getting dependencies ..."
+	@glide install
 
 clean:
 	@echo "Cleaning up ..."
@@ -54,4 +65,4 @@ test:
 	@echo "Running tests ..."
 	@${GOTEST}
 
-all: clean cert build local package
+all: clean cert dep build local package
