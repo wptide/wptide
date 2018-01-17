@@ -1,4 +1,3 @@
-# @TODO: Perhaps move some of these to another Makefile.
 EXECNAME=lh-server
 BINARY=bin/${EXECNAME}
 GOOS=linux
@@ -10,15 +9,11 @@ GOBUILDLOCAL=${GO} build
 PACKAGEPATH=./cmd/lh-server/...
 TAG=0.0.1
 
-# @TODO: Add a <example>.properties Makefile to include additional variables.
-#        See: https://github.com/tpryan/whack_a_pod Sample.properties
-
 # Binary version.
 VERSION=0.0.1
 BUILD=`git rev-parse HEAD`
 
 # Setup -ldflags for go build.
-# Allows setting some global vars before compilation.
 LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 
 default:

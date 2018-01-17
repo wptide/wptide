@@ -7,9 +7,29 @@ import (
 	"github.com/xwp/go-tide/src/audit/info"
 	"github.com/xwp/go-tide/src/audit/lighthouse"
 	"github.com/xwp/go-tide/src/audit/tide"
+	"flag"
+	"fmt"
+)
+
+var (
+	Version string // Set during build.
+	Build   string // Set during build.
 )
 
 func main() {
+
+	// Is the -version flag being used?
+	bVersion := flag.Bool("version", false, "a bool")
+
+	// Parse all flags.
+	flag.Parse()
+
+	// @TODO: Code here.
+
+	// If -version is requested then echo the version details.
+	if *bVersion {
+		fmt.Printf("Version: %s\nBuild: %s\n", Version, Build)
+	}
 }
 
 // processMessage takes an SQS message and runs it through an audit process.
