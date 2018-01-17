@@ -5,7 +5,6 @@ import (
 
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
-	"golang.org/x/tools/go/gcimporter15/testdata"
 )
 
 func TestProcessor_Process(t *testing.T) {
@@ -18,7 +17,7 @@ func TestProcessor_Process(t *testing.T) {
 		p    Processor
 		args args
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

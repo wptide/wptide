@@ -6,6 +6,7 @@ LOCAL=local
 LOCALBIN=bin/${LOCAL}/${EXECNAME}
 GO=`which go`
 GOBUILD=CGO_ENABLED=0 GOOS=${GOOS} ${GO} build
+GOTEST=${GO} test -cover ./src/...
 GOBUILDLOCAL=${GO} build
 PACKAGEPATH=./cmd/lh-server/...
 CERTFILE=certs/cacert.pem
@@ -48,5 +49,9 @@ local:
 package: clean cert build
 	@echo "Building Docker image [${TAG}] ..."
 	@docker build -t ${TAG} --no-cache .
+
+test:
+	@echo "Running tests ..."
+	@${GOTEST}
 
 all: clean cert build local package
