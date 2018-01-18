@@ -18,9 +18,14 @@ import (
 var (
 	Version    string // Set during build.
 	Build      string // Set during build.
+
+	// Use the interface so that we can test.
 	TideClient tideApi.ClientInterface
+
+	// Number of concurrent audits.
 	bufferSize = 2
 
+	// Tide API configuration.
 	tideConfig = struct {
 		id           string
 		secret       string
@@ -31,6 +36,7 @@ var (
 		env.GetEnv("TIDE_API_AUTH_URL", ""),
 	}
 
+	// Lighthouse SQS configuration.
 	lhConfig = struct {
 		region string
 		key    string
@@ -57,9 +63,11 @@ func main() {
 		fmt.Printf("Version: %s\nBuild: %s\n", Version, Build)
 	}
 
+	// Prepare the Tide Client.
 	TideClient = &api.Client{}
 	TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
 
+	// Initiate a new Message provider.
 	provider := sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
 
 	// Create a buffer for the amount of concurrent audits.
@@ -68,7 +76,7 @@ func main() {
 	// Create a channel that receives messages from a queue.
 	cMessage := messageChannel(provider, buffer)
 
-	// Never ending polling.
+	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
 		// Message received from the queue.
@@ -109,7 +117,7 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-ch
 				}
 			}
 
-			fmt.Println("Polling...")
+			log.Println("Polling...")
 
 			// If message has been retrieved add it to the channel.
 			if msg != nil {
@@ -130,7 +138,8 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-ch
 // processMessage takes an SQS message and runs it through an audit process.
 func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer <-chan struct{}) {
 
-	fmt.Println("Processing...")
+	// @todo Provide better information.
+	log.Println("Processing...")
 
 	// An slice of processes that need to be performed on the message.
 	// A slice ensures that they happen in the correct order.
@@ -139,7 +148,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 		&tide.Processor{},
 	}
 
-	// Initialise an empty result.
+	// Initialise result with Tide client reference.
 	result := &audit.Result{
 		"client": &client,
 	}
