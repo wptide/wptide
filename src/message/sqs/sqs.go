@@ -11,11 +11,12 @@ import (
 	"errors"
 	"github.com/xwp/go-tide/src/message"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
 // SqsProvider represents an SQS queue.
 type SqsProvider struct {
-	session   *session.Session
+	session *session.Session
 	// Use sqsiface instead of sqs.SQS to benefit from the interface.
 	sqs       sqsiface.SQSAPI
 	QueueUrl  *string
@@ -77,6 +78,18 @@ func (mgr SqsProvider) GetNextMessage() (*message.Message, error) {
 	result, err := mgr.sqs.ReceiveMessage(messageInput)
 
 	if err != nil {
+		// If we get a critical AWS error, issue a new provider error.
+		if awsErr, ok := err.(awserr.Error); ok {
+
+			pErr := message.NewProviderError(awsErr.Message())
+			if awsErr.Message() != sqs.ErrCodeOverLimit {
+				pErr.Type = message.ErrCritcal
+			} else {
+				pErr.Type = message.ErrOverQuota
+			}
+
+			return nil, pErr
+		}
 		return nil, err
 	}
 
