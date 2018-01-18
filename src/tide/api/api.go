@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/xwp/go-tide/src/tide"
+	"errors"
 )
 
-type Client struct{
+type Client struct {
 	user *tide.Auth
 }
 
@@ -32,16 +33,14 @@ func (c *Client) Authenticate(clientId, clientSecret, authEndpoint string) error
 	defer rsp.Body.Close()
 
 	// Read the response into a bytes buffer.
-	body_byte, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return err
-	}
+	body_byte, _ := ioutil.ReadAll(rsp.Body)
 
 	// Attempt to unmarshal the JSON string into an Auth object.
 	var auth *tide.Auth
-	err = json.Unmarshal(body_byte, &auth)
-	if err != nil {
-		return err
+	json.Unmarshal(body_byte, &auth)
+
+	if rsp.StatusCode != http.StatusOK || auth == nil || auth.AccessToken == "" {
+		return errors.New("Could not authenticate user.")
 	}
 
 	c.user = auth
@@ -69,8 +68,12 @@ func (c Client) SendPayload(method, endpoint, data string) (string, error) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+
 	if err != nil {
 		return "", err
+	}
+	if ( resp.StatusCode < 200 || resp.StatusCode > 299 ) {
+		return "", errors.New("Unexpected status code.")
 	}
 	defer resp.Body.Close()
 
