@@ -3,8 +3,6 @@ package main
 import (
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
-	"github.com/xwp/go-tide/src/audit/ingest"
-	"github.com/xwp/go-tide/src/audit/info"
 	"github.com/xwp/go-tide/src/audit/lighthouse"
 	"github.com/xwp/go-tide/src/audit/tide"
 	"flag"
@@ -14,6 +12,7 @@ import (
 	"github.com/xwp/go-tide/src/message/sqs"
 	"time"
 	"log"
+	"github.com/xwp/go-tide/src/env"
 )
 
 var (
@@ -21,6 +20,28 @@ var (
 	Build      string // Set during build.
 	TideClient tideApi.ClientInterface
 	bufferSize = 2
+
+	tideConfig = struct {
+		id           string
+		secret       string
+		authEndpoint string
+	}{
+		env.GetEnv("TIDE_API_KEY", ""),
+		env.GetEnv("TIDE_API_SECRET", ""),
+		env.GetEnv("TIDE_API_AUTH_URL", ""),
+	}
+
+	lhConfig = struct {
+		region string
+		key    string
+		secret string
+		queue  string
+	}{
+		env.GetEnv("AWS_SQS_LH_REGION", ""),
+		env.GetEnv("AWS_SQS_LH_KEY", ""),
+		env.GetEnv("AWS_SQS_LH_SECRET", ""),
+		env.GetEnv("AWS_SQS_LH_QUEUE_NAME", ""),
+	}
 )
 
 func main() {
@@ -36,12 +57,10 @@ func main() {
 		fmt.Printf("Version: %s\nBuild: %s\n", Version, Build)
 	}
 
-	// @TODO: Tide API credentials.
 	TideClient = &api.Client{}
-	TideClient.Authenticate("", "", "")
+	TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
 
-	// @TODO: SQS credentials.
-	provider := sqs.NewSqsProvider("us-west-2", "", "", "")
+	provider := sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
 
 	// Create a buffer for the amount of concurrent audits.
 	buffer := make(chan struct{}, bufferSize)
@@ -84,7 +103,7 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-ch
 						log.Fatal(pErr)
 						break
 					case message.ErrOverQuota:
-						log.Println( pErr, "delaying for 60 seconds")
+						log.Println(pErr, "delaying for 60 seconds")
 						time.Sleep(time.Second * time.Duration(60))
 					}
 				}
@@ -116,8 +135,6 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// An slice of processes that need to be performed on the message.
 	// A slice ensures that they happen in the correct order.
 	processes := []audit.Processor{
-		&ingest.Processor{},
-		&info.Processor{},
 		&lighthouse.Processor{},
 		&tide.Processor{},
 	}

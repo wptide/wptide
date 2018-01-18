@@ -1,0 +1,19 @@
+version: '3.1'
+
+services:
+
+### Lighthouse Server ###########################################
+    lighthouse-server:
+        image: wptide/lighthouse
+        environment:
+            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
+            TIDE_API_HOST: ${TIDE_API_HOST}
+            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
+            TIDE_API_KEY: ${TIDE_API_KEY}
+            TIDE_API_SECRET: ${TIDE_API_SECRET}
+            TIDE_API_VERSION: ${TIDE_API_VERSION}
+            AWS_SQS_LH_VERSION: ${AWS_SQS_LH_VERSION}
+            AWS_SQS_LH_REGION: ${AWS_SQS_LH_REGION}
+            AWS_SQS_LH_KEY: ${AWS_SQS_LH_KEY}
+            AWS_SQS_LH_SECRET: ${AWS_SQS_LH_SECRET}
+            AWS_SQS_LH_QUEUE_NAME: ${AWS_SQS_LH_QUEUE_NAME}

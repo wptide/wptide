@@ -11,14 +11,15 @@ GOBUILDLOCAL=${GO} build
 PACKAGEPATH=./cmd/lh-server/...
 CERTFILE=certs/cacert.pem
 
-# @TODO: Add a <example>.properties Makefile to include additional variables.
-#        See: https://github.com/tpryan/whack_a_pod Sample.properties
+# Copy Sample.properties to Makefile.properties and update.
+include .env
 
 # Binary version.
 VERSION=0.0.1
 BUILD=`git rev-parse HEAD`
 
-TAG=wptide/lighthouse:${VERSION}
+DOCKERNAME=wptide/lighthouse
+TAG=${DOCKERNAME}:${VERSION}
 
 # Setup -ldflags for go build.
 # Allows setting some global vars before compilation.
@@ -60,6 +61,7 @@ local:
 package: clean cert build
 	@echo "Building Docker image [${TAG}] ..."
 	@docker build -t ${TAG} --no-cache .
+	@docker tag ${TAG} ${DOCKERNAME}:latest
 
 test:
 	@echo "Running tests ..."
