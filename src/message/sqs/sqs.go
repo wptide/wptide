@@ -87,10 +87,10 @@ func (mgr SqsProvider) GetNextMessage() (*message.Message, error) {
 			} else {
 				pErr.Type = message.ErrOverQuota
 			}
-
 			return nil, pErr
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
 	// Attempt to unmarshal the message body into the returnTask.

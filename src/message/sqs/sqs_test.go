@@ -10,6 +10,7 @@ import (
 	"github.com/xwp/go-tide/src/message"
 	"github.com/pkg/errors"
 	"encoding/json"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
 type mockSqs struct {
@@ -58,6 +59,24 @@ var (
 		QueueName: &emptyQueue,
 		QueueUrl:  &emptyQueueUrl,
 	}
+
+	// Provider to mock an over limit response.
+	limitQueueUrl string      = "http://sqsurl/limit.fifo"
+	limitProvider SqsProvider = SqsProvider{
+		session:   &session.Session{},
+		sqs:       &mockSqs{},
+		QueueName: &emptyQueue,
+		QueueUrl:  &limitQueueUrl,
+	}
+
+	// Provider to mock an over limit response.
+	errorQueueUrl string      = "http://sqsurl/error.fifo"
+	errorProvider SqsProvider = SqsProvider{
+		session:   &session.Session{},
+		sqs:       &mockSqs{},
+		QueueName: &emptyQueue,
+		QueueUrl:  &errorQueueUrl,
+	}
 )
 
 func (m mockSqs) DeleteMessage(in *sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error) {
@@ -74,22 +93,26 @@ func (m mockSqs) ReceiveMessage(in *sqs.ReceiveMessageInput) (*sqs.ReceiveMessag
 
 	var messages []*sqs.Message
 
-	if *in.QueueUrl != failQueueUrl {
-
-		if *in.QueueUrl != emptyQueueUrl {
-			fake := message.Message{
-				Title: "Success!",
-			}
-
-			bodyBytes, _ := json.Marshal(fake)
-			body := string(bodyBytes)
-			msg := &sqs.Message{
-				Body: &body,
-			}
-			messages = append(messages, msg)
+	switch *in.QueueUrl {
+	case failQueueUrl:
+		return nil, awserr.New("Provider Error", "Provider Error", errors.New("Provider Error"))
+	case errorQueueUrl:
+		return nil, errors.New("Other error")
+	case emptyQueueUrl:
+		// Do nothing here.
+	case limitQueueUrl:
+		return nil, awserr.New(sqs.ErrCodeOverLimit, sqs.ErrCodeOverLimit, errors.New(sqs.ErrCodeOverLimit))
+	default:
+		fake := message.Message{
+			Title: "Success!",
 		}
-	} else {
-		return nil, errors.New("Something went wrong.")
+
+		bodyBytes, _ := json.Marshal(fake)
+		body := string(bodyBytes)
+		msg := &sqs.Message{
+			Body: &body,
+		}
+		messages = append(messages, msg)
 	}
 
 	out := &sqs.ReceiveMessageOutput{
@@ -191,6 +214,18 @@ func TestSqsProvider_GetNextMessage(t *testing.T) {
 		{
 			name:    "Empty Message",
 			mgr:     emptyProvider,
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Provider Over Limits",
+			mgr:     limitProvider,
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "Other Error",
+			mgr:     errorProvider,
 			want:    nil,
 			wantErr: true,
 		},
