@@ -13,6 +13,7 @@ import (
 	"time"
 	"log"
 	"github.com/xwp/go-tide/src/env"
+	"strconv"
 )
 
 var (
@@ -23,7 +24,7 @@ var (
 	TideClient tideApi.ClientInterface
 
 	// Number of concurrent audits.
-	bufferSize = 2
+	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
 
 	// Tide API configuration.
 	tideConfig = struct {
@@ -158,6 +159,9 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	for _, proc := range processes {
 		proc.Process(*msg, result)
 	}
+
+	// Remove message on success.
+	// @todo Add logic to look for a successful audit.
 
 	// Release item from buffer so that next item can be polled.
 	<-buffer
