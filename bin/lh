@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+  lighthouse --help
+else
+  lighthouse --quiet --chrome-flags="--headless --disable-gpu --no-sandbox" --output=json --output-path=stdout $@
+fi

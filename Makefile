@@ -9,7 +9,6 @@ GOBUILD=CGO_ENABLED=0 GOOS=${GOOS} ${GO} build
 GOTEST=${GO} test -cover ./src/...
 GOBUILDLOCAL=${GO} build
 PACKAGEPATH=./cmd/lh-server/...
-CERTFILE=certs/cacert.pem
 
 # Copy Sample.properties to Makefile.properties and update.
 include .env
@@ -30,7 +29,6 @@ default:
 	@echo "Please supply one of:"
 	@echo "\tdep\t- Dependencies"
 	@echo "\tclean\t- Cleanup builds"
-	@echo "\tcert\t- Get root certificates for SSL/TSL"
 	@echo "\tbuild\t- Build binaries"
 	@echo "\tlocal\t- Build binaries to run locally"
 	@echo "\tpackage\t- Build the Docker image"
@@ -47,12 +45,6 @@ clean:
 	@echo "Cleaning up ..."
 	@if [ -f ${BINARY} ]; then rm ${BINARY} ; fi
 	@if [ -f ${LOCALBIN} ]; then rm ${LOCALBIN} ; fi
-	@if [ -f ${CERTFILE} ]; then rm ${CERTFILE} ; fi
-
-# Get root certs so that we can use SSL on our image.
-cert:
-	@echo "Getting root certs for SSL/TLS ..."
-	@curl --output certs/cacert.pem https://curl.haxx.se/ca/cacert.pem -s
 
 # Build the binary.
 build:
@@ -65,7 +57,7 @@ local:
 	@${GOBUILDLOCAL} ${LDFLAGS} -o ${LOCALBIN} ${PACKAGEPATH}
 
 # Package and build the Docker image.
-package: clean cert build
+package: clean build
 	@echo "Building Docker image [${TAG}] ..."
 	@docker build -t ${TAG} --no-cache .
 	@docker tag ${TAG} ${DOCKERNAME}:latest
@@ -83,4 +75,6 @@ test:
 	@${GOTEST}
 
 # Do it all!
-all: clean cert dep build local up
+all: clean dep build local up
+
+echo 'export GOPATH=$HOME/go' >> ~/.bashrc

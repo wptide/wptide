@@ -1,35 +1,38 @@
-FROM alpine
+FROM alpine:3.7
+
 MAINTAINER XWP <engage@xwp.co>
 
-RUN apk add --no-cache \
-	nodejs \
-	nodejs-npm \
-	grep \
-    udev \
-    ttf-freefont \
-    chromium
+# Disable Lighthouse error reporting.
+ENV CI true
 
-# Download latest Lighthouse from npm.
-# cache bust so we always get the latest version of LH when building the image.
-ARG CACHEBUST=1
-RUN npm i lighthouse -g
+# Copy the shell script.
+COPY bin/lh /usr/bin/lh
 
-RUN apk del nodejs-npm
-
-
-#VOLUME /home/chrome/reports
-#WORKDIR /home/chrome/reports
-
-# Disable Lighthouse error reporting to prevent prompt.
-ENV CI=true
-
-EXPOSE 8080
+# Install software.
+RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    && apk add --no-cache --virtual .build-deps \
+        nodejs-npm \
+    && apk add --no-cache --update --virtual .persistent-deps \
+        chromium@community \
+        grep \
+        nodejs \
+        ttf-freefont \
+        udev \
+    && npm i lighthouse -g \
+    && runDeps="$( \
+        scanelf --needed --nobanner --recursive /usr/local \
+            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+            | sort -u \
+            | xargs -r apk info --installed \
+            | sort -u \
+    )" \
+    && apk add --virtual .run-deps $runDeps \
+    && apk del .build-deps \
+    && rm -rf /var/lib/apk/lists/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* /var/cache/apk/* \
+    && chmod +x /usr/bin/lh
 
 # Add the executable.
 ADD bin/lh-server /
-
-# Add certs because we are connecting to some services over SSL/TSL.
-ADD certs/cacert.pem /etc/ssl/certs/
 
 # Run the executable.
 CMD ["/lh-server"]
