@@ -76,5 +76,3 @@ test:
 
 # Do it all!
 all: clean dep build local up
-
-echo 'export GOPATH=$HOME/go' >> ~/.bashrc
