@@ -8,6 +8,10 @@ import (
 
 type Processor struct{}
 
+func (p Processor) Kind() string {
+	return "tide"
+}
+
 // Process takes *result and sends relevant results to the Tide API.
 func (p Processor) Process(msg message.Message, result *audit.Result) {
 

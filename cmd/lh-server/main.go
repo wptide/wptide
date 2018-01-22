@@ -17,8 +17,8 @@ import (
 )
 
 var (
-	Version    string // Set during build.
-	Build      string // Set during build.
+	Version string // Set during build.
+	Build   string // Set during build.
 
 	// Use the interface so that we can test.
 	TideClient tideApi.ClientInterface
@@ -151,21 +151,28 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 		&tide.Processor{},
 	}
 
+	var errors []error
+
 	// Initialise result with Tide client reference.
 	result := &audit.Result{
 		"client": &client,
 	}
 
+	// Pointer that we can use directly.
+	r := *result
+
 	// Run through each processor and update the result.
 	// Note: The result is a pointer so we're passing by reference.
 	for _, proc := range processes {
 		proc.Process(*msg, result)
+		kind := proc.Kind()
+		if r[kind+"Error"] != nil {
+			errors = append(errors, r[kind+"Error"].(error))
+		}
 	}
 
 	// Remove message on success.
-	// @todo Check each process for errors. Only lighthouseError is checked so far.
-	r := *result
-	if r["lighthouseError"] == nil {
+	if len(errors) == 0 {
 		messageProvider.DeleteMessage(msg.ExternalRef)
 	}
 

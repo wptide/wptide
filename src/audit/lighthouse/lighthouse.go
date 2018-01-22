@@ -31,6 +31,10 @@ type ReportCategory struct {
 
 type Processor struct{}
 
+func (p Processor) Kind() string {
+	return "lighthouse"
+}
+
 // Process will run a lighthouse audit against a theme and to *results.
 // Note: It checks *result first to see if the message has been ingested and if its processing a theme.
 func (p Processor) Process(msg message.Message, result *audit.Result) {

@@ -8,4 +8,5 @@ type Result map[string]interface{}
 // Processor is an interface for processing a message and producing results.
 type Processor interface{
 	Process(msg message.Message, result *Result)
+	Kind() string
 }

@@ -1,13 +1,13 @@
 package lighthouse
 
 import (
+	"fmt"
+	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
-	"os"
-	"os/exec"
-	"fmt"
 )
 
 func mockExecCommand(command string, args ...string) *exec.Cmd {
@@ -69,9 +69,9 @@ func TestProcessor_Process(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.p.Process(tt.args.msg, tt.args.result)
 			r := *tt.args.result
-			if (r["lighthouseError"] != nil && ! tt.wantErr) ||
+			if (r["lighthouseError"] != nil && !tt.wantErr) ||
 				(r["lighthouseError"] == nil && tt.wantErr) {
-					t.Errorf("lighthouse.Process: Error %v, WantErr %v", r["lighthouseError"], tt.wantErr)
+				t.Errorf("lighthouse.Process: Error %v, WantErr %v", r["lighthouseError"], tt.wantErr)
 			}
 		})
 	}
@@ -161,4 +161,13 @@ func exampleReport() string {
     }
   ]
 }`
+}
+
+func TestProcessor_Kind(t *testing.T) {
+	t.Run("Process Kind", func(t *testing.T) {
+		p := Processor{}
+		if got := p.Kind(); got != "lighthouse" {
+			t.Errorf("Processor.Kind() = %v, Impossible, this should be lighthouse.", got)
+		}
+	})
 }
