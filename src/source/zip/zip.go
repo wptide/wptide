@@ -121,22 +121,28 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 		if err != nil {
 			return filenames, checksums, err
 		}
-		defer fileReader.Close()
+
 		h := sha256.New()
 		if _, err := io.Copy(h, fileReader); err != nil {
-			return filenames, checksums, err
+			fileReader.Close()
+			return nil, nil, err
 		}
 		checksums = append(checksums, fmt.Sprintf("%x", h.Sum(nil)))
-		
+
 		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
-			return filenames, checksums, err
+			fileReader.Close()
+			return nil, nil, err
 		}
-		defer targetFile.Close()
 
 		if _, err := io.Copy(targetFile, fileReader); err != nil {
-			return filenames, checksums, err
+			fileReader.Close()
+			targetFile.Close()
+			return nil, nil, err
 		}
+
+		fileReader.Close()
+		targetFile.Close()
 	}
 
 	return filenames, checksums, err
