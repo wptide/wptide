@@ -127,13 +127,7 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 			return filenames, checksums, err
 		}
 		checksums = append(checksums, fmt.Sprintf("%x", h.Sum(nil)))
-
-		fileReader, err = file.Open()
-		if err != nil {
-			return filenames, checksums, err
-		}
-		defer fileReader.Close()
-
+		
 		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
 			return filenames, checksums, err
