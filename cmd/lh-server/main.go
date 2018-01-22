@@ -49,6 +49,8 @@ var (
 		env.GetEnv("AWS_SQS_LH_SECRET", ""),
 		env.GetEnv("AWS_SQS_LH_QUEUE_NAME", ""),
 	}
+
+	messageProvider message.MessageProvider
 )
 
 func main() {
@@ -69,13 +71,13 @@ func main() {
 	TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
 
 	// Initiate a new Message provider.
-	provider := sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
+	messageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
 
 	// Create a buffer for the amount of concurrent audits.
 	buffer := make(chan struct{}, bufferSize)
 
 	// Create a channel that receives messages from a queue.
-	cMessage := messageChannel(provider, buffer)
+	cMessage := messageChannel(messageProvider, buffer)
 
 	// Poll the message channel until the program is forcefully exited.
 	for {
@@ -161,7 +163,11 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	}
 
 	// Remove message on success.
-	// @todo Add logic to look for a successful audit.
+	// @todo Check each process for errors. Only lighthouseError is checked so far.
+	r := *result
+	if r["lighthouseError"] == nil {
+		messageProvider.DeleteMessage(msg.ExternalRef)
+	}
 
 	// Release item from buffer so that next item can be polled.
 	<-buffer
