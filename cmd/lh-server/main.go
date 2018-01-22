@@ -14,6 +14,7 @@ import (
 	"log"
 	"github.com/xwp/go-tide/src/env"
 	"strconv"
+	"github.com/xwp/go-tide/src/audit/ingest"
 )
 
 var (
@@ -68,7 +69,10 @@ func main() {
 
 	// Prepare the Tide Client.
 	TideClient = &api.Client{}
-	TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
+	err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
+	if err != nil {
+		log.Fatal("Tide API Error:", err)
+	}
 
 	// Initiate a new Message provider.
 	messageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
@@ -147,6 +151,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// An slice of processes that need to be performed on the message.
 	// A slice ensures that they happen in the correct order.
 	processes := []audit.Processor{
+		&ingest.Processor{},
 		&lighthouse.Processor{},
 		&tide.Processor{},
 	}
