@@ -8,6 +8,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/xwp/go-tide/src/source/zip"
+	"errors"
 )
 
 type Processor struct{
@@ -33,7 +35,19 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		return
 	}
 
-	srcMgr := source.NewSourceManager(msg.SourceURL)
+	var srcMgr source.Source
+
+	switch source.GetKind(msg.SourceURL) {
+	case "zip":
+		srcMgr = zip.NewZip(msg.SourceURL)
+	}
+
+	// Without a Source manager we can't continue.
+	if srcMgr == nil {
+		r["ingest"] = nil
+		r["ingestError"] = errors.New("could not handle source url")
+		return
+	}
 
 	hasher := sha256.New()
 	hasher.Write([]byte(msg.SourceURL))
