@@ -42,9 +42,7 @@ func (m *Zip) PrepareFiles(dest string) error {
 	}
 
 	// Calculate checksum - uses same technique as Tide Audit Server.
-	sort.Strings(checksums)
-	jsonChecksums, _ := json.Marshal(checksums)
-	m.checksum = fmt.Sprintf("%x", sha256.Sum256(jsonChecksums))
+	m.checksum = combinedChecksum(checksums)
 
 	return nil
 }
@@ -146,4 +144,10 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 	}
 
 	return filenames, checksums, err
+}
+
+func combinedChecksum(sums []string)string {
+	sort.Strings(sums)
+	jsonChecksums, _ := json.Marshal(sums)
+	return fmt.Sprintf("%x", sha256.Sum256(jsonChecksums))
 }
