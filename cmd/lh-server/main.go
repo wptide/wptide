@@ -27,6 +27,9 @@ var (
 	// Number of concurrent audits.
 	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
 
+	// Temp folder for downloaded files.
+	tempFolder = env.GetEnv("LH_TEMP_FOLDER", "/tmp")
+
 	// Tide API configuration.
 	tideConfig = struct {
 		id           string
@@ -158,9 +161,16 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 
 	var errors []error
 
-	// Initialise result with Tide client reference.
+	// Initialise result with:
+	// - Tide client reference,
+	// - Temp folder for downloaded/extracted files,
+	// - Audits to run
 	result := &audit.Result{
 		"client": &client,
+		"tempFolder": tempFolder,
+		"audits": []string{
+			"lighthouse",
+		},
 	}
 
 	// Pointer that we can use directly.

@@ -10,10 +10,16 @@ import (
 	"encoding/json"
 	"github.com/xwp/go-tide/src/source/zip"
 	"errors"
+	"github.com/xwp/go-tide/src/tide"
+	"fmt"
 )
 
-type Processor struct{
-	Dest string `json:"dest"`
+var (
+	srcMgr source.Source
+)
+
+type Processor struct {
+	Dest  string   `json:"dest"`
 	Files []string `json:"files"`
 }
 
@@ -27,19 +33,49 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	// Cannot perform indexing on the *result directly, so assigning pointer to a local variable.
 	r := *result
 
+	// Expected audits.
+	var availableResults int
+	expectedAudits, ok := r["audits"].([]string)
+
+	if !ok {
+		expectedAudits = []string{}
+		r["audits"] = expectedAudits
+	}
+
 	// Only ingest if we do not know if this is a theme or we don't have a specific
 	// route given. This will have to be calculated from checksum if not.
 	isCollection := util.IsCollectionEndpoint(msg.ResponseAPIEndpoint)
 
 	if ! isCollection {
-		return
+
+		//audits := r["audits"].([]string)
+		client := r["client"].(*tide.ClientInterface)
+		response, _ := p.getResults(client, msg.ResponseAPIEndpoint)
+		var results tide.Item
+		err := json.Unmarshal([]byte(response), &results)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for _, a := range expectedAudits {
+			if _, ok := results.Results[a]; ok {
+				availableResults += 1
+			}
+		}
+
+		if availableResults == len(expectedAudits) {
+			r["ingest"], _ = json.Marshal(p)
+			r["ingestError"] = errors.New("no new audits to run")
+			return
+		}
 	}
 
-	var srcMgr source.Source
-
-	switch source.GetKind(msg.SourceURL) {
-	case "zip":
-		srcMgr = zip.NewZip(msg.SourceURL)
+	// If srcMgr is not set at package level, then set it.
+	if srcMgr == nil {
+		switch source.GetKind(msg.SourceURL) {
+		case "zip":
+			srcMgr = zip.NewZip(msg.SourceURL)
+		}
 	}
 
 	// Without a Source manager we can't continue.
@@ -51,7 +87,16 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 
 	hasher := sha256.New()
 	hasher.Write([]byte(msg.SourceURL))
-	p.Dest = "/tmp/lh-" + base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+
+	tempFolder, ok := r["tempFolder"].(string)
+
+	if !ok {
+		r["ingest"] = nil
+		r["ingestError"] = errors.New("can't extract without a `temptFolder`")
+		return
+	}
+
+	p.Dest = tempFolder + "/lh-" + base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 
 	err := srcMgr.PrepareFiles(p.Dest)
 	if err != nil {
@@ -59,4 +104,9 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	}
 
 	r["ingest"], _ = json.Marshal(p)
+}
+
+func (p Processor) getResults(client *tide.ClientInterface, endpoint string) (string, error) {
+	c := *client
+	return c.SendPayload("GET", endpoint, "")
 }
