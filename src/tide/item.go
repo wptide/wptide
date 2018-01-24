@@ -40,14 +40,11 @@ type AuditResult struct {
 		Type       string `json:"type,omitempty"`
 		Key        string `json:"key,omitempty"`
 		BucketName string `json:"bucket_name,omitempty"`
-		PhpcsResults
-		LighthouseResults
+		*PhpcsResults
+		*LighthouseResults
 	} `json:"details,omitempty"`
-	Summary struct {
-		PhpcsSummary
-		LighthouseSummary
-	} `json:"summary,omitempty"`
-	CompatibleVersions []string `json:"compatible_versions,omitempty"`
+	Summary            *AuditSummary `json:"summary,omitempty"`
+	CompatibleVersions []string     `json:"compatible_versions,omitempty"`
 }
 
 type PhpcsResults struct {
@@ -69,6 +66,11 @@ type PhpcsResults struct {
 	} `json:"files,omitempty"`
 }
 
+type AuditSummary struct {
+	*PhpcsSummary
+	*LighthouseSummary
+}
+
 type PhpcsSummary struct {
 	Files map[string]struct {
 		Errors   int `json:"errors"`
@@ -80,7 +82,7 @@ type PhpcsSummary struct {
 }
 
 // @todo Define this later
-type LighthouseResults interface{}
+type LighthouseResults struct{}
 
 type LighthouseSummary struct {
 	ReportCategories []LighthouseCategory `json:"reportCategories,omitempty"`

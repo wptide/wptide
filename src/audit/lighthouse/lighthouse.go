@@ -8,26 +8,13 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"errors"
+	"github.com/xwp/go-tide/src/tide"
 )
 
 var (
 	// Using exec.Command as a variable so that we can mock it in tests.
 	execCommand = exec.Command
 )
-
-// Report contains a truncated version of the full report.
-type Report struct {
-	ReportCategories []ReportCategory `json:"reportCategories"`
-}
-
-// ReportCategory contains the results for each category without the audits.
-type ReportCategory struct {
-	Name        string  `json:"name"`
-	Weight      float32 `json:"weight"`
-	Description string  `json:"description"`
-	Id          string  `json:"id"`
-	Score       float32 `json:"score"`
-}
 
 type Processor struct{}
 
@@ -47,7 +34,7 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 		return
 	}
 
-	var results *Report
+	var results *tide.LighthouseSummary
 
 	// Note: This assumes the shell script `lh` is in $PATH and contains the following command:
 	// `lighthouse --quiet --chrome-flags="--headless --disable-gpu --no-sandbox" --output=json --output-path=stdout $@`
@@ -76,7 +63,7 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	errCheck(err, result)
 
 	if len(errorBytes) > 0 {
-		r["lighthouse"] = results
+		r["lighthouse"] = nil
 		r["lighthouseError"] = errors.New("lighthouse command failed: " + string(errorBytes))
 		return
 	}
@@ -89,7 +76,16 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	err = json.Unmarshal(resultBytes, &results)
 	errCheck(err, result)
 
-	r["lighthouse"] = results
+	// @todo Write `resultBytes` to S3.
+
+	// @todo Add full report after completing S3 component.
+	auditResult := &tide.AuditResult{}
+	auditResult.Summary = &tide.AuditSummary{
+		LighthouseSummary: results,
+	}
+	test, _ := json.Marshal(auditResult)
+	fmt.Println(string(test))
+	r["lighthouse"] = auditResult
 }
 
 func errCheck(err error, result *audit.Result) {

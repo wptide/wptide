@@ -15,17 +15,14 @@ type MockClient struct{}
 
 var (
 	TideClient tide.ClientInterface
-	mockItems  = map[string]*tide.Item{
+
+	mockItems = map[string]*tide.Item{
 		"27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a": &tide.Item{},
 		"39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e": &tide.Item{
 			Results: map[string]tide.AuditResult{
 				"lighthouse": tide.AuditResult{
-					Summary: struct {
-						tide.PhpcsSummary
-						tide.LighthouseSummary
-					}{
-						tide.PhpcsSummary{},
-						tide.LighthouseSummary{
+					Summary: &tide.AuditSummary{
+						LighthouseSummary: &tide.LighthouseSummary{
 							[]tide.LighthouseCategory{
 								tide.LighthouseCategory{
 									Name:        "Performance",
@@ -100,7 +97,10 @@ type mockSourceManager struct {
 	files    []string
 }
 
-func (m mockSourceManager) PrepareFiles(dest string) error {
+func (m *mockSourceManager) PrepareFiles(dest string) error {
+	if strings.Split(dest, "/")[1] == "collection" {
+		m.checksum = "39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e"
+	}
 	return nil
 }
 
@@ -130,7 +130,24 @@ func TestProcessor_Process(t *testing.T) {
 		"audits": []string{
 			"lighthouse",
 		},
-		"tempFolder": "/tmp/",
+		"tempFolder": "/tmp",
+	}
+
+	initialResultNoTemp := &audit.Result{
+		"client": &TideClient,
+		"audits": []string{
+			"lighthouse",
+		},
+	}
+
+	initialResultNoAudits := &audit.Result{
+		"client":     &TideClient,
+		"tempFolder": "/tmp",
+	}
+
+	initialResultCollectionResults := &audit.Result{
+		"client":     &TideClient,
+		"tempFolder": "/collection",
 	}
 
 	type args struct {
@@ -153,6 +170,19 @@ func TestProcessor_Process(t *testing.T) {
 					SourceURL:           "http://example/collection.zip",
 				},
 				initialResult,
+			},
+			false,
+			true,
+		},
+		{
+			"Collection Endpoint - With Results",
+			&Processor{},
+			args{
+				message.Message{
+					ResponseAPIEndpoint: "http://example/api/tide/v1/audit",
+					SourceURL:           "http://example/collection.zip",
+				},
+				initialResultCollectionResults,
 			},
 			false,
 			true,
@@ -188,7 +218,17 @@ func TestProcessor_Process(t *testing.T) {
 			&Processor{},
 			args{
 				message.Message{},
-				&audit.Result{},
+				initialResultNoTemp,
+			},
+			true,
+			true,
+		},
+		{
+			"No Defined Audits",
+			&Processor{},
+			args{
+				message.Message{},
+				initialResultNoAudits,
 			},
 			true,
 			true,

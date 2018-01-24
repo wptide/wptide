@@ -47,11 +47,11 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	// route given. This will have to be calculated from checksum if not.
 	isCollection := util.IsCollectionEndpoint(msg.ResponseAPIEndpoint)
 
+	// Get the Tide API client. We will use it for collections and specific routes.
+	client := r["client"].(*tide.ClientInterface)
+
 	// If its not a collection we need to attempt to get results from Tide API.
 	if ! isCollection {
-
-		// Get the client.
-		client := r["client"].(*tide.ClientInterface)
 
 		// Fetch results from Tide API.
 		response, _ := p.getResults(client, msg.ResponseAPIEndpoint)
@@ -120,8 +120,24 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	}
 
 	// Attach calculated checksum to the results.
-	r["checksum"] = srcMgr.GetChecksum()
+	checksum := srcMgr.GetChecksum()
+	r["checksum"] = checksum
+
+	// Attach file paths.
 	r["files"] = srcMgr.GetFiles()
+
+	// If collection route, now that we have the checksum its worth checking the API for existing results.
+	if isCollection && checksum != "" {
+		// Fetch results from Tide API.
+		response, _ := p.getResults(client, msg.ResponseAPIEndpoint+"/"+checksum)
+
+		// Attempt to unmarshal the results.
+		var results tide.Item
+		err := json.Unmarshal([]byte(response), &results)
+		if err == nil {
+			r["tideItem"], _ = json.Marshal(results)
+		}
+	}
 
 	r["ingest"], _ = json.Marshal(p)
 }

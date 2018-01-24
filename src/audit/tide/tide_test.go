@@ -25,3 +25,12 @@ func TestProcessor_Process(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessor_Kind(t *testing.T) {
+	t.Run("Process Kind", func(t *testing.T) {
+		p := Processor{}
+		if got := p.Kind(); got != "tide" {
+			t.Errorf("Processor.Kind() = %v, Impossible, this should be tide.", got)
+		}
+	})
+}
