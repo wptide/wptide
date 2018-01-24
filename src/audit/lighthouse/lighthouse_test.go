@@ -25,7 +25,11 @@ func TestProcessor_Process(t *testing.T) {
 	// Remember to set it back after the test.
 	defer func() { execCommand = exec.Command }()
 
-	result := &audit.Result{}
+	result := &audit.Result{
+		"audits": []string{"lighthouse"},
+	}
+
+	noAuditResult := &audit.Result{}
 
 	type args struct {
 		msg    message.Message
@@ -63,6 +67,15 @@ func TestProcessor_Process(t *testing.T) {
 				result: result,
 			},
 			wantErr: true,
+		},
+		{
+			name: "Don't Run Lighthouse",
+			p: &Processor{},
+			args: args{
+				msg:    message.Message{},
+				result: noAuditResult,
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {

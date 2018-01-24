@@ -41,6 +41,12 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 
 	// Cannot perform indexing on the *result directly, so assigning pointer to a local variable.
 	r := *result
+
+	// Check if lighthouse is supposed to run or exit.
+	if ! audit.CanRunAudit(p, result) {
+		return
+	}
+
 	var results *Report
 
 	// Note: This assumes the shell script `lh` is in $PATH and contains the following command:
