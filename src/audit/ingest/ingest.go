@@ -32,12 +32,14 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	// Cannot perform indexing on the *result directly, so assigning pointer to a local variable.
 	r := *result
 
-	// Expected audits.
+	// Expected audits that need to be run. E.g. lighthouse.
 	var availableResults int
 	expectedAudits, ok := r["audits"].([]string)
 
+	// If no audits are passed then set expectedAudits to nil.
+	// It will flow still flow through remaining processes if there is other work to do.
 	if !ok {
-		expectedAudits = []string{}
+		expectedAudits = nil
 		r["audits"] = expectedAudits
 	}
 
@@ -45,11 +47,16 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	// route given. This will have to be calculated from checksum if not.
 	isCollection := util.IsCollectionEndpoint(msg.ResponseAPIEndpoint)
 
+	// If its not a collection we need to attempt to get results from Tide API.
 	if ! isCollection {
 
-		//audits := r["audits"].([]string)
+		// Get the client.
 		client := r["client"].(*tide.ClientInterface)
+
+		// Fetch results from Tide API.
 		response, _ := p.getResults(client, msg.ResponseAPIEndpoint)
+
+		// Attempt to unmarshal the results.
 		var results tide.Item
 		err := json.Unmarshal([]byte(response), &results)
 		if err != nil {
@@ -64,6 +71,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		// Attach checksum to the result.
 		r["checksum"] = results.Checksum
 
+		// See if results exist for the expectedAudits to run.
 		for _, a := range expectedAudits {
 			if _, ok := results.Results[a]; ok {
 				availableResults += 1
