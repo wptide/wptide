@@ -1,6 +1,9 @@
 package zip
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func Test_combinedChecksum(t *testing.T) {
 	type args struct {
@@ -41,4 +44,38 @@ func Test_combinedChecksum(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestZip_GetChecksum(t *testing.T) {
+
+	checksum := "5a0c0a95d189c266ca1ed43767dd98f3fb513ce3434e2b08f34828ac11e79a94"
+
+	// Should be impossible to fail.
+	t.Run("Get Checksum", func(t *testing.T) {
+		m := Zip{
+			checksum: checksum,
+		}
+		if got := m.GetChecksum(); got != checksum {
+			t.Errorf("Zip.GetChecksum() = %v, want %v", got, checksum)
+		}
+	})
+}
+
+func TestZip_GetFiles(t *testing.T) {
+
+	files := []string{
+		"file1.txt",
+		"file2.txt",
+		"file3.txt",
+	}
+
+	// Should be impossible to fail.
+	t.Run("Get Files", func(t *testing.T) {
+		m := Zip{
+			files: files,
+		}
+		if got := m.GetFiles(); !reflect.DeepEqual(got, files) {
+			t.Errorf("Zip.GetFiles() = %v, want %v", got, files)
+		}
+	})
 }

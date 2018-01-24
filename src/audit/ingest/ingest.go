@@ -11,7 +11,6 @@ import (
 	"github.com/xwp/go-tide/src/source/zip"
 	"errors"
 	"github.com/xwp/go-tide/src/tide"
-	"fmt"
 )
 
 var (
@@ -54,8 +53,16 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		var results tide.Item
 		err := json.Unmarshal([]byte(response), &results)
 		if err != nil {
-			fmt.Println(err)
+			r["ingest"], _ = json.Marshal(p)
+			r["ingestError"] = err
+			return
 		}
+
+		// Attach existing audit item to the result.
+		r["tideItem"], _ = json.Marshal(results)
+
+		// Attach checksum to the result.
+		r["checksum"] = results.Checksum
 
 		for _, a := range expectedAudits {
 			if _, ok := results.Results[a]; ok {
@@ -63,7 +70,8 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 			}
 		}
 
-		if availableResults == len(expectedAudits) {
+		// If we have results for all the audits there is nothing to do, unless its forced.
+		if availableResults == len(expectedAudits) && ! msg.Force {
 			r["ingest"], _ = json.Marshal(p)
 			r["ingestError"] = errors.New("no new audits to run")
 			return
@@ -102,6 +110,10 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	if err != nil {
 		r["ingestError"] = err
 	}
+
+	// Attach calculated checksum to the results.
+	r["checksum"] = srcMgr.GetChecksum()
+	r["files"] = srcMgr.GetFiles()
 
 	r["ingest"], _ = json.Marshal(p)
 }

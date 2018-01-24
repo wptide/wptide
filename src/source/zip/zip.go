@@ -14,9 +14,9 @@ import (
 )
 
 type Zip struct {
-	url   string
-	dest  string
-	files []string
+	url      string
+	dest     string
+	files    []string
 	checksum string
 }
 
@@ -28,16 +28,14 @@ func (m *Zip) PrepareFiles(dest string) error {
 		os.Mkdir(m.dest, os.ModePerm)
 	}
 
-	err := downloadFile(m.url, m.dest + "/source.zip")
-	if err !=nil {
-		fmt.Println(err)
+	err := downloadFile(m.url, m.dest+"/source.zip")
+	if err != nil {
 		return err
 	}
 
 	var checksums []string
 	m.files, checksums, err = unzip(m.dest+"/source.zip", m.dest+"/unzipped")
-	if err !=nil {
-		fmt.Println(err)
+	if err != nil {
 		return err
 	}
 
@@ -45,6 +43,14 @@ func (m *Zip) PrepareFiles(dest string) error {
 	m.checksum = combinedChecksum(checksums)
 
 	return nil
+}
+
+func (m Zip) GetChecksum() string {
+	return m.checksum
+}
+
+func (m Zip) GetFiles() []string {
+	return m.files
 }
 
 func NewZip(url string) *Zip {
@@ -146,7 +152,7 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 	return filenames, checksums, err
 }
 
-func combinedChecksum(sums []string)string {
+func combinedChecksum(sums []string) string {
 	sort.Strings(sums)
 	jsonChecksums, _ := json.Marshal(sums)
 	return fmt.Sprintf("%x", sha256.Sum256(jsonChecksums))

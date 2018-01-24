@@ -6,6 +6,8 @@ import (
 
 type Source interface {
 	PrepareFiles(dest string) error
+	GetChecksum() string
+	GetFiles() []string
 }
 
 func GetKind(url string) string {
