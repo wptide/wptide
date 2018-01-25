@@ -6,7 +6,7 @@ LOCAL=local
 LOCALBIN=bin/${LOCAL}/${EXECNAME}
 GO=`which go`
 GOBUILD=CGO_ENABLED=0 GOOS=${GOOS} ${GO} build
-GOTEST=${GO} test -cover ./src/...
+GOTEST=${GO} list -f '{{if len .TestGoFiles}}"go test -cover {{.ImportPath}}"{{end}}' ./... | xargs -L 1 sh -c
 GOBUILDLOCAL=${GO} build
 PACKAGEPATH=./cmd/lh-server/...
 
