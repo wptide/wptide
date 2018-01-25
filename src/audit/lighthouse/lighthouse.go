@@ -83,8 +83,7 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	auditResult.Summary = &tide.AuditSummary{
 		LighthouseSummary: results,
 	}
-	test, _ := json.Marshal(auditResult)
-	fmt.Println(string(test))
+
 	r["lighthouse"] = auditResult
 }
 

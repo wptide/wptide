@@ -280,7 +280,7 @@ func TestProcessor_Process(t *testing.T) {
 			}
 
 			tt.p.Process(tt.args.msg, tt.args.result)
-			//fmt.Println(tt.args.result)
+
 			r := *tt.args.result
 			if r["ingestError"] != nil && ! tt.wantErr {
 				t.Errorf("Process() error = %v, wantErr %v", r["ingestError"], tt.wantErr)

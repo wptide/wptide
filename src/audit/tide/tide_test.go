@@ -6,14 +6,17 @@ import (
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
 	"github.com/xwp/go-tide/src/tide"
-	"fmt"
+	"github.com/pkg/errors"
 )
 
 var (
 	TideClient tide.ClientInterface
+	FailClient tide.ClientInterface
 )
 
-type MockClient struct{}
+type MockClient struct {
+	apiError bool
+}
 
 func (m MockClient) Authenticate(clientId, clientSecret, authEndpoint string) error {
 	return nil
@@ -21,8 +24,9 @@ func (m MockClient) Authenticate(clientId, clientSecret, authEndpoint string) er
 
 func (m MockClient) SendPayload(method, endpoint, data string) (string, error) {
 
-	// @todo Remove after debug.
-	fmt.Println(data)
+	if m.apiError {
+		return "", errors.New("API error")
+	}
 
 	return "", nil
 }
@@ -30,6 +34,7 @@ func (m MockClient) SendPayload(method, endpoint, data string) (string, error) {
 func TestProcessor_Process(t *testing.T) {
 
 	TideClient = &MockClient{}
+	FailClient = &MockClient{apiError: true}
 
 	fullCollectionMessage := message.Message{
 		ResponseAPIEndpoint: "http://example/api/tide/v1/audit",
@@ -47,29 +52,114 @@ func TestProcessor_Process(t *testing.T) {
 	fullItemMessage := fullCollectionMessage
 	fullItemMessage.ResponseAPIEndpoint += "/39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e"
 
-	fullResult := getFullResult()
+	fullResult := *getFullResult()
+	errorResult := *getFullResult()
+	errorResult["lighthouseError"] = errors.New("Something went wrong.")
+	clientError := *getFullResult()
+	clientError["client"] = nil
+	noAuditsError := *getFullResult()
+	noAuditsError["audits"] = nil
+	noExistingResults := *getFullResult()
+	noExistingResults["tideItem"] = nil
+	apiWriteFail := *getFullResult()
+	apiWriteFail["client"] = &FailClient
+	lighthouseFail := *getFullResult()
+	lighthouseFail["lighthouse"] = nil
 
 	type args struct {
 		msg    message.Message
 		result *audit.Result
 	}
 	tests := []struct {
-		name string
-		p    Processor
-		args args
+		name    string
+		p       Processor
+		args    args
+		wantErr bool
 	}{
 		{
 			"Collection Audit - Full",
 			Processor{},
 			args{
 				fullCollectionMessage,
-				fullResult,
+				&fullResult,
 			},
+			false,
+		},
+		{
+			"Item Audit - Full",
+			Processor{},
+			args{
+				fullItemMessage,
+				&fullResult,
+			},
+			false,
+		},
+		{
+			"Lighthouse Error",
+			Processor{},
+			args{
+				fullCollectionMessage,
+				&errorResult,
+			},
+			false,
+		},
+		{
+			"Lighthouse Shell Fail",
+			Processor{},
+			args{
+				fullCollectionMessage,
+				&lighthouseFail,
+			},
+			true,
+		},
+		{
+			"Tide Client Error",
+			Processor{},
+			args{
+				fullCollectionMessage,
+				&clientError,
+			},
+			true,
+		},
+		{
+			"No Audits Error",
+			Processor{},
+			args{
+				fullCollectionMessage,
+				&noAuditsError,
+			},
+			true,
+		},
+		{
+			"Collection Audit - No existing results",
+			Processor{},
+			args{
+				fullCollectionMessage,
+				&noExistingResults,
+			},
+			false,
+		},
+		{
+			"API Write Fail",
+			Processor{},
+			args{
+				fullCollectionMessage,
+				&apiWriteFail,
+			},
+			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.p.Process(tt.args.msg, tt.args.result)
+
+			r := *tt.args.result
+
+			if (r["tideError"] != nil && ! tt.wantErr) || (r["tideError"] == nil && tt.wantErr) {
+				t.Errorf("Process() error = %v, wantErr %v", r["tideError"], tt.wantErr)
+				return
+			}
+
 		})
 	}
 }

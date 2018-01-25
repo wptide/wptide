@@ -44,7 +44,8 @@ type AuditResult struct {
 		*LighthouseResults
 	} `json:"details,omitempty"`
 	Summary            *AuditSummary `json:"summary,omitempty"`
-	CompatibleVersions []string     `json:"compatible_versions,omitempty"`
+	CompatibleVersions []string      `json:"compatible_versions,omitempty"`
+	Error              string        `json:"error,omitempty"`
 }
 
 type PhpcsResults struct {

@@ -166,7 +166,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// - Temp folder for downloaded/extracted files,
 	// - Audits to run
 	result := &audit.Result{
-		"client": &client,
+		"client":     &client,
 		"tempFolder": tempFolder,
 		"audits": []string{
 			"lighthouse",

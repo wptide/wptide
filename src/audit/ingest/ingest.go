@@ -66,7 +66,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		}
 
 		// Attach existing audit item to the result.
-		r["tideItem"], _ = json.Marshal(results)
+		r["tideItem"] = &results
 
 		// Attach checksum to the result.
 		r["checksum"] = results.Checksum
@@ -135,7 +135,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		var results tide.Item
 		err := json.Unmarshal([]byte(response), &results)
 		if err == nil {
-			r["tideItem"], _ = json.Marshal(results)
+			r["tideItem"] = &results
 		}
 	}
 
