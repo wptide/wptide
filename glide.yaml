@@ -7,6 +7,5 @@ import:
   - aws/credentials
   - aws/session
   - service/sqs
-# @todo Add gocloc
-#- package: github.com/hhatto/gocloc
+- package: github.com/hhatto/gocloc
 #- package: github.com/nanobox-io/golang-scribble

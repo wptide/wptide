@@ -139,7 +139,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		}
 	}
 
-	r["ingest"], _ = json.Marshal(p)
+	r["ingest"] = p
 }
 
 func (p Processor) getResults(client *tide.ClientInterface, endpoint string) (string, error) {

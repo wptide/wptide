@@ -94,6 +94,11 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 		return
 	}
 
+	codeInfo, ok := r["info"].(*tide.CodeInfo)
+	if !ok {
+		codeInfo = &tide.CodeInfo{}
+	}
+
 	// If we don't have an existing item, create it.
 	if payloadItem == nil {
 		payloadItem = &tide.Item{
@@ -104,7 +109,7 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 			ProjectType: msg.ProjectType,
 			SourceUrl:   msg.SourceURL,
 			SourceType:  msg.SourceType,
-			CodeInfo:    tide.CodeInfo{},
+			CodeInfo:    *codeInfo,
 		}
 	}
 

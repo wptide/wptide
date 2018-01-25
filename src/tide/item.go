@@ -18,16 +18,20 @@ type Item struct {
 
 type CodeInfo struct {
 	Type string `json:"type"`
-	Details []struct {
-		Key   string `json:"key"`
-		Value string `json:"value"`
-	} `json:"details"`
-	Cloc map[string]struct {
-		Blank   int `json:"blank"`
-		Comment int `json:"comment"`
-		Code    int `json:"code"`
-		NFiles  int `json:"n_files"`
-	} `json:"cloc"`
+	Details []InfoDetails `json:"details"`
+	Cloc map[string]ClocResult `json:"cloc"`
+}
+
+type InfoDetails struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type ClocResult struct {
+	Blank   int `json:"blank"`
+	Comment int `json:"comment"`
+	Code    int `json:"code"`
+	NFiles  int `json:"n_files"`
 }
 
 type AuditResult struct {
