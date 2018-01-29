@@ -121,6 +121,7 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 
 		filenames = append(filenames, path)
 
+		// This reads the file from the ZIP. It does not yet exist on the system.
 		fileReader, err := file.Open()
 		if err != nil {
 			return filenames, checksums, err
@@ -137,6 +138,12 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 		if err != nil {
 			fileReader.Close()
 			return nil, nil, err
+		}
+
+		// Because the zip package does not implement Seek(), we need to read it again..
+		fileReader, err = file.Open()
+		if err != nil {
+			return filenames, checksums, err
 		}
 
 		if _, err := io.Copy(targetFile, fileReader); err != nil {

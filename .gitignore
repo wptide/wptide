@@ -3,3 +3,6 @@ vendor
 
 # Variables
 .env
+
+# MacOS
+.DS_Store

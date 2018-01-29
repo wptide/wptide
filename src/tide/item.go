@@ -1,5 +1,7 @@
 package tide
 
+import "reflect"
+
 type ResultSet struct {
 	Results []Item
 }
@@ -12,19 +14,30 @@ type Item struct {
 	ProjectType string                 `json:"project_type"`
 	SourceUrl   string                 `json:"source_url"`
 	SourceType  string                 `json:"source_type"`
-	CodeInfo    CodeInfo               `json:"code_info"`
-	Results     map[string]AuditResult `json:"results"`
+	CodeInfo    CodeInfo               `json:"code_info,omitempty"`
+	Results     map[string]AuditResult `json:"results,omitempty"`
 }
 
 type CodeInfo struct {
-	Type string `json:"type"`
-	Details []InfoDetails `json:"details"`
-	Cloc map[string]ClocResult `json:"cloc"`
+	Type    string                `json:"type"`
+	Details []InfoDetails         `json:"details"`
+	Cloc    map[string]ClocResult `json:"cloc"`
 }
 
 type InfoDetails struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+}
+
+type InfoDetailsSimple struct {
+	Name        string
+	PluginURI   string
+	ThemeURI    string
+	Version     string
+	Description string
+	Author      string
+	AuthorURI   string
+	TextDomain  string
 }
 
 type ClocResult struct {
@@ -99,4 +112,33 @@ type LighthouseCategory struct {
 	Description string  `json:"description"`
 	Id          string  `json:"id"`
 	Score       float32 `json:"score"`
+}
+
+func SimplifyCodeDetails(details []InfoDetails) *InfoDetailsSimple {
+	simple := &InfoDetailsSimple{}
+
+	sV := reflect.ValueOf(simple).Elem()
+
+	for _, item := range details {
+		sV.FieldByName(item.Key).Set(reflect.ValueOf(item.Value))
+	}
+	return simple
+}
+
+func ComplexifyCodeDetails(simple *InfoDetailsSimple) []InfoDetails {
+
+	sV := reflect.ValueOf(*simple)
+
+	details := []InfoDetails{}
+
+	for i := 0; i < sV.NumField(); i++ {
+		if sV.Field(i).String() != "" {
+			details = append(details, InfoDetails{
+				sV.Type().Field(i).Name,
+				sV.Field(i).String(),
+			})
+		}
+	}
+
+	return details
 }

@@ -79,3 +79,51 @@ func TestZip_GetFiles(t *testing.T) {
 		}
 	})
 }
+
+func Test_unzip(t *testing.T) {
+	type args struct {
+		source      string
+		destination string
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantFilenames []string
+		wantChecksums []string
+		wantErr       bool
+	}{
+		{
+			"Unzip File - Success",
+			args{
+				"./testdata/test.zip",
+				"./testdata/unzipped",
+			},
+			[]string{
+				"testdata/unzipped/function.php",
+				"testdata/unzipped/script.js",
+				"testdata/unzipped/style.css",
+			},
+			[]string{
+				"64a43b6ce686b50bbd7eb91b2b1346ed66e7053d42f7f7b9d5562d55a25d1321",
+				"9a8549c5d1f384593788dc25b1c236f8450534e8cb95833003786fef8201b92b",
+				"09679b8abb88b21dd1cf166e1d2745df7882a879d2b8672548f6dc0dc9572fe6",
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotFilenames, gotChecksums, err := unzip(tt.args.source, tt.args.destination)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("unzip() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotFilenames, tt.wantFilenames) {
+				t.Errorf("unzip() gotFilenames = %v, want %v", gotFilenames, tt.wantFilenames)
+			}
+			if !reflect.DeepEqual(gotChecksums, tt.wantChecksums) {
+				t.Errorf("unzip() gotChecksums = %v, want %v", gotChecksums, tt.wantChecksums)
+			}
+		})
+	}
+}

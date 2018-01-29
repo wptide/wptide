@@ -11,6 +11,7 @@ import (
 	"github.com/xwp/go-tide/src/source/zip"
 	"errors"
 	"github.com/xwp/go-tide/src/tide"
+	"strings"
 )
 
 var (
@@ -55,6 +56,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 
 		// Fetch results from Tide API.
 		response, _ := p.getResults(client, msg.ResponseAPIEndpoint)
+		response = cleanResults(response)
 
 		// Attempt to unmarshal the results.
 		var results tide.Item
@@ -79,6 +81,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		}
 
 		// If we have results for all the audits there is nothing to do, unless its forced.
+		//if availableResults == len(expectedAudits) && ! msg.Force && results.CodeInfo.Type != "" {
 		if availableResults == len(expectedAudits) && ! msg.Force {
 			r["ingest"], _ = json.Marshal(p)
 			r["ingestError"] = errors.New("no new audits to run")
@@ -130,6 +133,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	if isCollection && checksum != "" {
 		// Fetch results from Tide API.
 		response, _ := p.getResults(client, msg.ResponseAPIEndpoint+"/"+checksum)
+		response = cleanResults(response)
 
 		// Attempt to unmarshal the results.
 		var results tide.Item
@@ -145,4 +149,9 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 func (p Processor) getResults(client *tide.ClientInterface, endpoint string) (string, error) {
 	c := *client
 	return c.SendPayload("GET", endpoint, "")
+}
+
+func cleanResults(in string) string {
+	in = strings.Replace(in, `,"code_info":""`, "", -1)
+	return in
 }

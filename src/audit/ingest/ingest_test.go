@@ -16,49 +16,51 @@ type MockClient struct{}
 var (
 	TideClient tide.ClientInterface
 
-	mockItems = map[string]*tide.Item{
-		"27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a": &tide.Item{},
-		"39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e": &tide.Item{
-			Results: map[string]tide.AuditResult{
-				"lighthouse": tide.AuditResult{
-					Summary: &tide.AuditSummary{
-						LighthouseSummary: &tide.LighthouseSummary{
-							[]tide.LighthouseCategory{
-								tide.LighthouseCategory{
-									Name:        "Performance",
-									Description: "These encapsulate your web app's current performance and opportunities to improve it.",
-									Id:          "performance",
-									Score:       72.17647058823529,
-								},
-								tide.LighthouseCategory{
-									Name:        "Progressive Web App",
-									Description: "These checks validate the aspects of a Progressive Web App, as specified by the baseline [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
-									Id:          "pwa",
-									Score:       72.17647058823529,
-								},
-								tide.LighthouseCategory{
-									Name:        "Accessibility",
-									Description: "These checks highlight opportunities to [improve the accessibility of your web app](https://developers.google.com/web/fundamentals/accessibility). Only a subset of accessibility issues can be automatically detected so manual testing is also encouraged.",
-									Id:          "accessibility",
-									Score:       100.00,
-								},
-								tide.LighthouseCategory{
-									Name:        "Best Practices",
-									Description: "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls.",
-									Id:          "best-practices",
-									Score:       81.25,
-								},
-								tide.LighthouseCategory{
-									Name:        "SEO",
-									Description: "These checks ensure that your page is optimized for search engine results ranking. There are additional factors Lighthouse does not check that may affect your search ranking. [Learn more](https://support.google.com/webmasters/answer/35769).",
-									Id:          "seo",
-									Score:       90,
-								},
-							},
+	fakeResults = map[string]tide.AuditResult{
+		"lighthouse": tide.AuditResult{
+			Summary: &tide.AuditSummary{
+				LighthouseSummary: &tide.LighthouseSummary{
+					[]tide.LighthouseCategory{
+						tide.LighthouseCategory{
+							Name:        "Performance",
+							Description: "These encapsulate your web app's current performance and opportunities to improve it.",
+							Id:          "performance",
+							Score:       72.17647058823529,
+						},
+						tide.LighthouseCategory{
+							Name:        "Progressive Web App",
+							Description: "These checks validate the aspects of a Progressive Web App, as specified by the baseline [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
+							Id:          "pwa",
+							Score:       72.17647058823529,
+						},
+						tide.LighthouseCategory{
+							Name:        "Accessibility",
+							Description: "These checks highlight opportunities to [improve the accessibility of your web app](https://developers.google.com/web/fundamentals/accessibility). Only a subset of accessibility issues can be automatically detected so manual testing is also encouraged.",
+							Id:          "accessibility",
+							Score:       100.00,
+						},
+						tide.LighthouseCategory{
+							Name:        "Best Practices",
+							Description: "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls.",
+							Id:          "best-practices",
+							Score:       81.25,
+						},
+						tide.LighthouseCategory{
+							Name:        "SEO",
+							Description: "These checks ensure that your page is optimized for search engine results ranking. There are additional factors Lighthouse does not check that may affect your search ranking. [Learn more](https://support.google.com/webmasters/answer/35769).",
+							Id:          "seo",
+							Score:       90,
 						},
 					},
 				},
 			},
+		},
+	}
+
+	mockItems = map[string]*tide.Item{
+		"27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a": &tide.Item{},
+		"39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e": &tide.Item{
+			Results: fakeResults,
 		},
 	}
 )

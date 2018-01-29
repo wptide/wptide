@@ -15,6 +15,7 @@ import (
 	"github.com/xwp/go-tide/src/env"
 	"strconv"
 	"github.com/xwp/go-tide/src/audit/ingest"
+	"github.com/xwp/go-tide/src/audit/info"
 )
 
 var (
@@ -155,6 +156,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// A slice ensures that they happen in the correct order.
 	processes := []audit.Processor{
 		&ingest.Processor{},
+		&info.Processor{},
 		&lighthouse.Processor{},
 		&tide.Processor{},
 	}
@@ -189,6 +191,8 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// Remove message on success.
 	if len(errors) == 0 {
 		messageProvider.DeleteMessage(msg.ExternalRef)
+	} else {
+		fmt.Println(result)
 	}
 
 	// Release item from buffer so that next item can be polled.
