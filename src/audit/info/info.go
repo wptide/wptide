@@ -145,6 +145,8 @@ func extractHeader(filename string) (projectType string, details []tide.InfoDeta
 	b1 := make([]byte, 8192)
 	n1, _ := f.Read(b1)
 
+	isStyleCSS, _ := regexp.Match(`(style.css)$`, []byte(filename))
+
 	if n1 > 0 {
 
 		validHeader := false
@@ -161,7 +163,7 @@ func extractHeader(filename string) (projectType string, details []tide.InfoDeta
 					validHeader = true
 					fieldname = "Name"
 				}
-				if field == "Theme Name" {
+				if field == "Theme Name" && isStyleCSS {
 					projectType = "theme"
 					validHeader = true
 					fieldname = "Name"

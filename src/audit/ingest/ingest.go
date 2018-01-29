@@ -132,7 +132,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	// If collection route, now that we have the checksum its worth checking the API for existing results.
 	if isCollection && checksum != "" {
 		// Fetch results from Tide API.
-		response, _ := p.getResults(client, msg.ResponseAPIEndpoint+"/"+checksum)
+		response, _ := p.getResults(client, strings.TrimRight(msg.ResponseAPIEndpoint, "/")+"/"+checksum)
 		response = cleanResults(response)
 
 		// Attempt to unmarshal the results.
@@ -153,5 +153,6 @@ func (p Processor) getResults(client *tide.ClientInterface, endpoint string) (st
 
 func cleanResults(in string) string {
 	in = strings.Replace(in, `,"code_info":""`, "", -1)
+	in = strings.Replace(in, `,"results":[]`, "", -1)
 	return in
 }

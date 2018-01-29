@@ -8,6 +8,7 @@ type ResultSet struct {
 
 type Item struct {
 	Title       string                 `json:"title"`
+	Description string                 `json:"content"`
 	Version     string                 `json:"version"`
 	Checksum    string                 `json:"checksum"`
 	Visibility  string                 `json:"visibility"`
@@ -120,7 +121,10 @@ func SimplifyCodeDetails(details []InfoDetails) *InfoDetailsSimple {
 	sV := reflect.ValueOf(simple).Elem()
 
 	for _, item := range details {
-		sV.FieldByName(item.Key).Set(reflect.ValueOf(item.Value))
+		sF := sV.FieldByName(item.Key)
+		if sF.IsValid() {
+			sF.Set(reflect.ValueOf(item.Value))
+		}
 	}
 	return simple
 }

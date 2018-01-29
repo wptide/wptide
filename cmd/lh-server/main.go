@@ -191,8 +191,6 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// Remove message on success.
 	if len(errors) == 0 {
 		messageProvider.DeleteMessage(msg.ExternalRef)
-	} else {
-		fmt.Println(result)
 	}
 
 	// Release item from buffer so that next item can be polled.

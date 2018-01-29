@@ -1,12 +1,13 @@
 package tide
 
 import (
+	"reflect"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
 	"github.com/xwp/go-tide/src/tide"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -155,7 +156,7 @@ func TestProcessor_Process(t *testing.T) {
 
 			r := *tt.args.result
 
-			if (r["tideError"] != nil && ! tt.wantErr) || (r["tideError"] == nil && tt.wantErr) {
+			if (r["tideError"] != nil && !tt.wantErr) || (r["tideError"] == nil && tt.wantErr) {
 				t.Errorf("Process() error = %v, wantErr %v", r["tideError"], tt.wantErr)
 				return
 			}
@@ -236,5 +237,158 @@ func getFullResult() *audit.Result {
 			},
 		},
 		"lighthouseError": nil,
+	}
+}
+
+func Test_fallbackValue(t *testing.T) {
+	type args struct {
+		value []interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want interface{}
+	}{
+		{
+			"Fallback - Strings",
+			args{
+				[]interface{}{
+					"",
+					"",
+					"The Value",
+				},
+			},
+			"The Value",
+		},
+		{
+			"Fallback - Int",
+			args{
+				[]interface{}{
+					0,
+					2,
+					1,
+				},
+			},
+			2,
+		},
+		{
+			"Fallback - CodeInfo",
+			args{
+				[]interface{}{
+					tide.CodeInfo{},
+					tide.CodeInfo{},
+					tide.CodeInfo{Type: "theme"},
+				},
+			},
+			tide.CodeInfo{
+				Type: "theme",
+			},
+		},
+		{
+			"Fallback - Missmatch",
+			args{
+				[]interface{}{
+					"1",
+					2,
+					&tide.CodeInfo{},
+				},
+			},
+			nil,
+		},
+		{
+			// Note: Custom fallback conditions need to be created.
+			// Failure to do so will always return the first item.
+			"Fallback - Custom",
+			args{
+				[]interface{}{
+					struct{Name string}{"Rheinard"},
+					struct{Name string}{"Someone"},
+				},
+			},
+			struct{Name string}{"Rheinard"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := fallbackValue(tt.args.value...)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("fallbackValue() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getValidItem(t *testing.T) {
+
+	type args struct {
+		isCollection bool
+		item         tide.Item
+		msg          message.Message
+		result       audit.Result
+		codeInfo     tide.CodeInfo
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    PayloadMessage
+		wantErr bool
+	}{
+		{
+			"Valid Item",
+			args{
+				true,
+				tide.Item{},
+				message.Message{
+					RequestClient:"audit_server",
+				},
+				audit.Result{},
+				tide.CodeInfo{},
+			},
+			PayloadMessage{
+				Item:          tide.Item{CodeInfo: tide.CodeInfo{}},
+				RequestClient: "audit_server",
+			},
+			false,
+		},
+		{
+			"Result Code Info",
+			args{
+				true,
+				tide.Item{
+					CodeInfo: tide.CodeInfo{Type: "theme"},
+				},
+				message.Message{
+					RequestClient:"audit_server",
+				},
+				audit.Result{
+					"tideItem": &tide.Item{
+						CodeInfo: tide.CodeInfo{Type: "other"},
+					},
+				},
+				tide.CodeInfo{
+					Type: "theme",
+				},
+			},
+			PayloadMessage{
+				Item: tide.Item{
+					ProjectType: "other",
+					CodeInfo:    tide.CodeInfo{Type: "other"},
+				},
+				RequestClient: "audit_server",
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getValidItem(tt.args.isCollection, tt.args.item, tt.args.msg, tt.args.result, tt.args.codeInfo)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getValidItem() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(*got, tt.want) {
+				t.Errorf("getValidItem() = %v, want %v", *got, tt.want)
+			}
+		})
 	}
 }
