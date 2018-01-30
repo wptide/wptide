@@ -9,6 +9,8 @@ import (
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
 	"github.com/xwp/go-tide/src/storage"
+	"io/ioutil"
+	"github.com/pkg/errors"
 )
 
 var(
@@ -41,12 +43,26 @@ func (m mockStorage) DownloadFile(reference, filename string) error {
 	return nil
 }
 
+func mockWriteFile(filename string, data []byte, perm os.FileMode) error {
+	switch filename {
+	case "/tmp/ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-lighthouse-full.json":
+		return errors.New("something went wrong")
+	default:
+		return nil
+	}
+}
+
 func TestProcessor_Process(t *testing.T) {
 
 	// Set out execCommand variable to the mock function.
 	execCommand = mockExecCommand
 	// Remember to set it back after the test.
 	defer func() { execCommand = exec.Command }()
+
+	// Set out execCommand variable to the mock function.
+	writeFile = mockWriteFile
+	// Remember to set it back after the test.
+	defer func() { writeFile = ioutil.WriteFile }()
 
 	storageProvider = mockStorage{}
 
@@ -72,6 +88,13 @@ func TestProcessor_Process(t *testing.T) {
 		"audits": []string{"lighthouse"},
 		"fileStore": &storageProvider,
 		"tempFolder": "/tmp",
+	}
+
+	errorWriteResult := &audit.Result{
+		"audits": []string{"lighthouse"},
+		"fileStore": &storageProvider,
+		"tempFolder": "/tmp",
+		"checksum": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
 	}
 
 	type args struct {
@@ -119,6 +142,15 @@ func TestProcessor_Process(t *testing.T) {
 				result: noAuditResult,
 			},
 			wantErr: false,
+		},
+		{
+			name: "Write File Error - Upload",
+			p:    &Processor{},
+			args: args{
+				msg:    message.Message{},
+				result: errorWriteResult,
+			},
+			wantErr: true,
 		},
 		{
 			name: "No File Store - Upload",

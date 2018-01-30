@@ -85,8 +85,12 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	fullResults, err := uploadToStorage(r, resultBytes)
 	errCheck(err, result)
 
+	// @todo Decide if `Details` should only contain results from `reportCategories` and update structure in tide/item.go.
 	if fullResults != nil {
 		auditResult.Full = fullResults.Full
+		auditResult.Details.Type = fullResults.Full.Type
+		auditResult.Details.Key = fullResults.Full.Key
+		auditResult.Details.BucketName = fullResults.Full.BucketName
 	}
 
 	auditResult.Summary = &tide.AuditSummary{
@@ -127,8 +131,13 @@ func uploadToStorage(r audit.Result, buffer []byte) (*tide.AuditResult, error) {
 	storageRef := checksum + "-lighthouse-full.json"
 	filename := strings.TrimRight(tempFolder, "/") + "/" + storageRef
 
+	err := writeFile(filename, buffer, 0644)
+	if err != nil {
+		return nil, errors.New("could not write lighthouse audit to tempFolder")
+	}
+
 	sP := *storageProvider
-	err := sP.UploadFile(filename, storageRef)
+	err = sP.UploadFile(filename, storageRef)
 
 	if err == nil {
 		results = &tide.AuditResult{
