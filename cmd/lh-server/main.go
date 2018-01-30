@@ -64,10 +64,10 @@ var (
 		secret string
 		bucket string
 	}{
-		env.GetEnv("AWS_S3_LH_REGION", ""),
-		env.GetEnv("AWS_S3_LH_KEY", ""),
-		env.GetEnv("AWS_S3_LH_SECRET", ""),
-		env.GetEnv("AWS_S3_LH_BUCKET_NAME", ""),
+		env.GetEnv("AWS_S3_REGION", ""),
+		env.GetEnv("AWS_S3_KEY", ""),
+		env.GetEnv("AWS_S3_SECRET", ""),
+		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 	}
 
 	messageProvider message.MessageProvider
