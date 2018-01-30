@@ -2,7 +2,6 @@ package log
 
 import (
 	"testing"
-	"log"
 	"bytes"
 	"os"
 )
