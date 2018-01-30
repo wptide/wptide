@@ -12,6 +12,7 @@ import (
 	"errors"
 	"github.com/xwp/go-tide/src/tide"
 	"strings"
+	"github.com/xwp/go-tide/src/log"
 )
 
 var (
@@ -32,6 +33,8 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 
 	// Cannot perform indexing on the *result directly, so assigning pointer to a local variable.
 	r := *result
+
+	log.Log(msg.Title, "Ingesting...")
 
 	// Expected audits that need to be run. E.g. lighthouse.
 	var availableResults int
@@ -64,6 +67,8 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		if err != nil {
 			r["ingest"], _ = json.Marshal(p)
 			r["ingestError"] = err
+
+			log.Log(msg.Title, r["ingestError"])
 			return
 		}
 
@@ -85,6 +90,8 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		if availableResults == len(expectedAudits) && ! msg.Force {
 			r["ingest"], _ = json.Marshal(p)
 			r["ingestError"] = errors.New("no new audits to run")
+
+			log.Log(msg.Title, r["ingestError"])
 			return
 		}
 	}
@@ -101,6 +108,8 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	if srcMgr == nil {
 		r["ingest"] = nil
 		r["ingestError"] = errors.New("could not handle source url")
+
+		log.Log(msg.Title, r["ingestError"])
 		return
 	}
 
@@ -112,6 +121,8 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	if !ok {
 		r["ingest"] = nil
 		r["ingestError"] = errors.New("can't extract without a `temptFolder`")
+
+		log.Log(msg.Title, r["ingestError"])
 		return
 	}
 
@@ -120,11 +131,14 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	err := srcMgr.PrepareFiles(p.Dest)
 	if err != nil {
 		r["ingestError"] = err
+		log.Log(msg.Title, r["ingestError"])
 	}
 
 	// Attach calculated checksum to the results.
 	checksum := srcMgr.GetChecksum()
 	r["checksum"] = checksum
+
+	log.Log(msg.Title, "Project checksum: `" + checksum + "`")
 
 	// Attach file paths.
 	r["files"] = srcMgr.GetFiles()

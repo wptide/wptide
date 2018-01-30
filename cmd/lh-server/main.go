@@ -12,6 +12,7 @@ import (
 	"github.com/xwp/go-tide/src/message/sqs"
 	"time"
 	"log"
+	tidelog "github.com/xwp/go-tide/src/log"
 	"github.com/xwp/go-tide/src/env"
 	"strconv"
 	"github.com/xwp/go-tide/src/audit/ingest"
@@ -168,8 +169,7 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-ch
 // processMessage takes an SQS message and runs it through an audit process.
 func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer <-chan struct{}) {
 
-	// @todo Provide better information.
-	log.Println("Processing...")
+	tidelog.Log(msg.Title, "Processing...")
 
 	// An slice of processes that need to be performed on the message.
 	// A slice ensures that they happen in the correct order.
@@ -211,6 +211,9 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// Remove message on success.
 	if len(errors) == 0 {
 		messageProvider.DeleteMessage(msg.ExternalRef)
+		tidelog.Log(msg.Title, "Completed without errors.")
+	} else {
+		tidelog.Log(msg.Title, "Completed with some errors.")
 	}
 
 	// Release item from buffer so that next item can be polled.

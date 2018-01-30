@@ -11,6 +11,7 @@ import (
 	"strings"
 	"reflect"
 	"github.com/xwp/go-tide/src/env"
+	"github.com/xwp/go-tide/src/log"
 )
 
 type PayloadMessage struct {
@@ -38,14 +39,18 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 		client = r["client"].(*tide.ClientInterface)
 	}
 
+	log.Log(msg.Title, "Preparing Tide API payload...")
+
 	// If we have no client there is nothing we can do.
 	if client == nil {
 		r["tideError"] = errors.New("Tide API client not provided")
+		log.Log(msg.Title, r["tideError"])
 		return
 	}
 
 	if r["audits"] == nil {
 		r["tideError"] = errors.New("there are no audits to send results for")
+		log.Log(msg.Title, r["tideError"])
 		return
 	}
 
@@ -56,6 +61,7 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	if item, ok := r["tideItem"].(*tide.Item); ok {
 		payloadItem = item
 		resultMap = item.Results
+		log.Log(msg.Title, "Using existing audit for payload.")
 	}
 
 	// Get the right endpoint to send results to.
@@ -95,11 +101,13 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 
 	if len(errorSlice) > 0 {
 		r["auditErrors"] = errors.New(fmt.Sprintf("the following audits could not run: %s", strings.Join(errorSlice, ",")))
+		log.Log(msg.Title, r["auditErrors"])
 	}
 
 	if len(resultMap) == 0 {
 		r["tideError"] = errors.New("no results to send to API")
 		r["tide"] = nil
+		log.Log(msg.Title, r["tideError"])
 		return
 	}
 
@@ -132,10 +140,12 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	// Validate the item and fill in missing fields.
 	validItem, _ := getValidItem(isCollection, *payloadItem, msg, *result, *codeInfo)
 
+	log.Log(msg.Title, "Sending payload to Tide API...")
 	payload, _ := json.Marshal(validItem)
 	_, err := p.sendResults(client, endpoint, string(payload))
 	if err != nil {
 		r["tideError"] = err
+		log.Log(msg.Title, r["tideError"])
 	}
 }
 

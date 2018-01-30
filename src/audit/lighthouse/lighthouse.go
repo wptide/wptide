@@ -11,6 +11,7 @@ import (
 	"github.com/xwp/go-tide/src/tide"
 	"github.com/xwp/go-tide/src/storage"
 	"strings"
+	"github.com/xwp/go-tide/src/log"
 )
 
 var (
@@ -36,6 +37,8 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	if ! audit.CanRunAudit(p, result) {
 		return
 	}
+
+	log.Log(msg.Title, "Running Lighthouse Audit...")
 
 	var results *tide.LighthouseSummary
 
@@ -68,6 +71,8 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	if len(errorBytes) > 0 {
 		r["lighthouse"] = nil
 		r["lighthouseError"] = errors.New("lighthouse command failed: " + string(errorBytes))
+
+		log.Log(msg.Title, r["lighthouseError"])
 		return
 	}
 
@@ -82,6 +87,7 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	auditResult := &tide.AuditResult {}
 
 	// Upload and get full results.
+	log.Log(msg.Title, "Uploading results to remote storage.")
 	fullResults, err := uploadToStorage(r, resultBytes)
 	errCheck(err, result)
 
@@ -98,12 +104,15 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	}
 
 	r["lighthouse"] = auditResult
+
+	log.Log(msg.Title, "Lighthouse process complete.")
 }
 
 func errCheck(err error, result *audit.Result) {
 	r := *result
 	if err != nil {
 		r["lighthouseError"] = err
+		log.Log("Lighthouse Error:", r["lighthouseError"])
 	}
 }
 

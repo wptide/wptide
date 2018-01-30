@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"github.com/xwp/go-tide/src/log"
 )
 
 type Processor struct{}
@@ -26,10 +27,14 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	// Cannot perform indexing on the *result directly, so assigning pointer to a local variable.
 	r := *result
 
+	log.Log(msg.Title, "Processing CodeInfo")
+
 	ingestObj, ok := r["ingest"].(*ingest.Processor);
 	if ! ok || ingestObj.Dest == "" {
 		r["infoError"] = errors.New("could not find path to code")
 		r["info"] = nil
+
+		log.Log(msg.Title, r["infoError"])
 		return
 	}
 
@@ -39,6 +44,8 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	if err != nil {
 		r["infoError"] = err
 		r["info"] = nil
+
+		log.Log(msg.Title, r["infoError"])
 		return
 	}
 
@@ -49,6 +56,8 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 		Details: details,
 		Cloc:    cloc,
 	}
+
+	log.Log(msg.Title, "Project is `" + projectType + "`")
 }
 
 func getProjectDetails(path string) (string, []tide.InfoDetails, error) {
