@@ -16,6 +16,8 @@ import (
 	"strconv"
 	"github.com/xwp/go-tide/src/audit/ingest"
 	"github.com/xwp/go-tide/src/audit/info"
+	"github.com/xwp/go-tide/src/storage"
+	"github.com/xwp/go-tide/src/storage/s3"
 )
 
 var (
@@ -55,7 +57,21 @@ var (
 		env.GetEnv("AWS_SQS_LH_QUEUE_NAME", ""),
 	}
 
+	// Lighthouse SQS configuration.
+	lhS3Config = struct {
+		region string
+		key    string
+		secret string
+		bucket string
+	}{
+		env.GetEnv("AWS_S3_LH_REGION", ""),
+		env.GetEnv("AWS_S3_LH_KEY", ""),
+		env.GetEnv("AWS_S3_LH_SECRET", ""),
+		env.GetEnv("AWS_S3_LH_BUCKET_NAME", ""),
+	}
+
 	messageProvider message.MessageProvider
+	storageProvider storage.StorageProvider
 )
 
 func main() {
@@ -80,6 +96,9 @@ func main() {
 
 	// Initiate a new Message provider.
 	messageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
+
+	// Initiate a new Storage provider.
+	storageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
 
 	// Create a buffer for the amount of concurrent audits.
 	buffer := make(chan struct{}, bufferSize)
@@ -173,6 +192,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 		"audits": []string{
 			"lighthouse",
 		},
+		"fileStore": &storageProvider,
 	}
 
 	// Pointer that we can use directly.

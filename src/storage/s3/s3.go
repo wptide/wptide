@@ -12,7 +12,7 @@ import (
 
 var (
 	fileCreate = os.Create
-	fileOpen = os.Open
+	fileOpen   = os.Open
 )
 
 type S3Provider struct {
@@ -20,6 +20,14 @@ type S3Provider struct {
 	uploader   s3manageriface.UploaderAPI
 	downloader s3manageriface.DownloaderAPI
 	bucket     string
+}
+
+func (s3p S3Provider) Kind() string {
+	return "s3"
+}
+
+func (s3p S3Provider) CollectionRef() string {
+	return s3p.bucket
 }
 
 func (s3p S3Provider) UploadFile(filename, reference string) error {

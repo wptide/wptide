@@ -1,16 +1,16 @@
 package s3
 
 import (
+	"io"
+	"os"
 	"reflect"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/aws"
-	"io"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 	"github.com/pkg/errors"
-	"os"
 )
 
 type mockS3 struct {
@@ -224,4 +224,42 @@ func TestNewS3Provider(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestS3Provider_CollectionRef(t *testing.T) {
+	type fields struct {
+		bucket string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			"Collection Reference",
+			fields{
+				"test_bucket",
+			},
+			"test_bucket",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s3p := S3Provider{
+				bucket: tt.fields.bucket,
+			}
+			if got := s3p.CollectionRef(); got != tt.want {
+				t.Errorf("S3Provider.CollectionRef() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestS3Provider_Kind(t *testing.T) {
+	t.Run("Storage Provider Kind", func(t *testing.T) {
+		p := S3Provider{}
+		if got := p.Kind(); got != "s3" {
+			t.Errorf("StorageProvider.Kind() = %v, Impossible, this should be s3.", got)
+		}
+	})
 }

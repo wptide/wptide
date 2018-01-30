@@ -9,11 +9,14 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/xwp/go-tide/src/tide"
+	"github.com/xwp/go-tide/src/storage"
+	"strings"
 )
 
 var (
 	// Using exec.Command as a variable so that we can mock it in tests.
 	execCommand = exec.Command
+	writeFile   = ioutil.WriteFile
 )
 
 type Processor struct{}
@@ -76,10 +79,16 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	err = json.Unmarshal(resultBytes, &results)
 	errCheck(err, result)
 
-	// @todo Write `resultBytes` to S3.
+	auditResult := &tide.AuditResult {}
 
-	// @todo Add full report after completing S3 component.
-	auditResult := &tide.AuditResult{}
+	// Upload and get full results.
+	fullResults, err := uploadToStorage(r, resultBytes)
+	errCheck(err, result)
+
+	if fullResults != nil {
+		auditResult.Full = fullResults.Full
+	}
+
 	auditResult.Summary = &tide.AuditSummary{
 		LighthouseSummary: results,
 	}
@@ -92,4 +101,48 @@ func errCheck(err error, result *audit.Result) {
 	if err != nil {
 		r["lighthouseError"] = err
 	}
+}
+
+func uploadToStorage(r audit.Result, buffer []byte) (*tide.AuditResult, error) {
+
+	var results *tide.AuditResult
+
+	// Get required variables from results.
+	storageProvider, providerOk := r["fileStore"].(*storage.StorageProvider)
+	tempFolder, folderOk := r["tempFolder"].(string)
+	checksum, checksumOk := r["checksum"].(string)
+
+	if ! providerOk {
+		return nil, errors.New("could not get fileStore to upload to")
+	}
+
+	if ! folderOk {
+		return nil, errors.New("no tempFolder to write results to before upload to fileStore")
+	}
+
+	if ! checksumOk {
+		return nil, errors.New("there was no checksum to be used for filenames")
+	}
+
+	storageRef := checksum + "-lighthouse-full.json"
+	filename := strings.TrimRight(tempFolder, "/") + "/" + storageRef
+
+	sP := *storageProvider
+	err := sP.UploadFile(filename, storageRef)
+
+	if err == nil {
+		results = &tide.AuditResult{
+			Full: struct {
+				Type       string `json:"type,omitempty"`
+				Key        string `json:"key,omitempty"`
+				BucketName string `json:"bucket_name,omitempty"`
+			}{
+				Type:       sP.Kind(),
+				Key:        storageRef,
+				BucketName: sP.CollectionRef(),
+			},
+		}
+	}
+
+	return results, err
 }

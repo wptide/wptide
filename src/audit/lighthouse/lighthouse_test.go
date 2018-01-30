@@ -8,6 +8,11 @@ import (
 
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
+	"github.com/xwp/go-tide/src/storage"
+)
+
+var(
+	storageProvider storage.StorageProvider
 )
 
 func mockExecCommand(command string, args ...string) *exec.Cmd {
@@ -18,6 +23,24 @@ func mockExecCommand(command string, args ...string) *exec.Cmd {
 	return cmd
 }
 
+type mockStorage struct{}
+
+func (m mockStorage) Kind() string {
+	return "mock"
+}
+
+func (m mockStorage) CollectionRef() string {
+	return "mock-collection"
+}
+
+func (m mockStorage) UploadFile(filename, reference string) error {
+	return nil
+}
+
+func (m mockStorage) DownloadFile(reference, filename string) error {
+	return nil
+}
+
 func TestProcessor_Process(t *testing.T) {
 
 	// Set out execCommand variable to the mock function.
@@ -25,11 +48,31 @@ func TestProcessor_Process(t *testing.T) {
 	// Remember to set it back after the test.
 	defer func() { execCommand = exec.Command }()
 
+	storageProvider = mockStorage{}
+
 	result := &audit.Result{
 		"audits": []string{"lighthouse"},
+		"fileStore": &storageProvider,
+		"tempFolder": "/tmp",
+		"checksum": "39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e",
 	}
 
 	noAuditResult := &audit.Result{}
+
+	noFileStoreResult := &audit.Result{
+		"audits": []string{"lighthouse"},
+	}
+
+	noTempResult := &audit.Result{
+		"audits": []string{"lighthouse"},
+		"fileStore": &storageProvider,
+	}
+
+	noChecksumResult := &audit.Result{
+		"audits": []string{"lighthouse"},
+		"fileStore": &storageProvider,
+		"tempFolder": "/tmp",
+	}
 
 	type args struct {
 		msg    message.Message
@@ -76,6 +119,33 @@ func TestProcessor_Process(t *testing.T) {
 				result: noAuditResult,
 			},
 			wantErr: false,
+		},
+		{
+			name: "No File Store - Upload",
+			p:    &Processor{},
+			args: args{
+				msg:    message.Message{},
+				result: noFileStoreResult,
+			},
+			wantErr: true,
+		},
+		{
+			name: "No Temp Folder - Upload",
+			p:    &Processor{},
+			args: args{
+				msg:    message.Message{},
+				result: noTempResult,
+			},
+			wantErr: true,
+		},
+		{
+			name: "No Checksum - Upload",
+			p:    &Processor{},
+			args: args{
+				msg:    message.Message{},
+				result: noChecksumResult,
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
