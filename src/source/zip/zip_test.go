@@ -1,9 +1,21 @@
 package zip
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 )
+
+var fileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	switch r.URL.String() {
+	case "/test.zip":
+		w.Header().Set("Content-Type", "applicaiton/zip")
+		w.Header().Set("Content-Disposition", "attachment; filename='test.zip'")
+		http.ServeFile(w, r, "./testdata/test.zip")
+	}
+}))
 
 func Test_combinedChecksum(t *testing.T) {
 	type args struct {
@@ -123,6 +135,49 @@ func Test_unzip(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotChecksums, tt.wantChecksums) {
 				t.Errorf("unzip() gotChecksums = %v, want %v", gotChecksums, tt.wantChecksums)
+			}
+		})
+	}
+}
+
+func TestZip_PrepareFiles(t *testing.T) {
+	type fields struct {
+		url      string
+		dest     string
+		files    []string
+		checksum string
+	}
+	type args struct {
+		dest string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			"Simple Zip Fetch",
+			fields{
+				url:  fileServer.URL + "/test.zip",
+				dest: "./testdata/download/",
+			},
+			args{
+				dest: "./testdata/download/",
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &Zip{
+				url:      tt.fields.url,
+				dest:     tt.fields.dest,
+				files:    tt.fields.files,
+				checksum: tt.fields.checksum,
+			}
+			if err := m.PrepareFiles(tt.args.dest); (err != nil) != tt.wantErr {
+				t.Errorf("Zip.PrepareFiles() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
