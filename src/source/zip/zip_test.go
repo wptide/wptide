@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"os"
 )
 
 var fileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -93,6 +94,12 @@ func TestZip_GetFiles(t *testing.T) {
 }
 
 func Test_unzip(t *testing.T) {
+
+	// Clean up after.
+	defer func() {
+		os.RemoveAll("./testdata/unzipped")
+	}()
+
 	type args struct {
 		source      string
 		destination string
@@ -141,6 +148,14 @@ func Test_unzip(t *testing.T) {
 }
 
 func TestZip_PrepareFiles(t *testing.T) {
+
+	dest := "./testdata/download/"
+
+	// Clean up after.
+	defer func() {
+		os.RemoveAll(dest)
+	}()
+
 	type fields struct {
 		url      string
 		dest     string
@@ -160,10 +175,10 @@ func TestZip_PrepareFiles(t *testing.T) {
 			"Simple Zip Fetch",
 			fields{
 				url:  fileServer.URL + "/test.zip",
-				dest: "./testdata/download/",
+				dest: dest,
 			},
 			args{
-				dest: "./testdata/download/",
+				dest: dest,
 			},
 			false,
 		},
