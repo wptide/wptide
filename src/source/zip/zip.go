@@ -20,6 +20,17 @@ type Zip struct {
 	checksum string
 }
 
+var (
+	// File system operation variables.
+	createFile       = os.Create
+	makeDirectoryAll = os.MkdirAll
+	ioCopy           = io.Copy
+	openFile         = os.OpenFile
+
+	// Default paths.
+	sourceFilename = "source.zip"
+)
+
 func (m *Zip) PrepareFiles(dest string) error {
 
 	// Prepare destination.
@@ -28,13 +39,13 @@ func (m *Zip) PrepareFiles(dest string) error {
 		os.Mkdir(m.dest, os.ModePerm)
 	}
 
-	err := downloadFile(m.url, m.dest+"/source.zip")
+	err := downloadFile(m.url, m.dest+"/"+sourceFilename)
 	if err != nil {
 		return err
 	}
 
 	var checksums []string
-	m.files, checksums, err = unzip(m.dest+"/source.zip", m.dest+"/unzipped")
+	m.files, checksums, err = unzip(m.dest+"/"+sourceFilename, m.dest+"/unzipped")
 	if err != nil {
 		return err
 	}
@@ -63,7 +74,7 @@ func NewZip(url string) *Zip {
 func downloadFile(source string, destination string) error {
 
 	// Create destination
-	out, err := os.Create(destination)
+	out, err := createFile(destination)
 	if err != nil {
 		return err
 	}
@@ -77,7 +88,7 @@ func downloadFile(source string, destination string) error {
 	defer resp.Body.Close()
 
 	// Write to file
-	_, err = io.Copy(out, resp.Body)
+	_, err = ioCopy(out, resp.Body)
 
 	if err != nil {
 		return err
@@ -97,7 +108,7 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 		return filenames, checksums, err
 	}
 
-	if err := os.MkdirAll(destination, 0755); err != nil {
+	if err := makeDirectoryAll(destination, 0755); err != nil {
 		return filenames, checksums, err
 	}
 
@@ -115,38 +126,32 @@ func unzip(source, destination string) (filenames, checksums []string, err error
 	for _, file := range reader.File {
 		path := filepath.Join(destination, strings.TrimPrefix(file.Name, rootPath))
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(path, file.Mode())
+			makeDirectoryAll(path, file.Mode())
 			continue
 		}
 
 		filenames = append(filenames, path)
 
 		// This reads the file from the ZIP. It does not yet exist on the system.
-		fileReader, err := file.Open()
-		if err != nil {
-			return filenames, checksums, err
-		}
+		fileReader, _ := file.Open()
 
 		h := sha256.New()
-		if _, err := io.Copy(h, fileReader); err != nil {
+		if _, err := ioCopy(h, fileReader); err != nil {
 			fileReader.Close()
 			return nil, nil, err
 		}
 		checksums = append(checksums, fmt.Sprintf("%x", h.Sum(nil)))
 
-		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+		targetFile, err := openFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
 			fileReader.Close()
 			return nil, nil, err
 		}
 
 		// Because the zip package does not implement Seek(), we need to read it again..
-		fileReader, err = file.Open()
-		if err != nil {
-			return filenames, checksums, err
-		}
+		fileReader, _ = file.Open()
 
-		if _, err := io.Copy(targetFile, fileReader); err != nil {
+		if _, err := ioCopy(targetFile, fileReader); err != nil {
 			fileReader.Close()
 			targetFile.Close()
 			return nil, nil, err

@@ -1,15 +1,17 @@
 package zip
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
-	"os"
+
+	"errors"
 )
 
 var fileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 	switch r.URL.String() {
 	case "/test.zip":
 		w.Header().Set("Content-Type", "applicaiton/zip")
@@ -100,9 +102,34 @@ func Test_unzip(t *testing.T) {
 		os.RemoveAll("./testdata/unzipped")
 	}()
 
+	errorDirectoryCreate := func(path string, perm os.FileMode) error {
+		return errors.New("something went wrong.")
+	}
+
+	errorCopySHA := func(dst io.Writer, src io.Reader) (written int64, err error) {
+		if reflect.TypeOf(dst).String() != "*sha256.digest" {
+			return io.Copy(dst, src)
+		}
+		return 0, errors.New("something went wrong")
+	}
+
+	errorCopyFile := func(dst io.Writer, src io.Reader) (written int64, err error) {
+		if reflect.TypeOf(dst).String() != "*os.File" {
+			return io.Copy(dst, src)
+		}
+		return 0, errors.New("something went wrong")
+	}
+
+	errorOpenFile := func(name string, flag int, perm os.FileMode) (*os.File, error) {
+		return nil, errors.New("something went wrong")
+	}
+
 	type args struct {
-		source      string
-		destination string
+		source           string
+		destination      string
+		makeDirectoryAll func(path string, perm os.FileMode) error
+		ioCopy           func(dst io.Writer, src io.Reader) (written int64, err error)
+		openFile         func(name string, flag int, perm os.FileMode) (*os.File, error)
 	}
 	tests := []struct {
 		name          string
@@ -114,8 +141,8 @@ func Test_unzip(t *testing.T) {
 		{
 			"Unzip File - Success",
 			args{
-				"./testdata/test.zip",
-				"./testdata/unzipped",
+				source:      "./testdata/test.zip",
+				destination: "./testdata/unzipped",
 			},
 			[]string{
 				"testdata/unzipped/function.php",
@@ -129,9 +156,91 @@ func Test_unzip(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"Unzip File - File",
+			args{
+				source:      "./testdata/error.zip",
+				destination: "./testdata/unzipped",
+			},
+			nil,
+			nil,
+			true,
+		},
+		{
+			"Unzip - Failed Directory Create",
+			args{
+				source:           "./testdata/test.zip",
+				destination:      "./testdata/unzipped",
+				makeDirectoryAll: errorDirectoryCreate,
+			},
+			nil,
+			nil,
+			true,
+		},
+		{
+			"Unzip - Faile Copy to Hasher",
+			args{
+				source:      "./testdata/test.zip",
+				destination: "./testdata/unzipped",
+				ioCopy:      errorCopySHA,
+			},
+			nil,
+			nil,
+			true,
+		},
+		{
+			"Unzip - Fail Open Target File",
+			args{
+				source:      "./testdata/test.zip",
+				destination: "./testdata/unzipped",
+				openFile:    errorOpenFile,
+			},
+			nil,
+			nil,
+			true,
+		},
+		{
+			"Unzip - Faile Copy to Target File",
+			args{
+				source:      "./testdata/test.zip",
+				destination: "./testdata/unzipped",
+				ioCopy:      errorCopyFile,
+			},
+			nil,
+			nil,
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			// Test create file.
+			if tt.args.makeDirectoryAll != nil {
+				oldMakeDirectoryAll := makeDirectoryAll
+				makeDirectoryAll = tt.args.makeDirectoryAll
+				defer func() {
+					makeDirectoryAll = oldMakeDirectoryAll
+				}()
+			}
+
+			// Test io.Copy error.
+			if tt.args.ioCopy != nil {
+				oldCopy := ioCopy
+				ioCopy = tt.args.ioCopy
+				defer func() {
+					ioCopy = oldCopy
+				}()
+			}
+
+			// Test io.Copy error.
+			if tt.args.openFile != nil {
+				oldOpenFile := openFile
+				openFile = tt.args.openFile
+				defer func() {
+					openFile = oldOpenFile
+				}()
+			}
+
 			gotFilenames, gotChecksums, err := unzip(tt.args.source, tt.args.destination)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("unzip() error = %v, wantErr %v", err, tt.wantErr)
@@ -150,11 +259,17 @@ func Test_unzip(t *testing.T) {
 func TestZip_PrepareFiles(t *testing.T) {
 
 	dest := "./testdata/download/"
+	errDest := "./testdata/error/"
 
 	// Clean up after.
 	defer func() {
 		os.RemoveAll(dest)
+		os.RemoveAll(errDest)
 	}()
+
+	errorCreate := func(path string) (*os.File, error) {
+		return nil, errors.New("something went wrong")
+	}
 
 	type fields struct {
 		url      string
@@ -163,7 +278,9 @@ func TestZip_PrepareFiles(t *testing.T) {
 		checksum string
 	}
 	type args struct {
-		dest string
+		dest           string
+		createFile     func(string) (*os.File, error)
+		sourceFilename string
 	}
 	tests := []struct {
 		name    string
@@ -182,9 +299,63 @@ func TestZip_PrepareFiles(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"Error Destination",
+			fields{
+				url:  fileServer.URL + "/test.zip",
+				dest: dest,
+			},
+			args{
+				dest:       dest,
+				createFile: errorCreate,
+			},
+			true,
+		},
+		{
+			"Error Source Zip",
+			fields{
+				url:  fileServer.URL + "/error.zip",
+				dest: errDest,
+			},
+			args{
+				dest:           errDest,
+				sourceFilename: "error.zip",
+			},
+			true,
+		},
+		{
+			"Error Url",
+			fields{
+				url:  "https://error.err/error.zip",
+				dest: dest,
+			},
+			args{
+				dest: dest,
+			},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			// Test create file.
+			if tt.args.createFile != nil {
+				oldCreateFile := createFile
+				createFile = tt.args.createFile
+				defer func() {
+					createFile = oldCreateFile
+				}()
+			}
+
+			// Test bad source name.
+			if tt.args.sourceFilename != "" {
+				oldFilename := sourceFilename
+				sourceFilename = tt.args.sourceFilename
+				defer func() {
+					sourceFilename = oldFilename
+				}()
+			}
+
 			m := &Zip{
 				url:      tt.fields.url,
 				dest:     tt.fields.dest,
@@ -193,6 +364,94 @@ func TestZip_PrepareFiles(t *testing.T) {
 			}
 			if err := m.PrepareFiles(tt.args.dest); (err != nil) != tt.wantErr {
 				t.Errorf("Zip.PrepareFiles() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_downloadFile(t *testing.T) {
+
+	dest := "./testdata/source.zip"
+
+	// Clean up after.
+	defer func() {
+		os.Remove(dest)
+	}()
+
+	errorCopy := func(dst io.Writer, src io.Reader) (written int64, err error) {
+		return 0, errors.New("something went wrong")
+	}
+
+	type args struct {
+		source      string
+		destination string
+		ioCopy      func(dst io.Writer, src io.Reader) (written int64, err error)
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			"Download - Success",
+			args{
+				source:      fileServer.URL + "/test.zip",
+				destination: dest,
+			},
+			false,
+		},
+		{
+			"Download - Fail Copy to Target",
+			args{
+				source:      fileServer.URL + "/test.zip",
+				destination: dest,
+				ioCopy:      errorCopy,
+			},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			// Test io.Copy error.
+			if tt.args.ioCopy != nil {
+				oldCopy := ioCopy
+				ioCopy = tt.args.ioCopy
+				defer func() {
+					ioCopy = oldCopy
+				}()
+			}
+
+			if err := downloadFile(tt.args.source, tt.args.destination); (err != nil) != tt.wantErr {
+				t.Errorf("downloadFile() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestNewZip(t *testing.T) {
+	type args struct {
+		url string
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Zip
+	}{
+		{
+			"Get new *Zip",
+			args{
+				fileServer.URL + "/test.zip",
+			},
+			&Zip{
+				url: fileServer.URL + "/test.zip",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewZip(tt.args.url); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewZip() = %v, want %v", got, tt.want)
 			}
 		})
 	}
