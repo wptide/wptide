@@ -5,8 +5,6 @@ import (
 	"github.com/xwp/go-tide/src/message"
 	"github.com/xwp/go-tide/src/audit/lighthouse"
 	"github.com/xwp/go-tide/src/audit/tide"
-	"flag"
-	"fmt"
 	tideApi "github.com/xwp/go-tide/src/tide"
 	"github.com/xwp/go-tide/src/tide/api"
 	"github.com/xwp/go-tide/src/message/sqs"
@@ -19,6 +17,7 @@ import (
 	"github.com/xwp/go-tide/src/audit/info"
 	"github.com/xwp/go-tide/src/storage"
 	"github.com/xwp/go-tide/src/storage/s3"
+	"flag"
 )
 
 var (
@@ -26,7 +25,7 @@ var (
 	Build   string // Set during build.
 
 	// Use the interface so that we can test.
-	TideClient tideApi.ClientInterface
+	TideClient tideApi.ClientInterface = &api.Client{}
 
 	// Number of concurrent audits.
 	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
@@ -71,46 +70,68 @@ var (
 		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 	}
 
-	messageProvider message.MessageProvider
-	storageProvider storage.StorageProvider
+	messageProvider message.MessageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
+	storageProvider storage.StorageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
+
+	// Create a buffer for the amount of concurrent audits.
+	buffer = make(chan struct{}, bufferSize)
+
+	// Create a channel that can terminate the app.
+	terminateChannel = make(chan struct{}, 1)
+
+	// Create a channel that receives messages from a queue.
+	cMessage chan *message.Message
+
+	bParseFlags = true
+	bVersion    = &[]bool{false}[0]
+
+	// An slice of processes that need to be performed on the message.
+	// A slice ensures that they happen in the correct order.
+	processes = []audit.Processor{
+		&ingest.Processor{},
+		&info.Processor{},
+		&lighthouse.Processor{},
+		&tide.Processor{},
+	}
 )
 
 func main() {
 
-	// Is the -version flag being used?
-	bVersion := flag.Bool("version", false, "a bool")
+	if bParseFlags {
+		// Is the -version flag being used?
+		bVersion = flag.Bool("version", false, "a bool")
 
-	// Parse all flags.
-	flag.Parse()
+		// Parse all flags.
+		flag.Parse()
+	}
 
 	// If -version is requested then echo the version details.
 	if *bVersion {
-		fmt.Printf("Version: %s\nBuild: %s\n", Version, Build)
+		oldFlags := log.Flags()
+		log.SetFlags(0)
+		log.Printf("Version: %s\nBuild: %s\n", Version, Build)
+		log.SetFlags(oldFlags)
 	}
 
 	// Prepare the Tide Client.
-	TideClient = &api.Client{}
 	err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
 	if err != nil {
-		log.Fatal("Tide API Error:", err)
+		log.Println("Tide API Error:", err)
+		terminateChannel <- struct{}{}
 	}
 
-	// Initiate a new Message provider.
-	messageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
-
-	// Initiate a new Storage provider.
-	storageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
-
-	// Create a buffer for the amount of concurrent audits.
-	buffer := make(chan struct{}, bufferSize)
-
-	// Create a channel that receives messages from a queue.
-	cMessage := messageChannel(messageProvider, buffer)
+	// Create a channel that receives messages from a queue, if it does not yet exist.
+	if cMessage == nil {
+		cMessage = messageChannel(messageProvider, buffer)
+	}
 
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
-		// Message received from the queue.
+		// Terminate signal received.
+		case <-terminateChannel:
+			break;
+			// Message received from the queue.
 		case msg := <-cMessage:
 			// Process the message in a go routine.
 			go processMessage(msg, TideClient, buffer)
@@ -120,7 +141,7 @@ func main() {
 
 // messageChannel returns a channel of messages to be processed. The message provider gets polled for
 // the next message and upon success it gets added to the channel.
-func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-chan *message.Message {
+func messageChannel(provider message.MessageProvider, buffer chan struct{}) chan *message.Message {
 
 	// Create the message channel.
 	c := make(chan *message.Message)
@@ -134,12 +155,12 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-ch
 
 			// Handle provider errors.
 			if err != nil {
-
 				// If its a Provider error we might need to panic and fail.
 				if pErr, ok := err.(*message.ProviderError); ok {
 					switch pErr.Type {
 					case message.ErrCritcal:
-						log.Fatal(pErr)
+						log.Println(pErr)
+						terminateChannel <- struct{}{}
 						break
 					case message.ErrOverQuota:
 						log.Println(pErr, "delaying for 60 seconds")
@@ -170,15 +191,6 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) <-ch
 func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer <-chan struct{}) {
 
 	tidelog.Log(msg.Title, "Processing...")
-
-	// An slice of processes that need to be performed on the message.
-	// A slice ensures that they happen in the correct order.
-	processes := []audit.Processor{
-		&ingest.Processor{},
-		&info.Processor{},
-		&lighthouse.Processor{},
-		&tide.Processor{},
-	}
 
 	var errors []error
 
