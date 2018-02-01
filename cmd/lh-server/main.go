@@ -18,30 +18,45 @@ import (
 	"github.com/xwp/go-tide/src/storage"
 	"github.com/xwp/go-tide/src/storage/s3"
 	"flag"
+	"github.com/xwp/go-tide/src/source"
+	"fmt"
+	"os"
 )
 
 var (
+	/** Compile time variables. **/
 	Version string // Set during build.
 	Build   string // Set during build.
 
+	/** Initialize interface instances **/
 	// Use the interface so that we can test.
 	TideClient tideApi.ClientInterface = &api.Client{}
 
-	// Number of concurrent audits.
-	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
+	// messageProvider is the primary source of messages to process.
+	messageProvider message.MessageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
+
+	// storageProvider is the cloud storage service for storing files.
+	storageProvider storage.StorageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
 
 	// Temp folder for downloaded files.
 	tempFolder = env.GetEnv("LH_TEMP_FOLDER", "/tmp")
 
+	/** Service Configurations **/
 	// Tide API configuration.
 	tideConfig = struct {
 		id           string
 		secret       string
 		authEndpoint string
+		host         string
+		protocol     string
+		version      string
 	}{
 		env.GetEnv("TIDE_API_KEY", ""),
 		env.GetEnv("TIDE_API_SECRET", ""),
 		env.GetEnv("TIDE_API_AUTH_URL", ""),
+		env.GetEnv("TIDE_API_HOST", ""),
+		env.GetEnv("TIDE_API_PROTOCOL", ""),
+		env.GetEnv("TIDE_API_VERSION", ""),
 	}
 
 	// Lighthouse SQS configuration.
@@ -70,11 +85,10 @@ var (
 		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 	}
 
-	messageProvider message.MessageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
-	storageProvider storage.StorageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
-
-	// Create a buffer for the amount of concurrent audits.
-	buffer = make(chan struct{}, bufferSize)
+	/** Channels **/
+	// Number of concurrent audits.
+	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
+	buffer        = make(chan struct{}, bufferSize)
 
 	// Create a channel that can terminate the app.
 	terminateChannel = make(chan struct{}, 1)
@@ -82,11 +96,26 @@ var (
 	// Create a channel that receives messages from a queue.
 	cMessage chan *message.Message
 
+	/** Flags **/
 	bParseFlags = true
-	bVersion    = &[]bool{false}[0]
 
-	// An slice of processes that need to be performed on the message.
-	// A slice ensures that they happen in the correct order.
+	// Display versions?
+	bVersion = &[]bool{false}[0]
+
+	// A single URL to process. Will not poll queue.
+	flagUrl = &[]string{""}[0]
+
+	// Project visibility for URL. "private" or "public"
+	flagVisibility = &[]string{"private"}[0]
+
+	// The client login id in Tide API.
+	flagClient = &[]string{"wporg"}[0]
+
+	// Send to Stdout rather than API?
+	flagOutput = &[]string{""}[0]
+
+	/** Processes **/
+	// A slice of processes (in order) that need to be performed on a message.
 	processes = []audit.Processor{
 		&ingest.Processor{},
 		&info.Processor{},
@@ -99,7 +128,19 @@ func main() {
 
 	if bParseFlags {
 		// Is the -version flag being used?
-		bVersion = flag.Bool("version", false, "a bool")
+		bVersion = flag.Bool("version", false, "print program version details")
+
+		// An -output file to write results to. Will not send to API.
+		flagOutput = flag.String("output", "", "send results to output file (json format)")
+
+		// A -url to run a single audit. Will not poll a queue.
+		flagUrl = flag.String("url", "", "audit single message from file")
+
+		// A -visibility to run a single audit. Will not poll a queue.
+		flagVisibility = flag.String("visibility", "public", `"private" or "public" - default "pubic"`)
+
+		// The -client login name in Tide API.
+		flagClient = flag.String("client", "wporg", `Tide API client to attribute project to - default "wporg"`)
 
 		// Parse all flags.
 		flag.Parse()
@@ -111,6 +152,36 @@ func main() {
 		log.SetFlags(0)
 		log.Printf("Version: %s\nBuild: %s\n", Version, Build)
 		log.SetFlags(oldFlags)
+	}
+
+	// If -url is set then prepare cMessage without a provider.
+	if *flagUrl != "" {
+		cMessage = make(chan *message.Message, 1)
+		cMessage <- &message.Message{
+			ResponseAPIEndpoint: fmt.Sprintf("%s://%s/api/tide/%s/audit", tideConfig.protocol, tideConfig.host, tideConfig.version),
+			Title:               "Single Project",
+			Content:             "Single project URL provided.",
+			SourceURL:           *flagUrl,
+			SourceType:          source.GetKind(*flagUrl),
+			Force:               true,
+			Visibility:          *flagVisibility,
+			RequestClient:       *flagClient,
+		}
+	}
+
+	// If -output is set add it to Tide process OutputFile.
+	if *flagOutput != "" {
+		var procs []audit.Processor
+
+		for _, proc := range processes {
+			if proc.Kind() != "tide" {
+				procs = append(procs, proc)
+			} else {
+				procs = append(procs, &tide.Processor{OutputFile: *flagOutput})
+			}
+		}
+
+		processes = procs
 	}
 
 	// Prepare the Tide Client.
@@ -133,8 +204,16 @@ func main() {
 			break;
 			// Message received from the queue.
 		case msg := <-cMessage:
-			// Process the message in a go routine.
-			go processMessage(msg, TideClient, buffer)
+			// If its a single process then don't run as goroutine.
+			if *flagUrl != "" {
+				// We still need to prime the bugger for processMessage() to be able to exit.
+				buffer <- struct{}{}
+				processMessage(msg, TideClient, buffer)
+				os.Exit(0)
+			} else {
+				// Process the message in a go routine.
+				go processMessage(msg, TideClient, buffer)
+			}
 		}
 	}
 }

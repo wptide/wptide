@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"github.com/xwp/go-tide/src/env"
 	"github.com/xwp/go-tide/src/log"
+	"io/ioutil"
 )
 
 type PayloadMessage struct {
@@ -20,7 +21,9 @@ type PayloadMessage struct {
 	Project       []string `json:"project"`
 }
 
-type Processor struct{}
+type Processor struct{
+	OutputFile string
+}
 
 func (p Processor) Kind() string {
 	return "tide"
@@ -140,9 +143,21 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	// Validate the item and fill in missing fields.
 	validItem, _ := getValidItem(isCollection, *payloadItem, msg, *result, *codeInfo)
 
-	log.Log(msg.Title, "Sending payload to Tide API...")
+
+
+	// Convert payload to JSON.
 	payload, _ := json.Marshal(validItem)
-	_, err := p.sendResults(client, endpoint, string(payload))
+
+	var err error
+	if p.OutputFile != "" {
+		log.Log(msg.Title, "Saving payload to file: " + p.OutputFile)
+		data := []byte(payload)
+		err = ioutil.WriteFile(p.OutputFile, data, 0644)
+	} else {
+		log.Log(msg.Title, "Sending payload to Tide API...")
+		_, err = p.sendResults(client, endpoint, string(payload))
+	}
+
 	if err != nil {
 		r["tideError"] = err
 		log.Log(msg.Title, r["tideError"])

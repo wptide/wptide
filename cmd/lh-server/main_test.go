@@ -13,6 +13,8 @@ import (
 	"log"
 	"bytes"
 	"github.com/xwp/go-tide/src/audit"
+	"net/http/httptest"
+	"net/http"
 )
 
 var (
@@ -42,6 +44,9 @@ var (
 		"LH_DEFAULT_REQUEST_CLIENT": "test_client",
 	}
 )
+
+var fileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+}))
 
 type mockMessageProvider struct {
 	Type string
@@ -140,6 +145,9 @@ func Test_main(t *testing.T) {
 		parseFlags     bool
 		version        bool
 		authError      bool
+		flagUrl        *string
+		flagOutput     *string
+		flagVisibility *string
 	}
 
 	tests := []struct {
@@ -175,12 +183,43 @@ func Test_main(t *testing.T) {
 				authError: true,
 			},
 		},
+		{
+			"Run Main - Output Flag set",
+			args{
+				timeOut:    1,
+				flagOutput: &[]string{"./testdata/report.json"}[0],
+			},
+		},
+		{
+			"Run Main - URL and Visibility Flag set",
+			args{
+				timeOut:        1,
+				flagUrl:        &[]string{fileServer.URL + "/test.zip"}[0],
+				flagVisibility: &[]string{"public"}[0],
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
 			// Parse the flags.
 			bParseFlags = tt.args.parseFlags
+
+			// -output
+			if tt.args.flagOutput != nil && *tt.args.flagOutput != "" {
+				flagOutput = tt.args.flagOutput
+			}
+
+			// -url
+			if tt.args.flagUrl != nil && *tt.args.flagUrl != "" {
+				flagUrl = tt.args.flagUrl
+				cMessage = nil
+			}
+
+			// -visibility
+			if tt.args.flagVisibility != nil && *tt.args.flagVisibility != "" {
+				flagVisibility = tt.args.flagVisibility
+			}
 
 			if tt.args.version {
 				bVersion = &[]bool{true}[0]
@@ -196,8 +235,12 @@ func Test_main(t *testing.T) {
 			go main()
 
 			if tt.args.messageChannel != nil {
+				oldCMessage := cMessage
 				cMessage = tt.args.messageChannel
 				cMessage <- tt.args.msg
+				defer func() {
+					cMessage = oldCMessage
+				}()
 			}
 
 			// Sleep for one second. Allows for one poll action.

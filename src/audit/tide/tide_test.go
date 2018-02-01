@@ -8,6 +8,7 @@ import (
 	"github.com/xwp/go-tide/src/audit"
 	"github.com/xwp/go-tide/src/message"
 	"github.com/xwp/go-tide/src/tide"
+	"os"
 )
 
 var (
@@ -33,6 +34,11 @@ func (m MockClient) SendPayload(method, endpoint, data string) (string, error) {
 }
 
 func TestProcessor_Process(t *testing.T) {
+
+	// Clean up after.
+	defer func() {
+		os.Remove("./testdata/test.json")
+	}()
 
 	TideClient = &MockClient{}
 	FailClient = &MockClient{apiError: true}
@@ -148,6 +154,15 @@ func TestProcessor_Process(t *testing.T) {
 				&apiWriteFail,
 			},
 			true,
+		},
+		{
+			"Collection Audit - Save to File",
+			Processor{ OutputFile: "./testdata/test.json" },
+			args{
+				fullCollectionMessage,
+				&fullResult,
+			},
+			false,
 		},
 	}
 	for _, tt := range tests {
