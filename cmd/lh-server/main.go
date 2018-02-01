@@ -134,7 +134,7 @@ func main() {
 		flagOutput = flag.String("output", "", "send results to output file (json format)")
 
 		// A -url to run a single audit. Will not poll a queue.
-		flagUrl = flag.String("url", "", "audit single message from file")
+		flagUrl = flag.String("url", "", "audit single message from url")
 
 		// A -visibility to run a single audit. Will not poll a queue.
 		flagVisibility = flag.String("visibility", "public", `"private" or "public" - default "pubic"`)
