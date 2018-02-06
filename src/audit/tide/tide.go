@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"strings"
 	"reflect"
-	"github.com/xwp/go-tide/src/env"
 	"github.com/xwp/go-tide/src/log"
 	"io/ioutil"
 )
@@ -21,7 +20,7 @@ type PayloadMessage struct {
 	Project       []string `json:"project"`
 }
 
-type Processor struct{
+type Processor struct {
 	OutputFile string
 }
 
@@ -143,14 +142,12 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	// Validate the item and fill in missing fields.
 	validItem, _ := getValidItem(isCollection, *payloadItem, msg, *result, *codeInfo)
 
-
-
 	// Convert payload to JSON.
 	payload, _ := json.Marshal(validItem)
 
 	var err error
 	if p.OutputFile != "" {
-		log.Log(msg.Title, "Saving payload to file: " + p.OutputFile)
+		log.Log(msg.Title, "Saving payload to file: "+p.OutputFile)
 		data := []byte(payload)
 		err = ioutil.WriteFile(p.OutputFile, data, 0644)
 	} else {
