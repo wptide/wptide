@@ -17,13 +17,8 @@ services:
             AWS_SQS_LH_KEY: ${AWS_SQS_LH_KEY}
             AWS_SQS_LH_SECRET: ${AWS_SQS_LH_SECRET}
             AWS_SQS_LH_QUEUE_NAME: ${AWS_SQS_LH_QUEUE_NAME}
-        extra_hosts:
-          - tide.local:${TIDE_API_HOST_IP}
-        networks:
-            - tide
-
-### Docker networks #######################################
-networks:
-    tide:
-        external:
-              name: tide_frontend
+            AWS_S3_REGION: ${AWS_S3_REGION}
+            AWS_S3_KEY: ${AWS_S3_KEY}
+            AWS_S3_SECRET: ${AWS_S3_SECRET}
+            AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+        network_mode: host
