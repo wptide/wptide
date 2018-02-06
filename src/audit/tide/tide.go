@@ -10,18 +10,17 @@ import (
 	"fmt"
 	"strings"
 	"reflect"
-	"github.com/xwp/go-tide/src/env"
 	"github.com/xwp/go-tide/src/log"
 	"io/ioutil"
 )
 
 type PayloadMessage struct {
 	tide.Item
-	RequestClient string   `json:"request_client"`
+	RequestClient string   `json:"request_client,omitempty"`
 	Project       []string `json:"project"`
 }
 
-type Processor struct{
+type Processor struct {
 	OutputFile string
 }
 
@@ -143,14 +142,12 @@ func (p Processor) Process(msg message.Message, result *audit.Result) {
 	// Validate the item and fill in missing fields.
 	validItem, _ := getValidItem(isCollection, *payloadItem, msg, *result, *codeInfo)
 
-
-
 	// Convert payload to JSON.
 	payload, _ := json.Marshal(validItem)
 
 	var err error
 	if p.OutputFile != "" {
-		log.Log(msg.Title, "Saving payload to file: " + p.OutputFile)
+		log.Log(msg.Title, "Saving payload to file: "+p.OutputFile)
 		data := []byte(payload)
 		err = ioutil.WriteFile(p.OutputFile, data, 0644)
 	} else {
@@ -209,7 +206,10 @@ func getValidItem(isCollection bool, item tide.Item, msg message.Message, result
 		validItem.SourceUrl = item.SourceUrl
 
 		// Set the request client on the API.
-		defaultRequestClient := env.GetEnv("LH_DEFAULT_REQUEST_CLIENT=audit_server", "audit_server")
+		defaultRequestClient, ok := result["clientCreditedUser"].(string)
+		if ! ok {
+			defaultRequestClient = ""
+		}
 		validItem.RequestClient, ok = fallbackValue(msg.RequestClient, defaultRequestClient).(string)
 	}
 

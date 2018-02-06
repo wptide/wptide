@@ -50,6 +50,7 @@ var (
 		host         string
 		protocol     string
 		version      string
+		creditedUser  string
 	}{
 		env.GetEnv("TIDE_API_KEY", ""),
 		env.GetEnv("TIDE_API_SECRET", ""),
@@ -57,6 +58,7 @@ var (
 		env.GetEnv("TIDE_API_HOST", ""),
 		env.GetEnv("TIDE_API_PROTOCOL", ""),
 		env.GetEnv("TIDE_API_VERSION", ""),
+		env.GetEnv("TIDE_API_CREDITED_USER", ""),
 	}
 
 	// Lighthouse SQS configuration.
@@ -279,6 +281,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 	// - Audits to run
 	result := &audit.Result{
 		"client":     &client,
+		"clientCreditedUser": tideConfig.creditedUser,
 		"tempFolder": tempFolder,
 		"audits": []string{
 			"lighthouse",
