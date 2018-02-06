@@ -17,7 +17,7 @@ import (
 
 type PayloadMessage struct {
 	tide.Item
-	RequestClient string   `json:"request_client"`
+	RequestClient string   `json:"request_client,omitempty"`
 	Project       []string `json:"project"`
 }
 
@@ -209,7 +209,10 @@ func getValidItem(isCollection bool, item tide.Item, msg message.Message, result
 		validItem.SourceUrl = item.SourceUrl
 
 		// Set the request client on the API.
-		defaultRequestClient := env.GetEnv("LH_DEFAULT_REQUEST_CLIENT=audit_server", "audit_server")
+		defaultRequestClient, ok := result["clientCreditedUser"].(string)
+		if ! ok {
+			defaultRequestClient = ""
+		}
 		validItem.RequestClient, ok = fallbackValue(msg.RequestClient, defaultRequestClient).(string)
 	}
 
