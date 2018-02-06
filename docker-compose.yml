@@ -17,10 +17,13 @@ services:
             AWS_SQS_LH_KEY: ${AWS_SQS_LH_KEY}
             AWS_SQS_LH_SECRET: ${AWS_SQS_LH_SECRET}
             AWS_SQS_LH_QUEUE_NAME: ${AWS_SQS_LH_QUEUE_NAME}
+        extra_hosts:
+          - tide.local:${TIDE_API_HOST_IP}
         networks:
-            - backend
+            - tide
 
 ### Docker networks #######################################
 networks:
-    backend:
-        driver: bridge
+    tide:
+        external:
+              name: tide_frontend
