@@ -123,24 +123,24 @@ build.cluster: config
 deploy.cluster: config creds
 	@kubectl run ${CLUSTER} --image=${REPO}/${TAG} --replicas=${REPLICAS} \
 	--env="TIDE_API_AUTH_URL=${TIDE_API_AUTH_URL}" \
-    --env="TIDE_API_HOST=${TIDE_API_HOST}" \
-    --env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
-    --env="TIDE_API_KEY=${TIDE_API_KEY}" \
-    --env="TIDE_API_SECRET=${TIDE_API_SECRET}" \
-    --env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
-    --env="AWS_SQS_LH_VERSION=${AWS_SQS_LH_VERSION}" \
-    --env="AWS_SQS_LH_REGION=${AWS_SQS_LH_REGION}" \
-    --env="AWS_SQS_LH_KEY=${AWS_SQS_LH_KEY}" \
-    --env="AWS_SQS_LH_SECRET=${AWS_SQS_LH_SECRET}" \
-    --env="AWS_SQS_LH_QUEUE_NAME=${AWS_SQS_LH_QUEUE_NAME}" \
-    --env="AWS_S3_REGION=${AWS_S3_REGION}" \
-    --env="AWS_S3_KEY=${AWS_S3_KEY}" \
-    --env="AWS_S3_SECRET=${AWS_S3_SECRET}" \
-    --env="AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}" \
-    @kubectl autoscale deployment ${CLUSTER} \
-    --cpu-percent=${CPU_PERCENT} \
-    --min=${MIN_PODS} \
-    --max=${MAX_PODS}
+	--env="TIDE_API_HOST=${TIDE_API_HOST}" \
+	--env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
+	--env="TIDE_API_KEY=${TIDE_API_KEY}" \
+	--env="TIDE_API_SECRET=${TIDE_API_SECRET}" \
+	--env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
+ 	--env="AWS_SQS_LH_VERSION=${AWS_SQS_LH_VERSION}" \
+	--env="AWS_SQS_LH_REGION=${AWS_SQS_LH_REGION}" \
+	--env="AWS_SQS_LH_KEY=${AWS_SQS_LH_KEY}" \
+	--env="AWS_SQS_LH_SECRET=${AWS_SQS_LH_SECRET}" \
+	--env="AWS_SQS_LH_QUEUE_NAME=${AWS_SQS_LH_QUEUE_NAME}" \
+	--env="AWS_S3_REGION=${AWS_S3_REGION}" \
+	--env="AWS_S3_KEY=${AWS_S3_KEY}" \
+	--env="AWS_S3_SECRET=${AWS_S3_SECRET}" \
+	--env="AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}"
+	@kubectl autoscale deployment ${CLUSTER} \
+	--cpu-percent=${CPU_PERCENT} \
+	--min=${MIN_PODS} \
+	--max=${MAX_PODS}
 
 # Clean the GKE cluster.
 clean.cluster: config
