@@ -1,0 +1,1 @@
+This folder contains files to tests against WordPress Coding Standards.
