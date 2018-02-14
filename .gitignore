@@ -3,6 +3,10 @@ vendor
 
 # Variables
 .env
+.env.prod
 
 # MacOS
 .DS_Store
+
+# GO Binary
+bin/lh-server
