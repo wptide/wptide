@@ -157,7 +157,6 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	fileReader, err := os.Open(p.ReportFilePath)
 	p.errCheck(err, result)
 	for _, proc := range p.PostProcessors {
-		// @todo Replace PostProcessor with audit.PostProcessor when merged with wptide/pkg
 		if proc, ok := proc.(audit.PostProcessor); ok && err == nil {
 			fileReader.Seek(0, 0) // Rewind file.
 			proc.Parent(p)
