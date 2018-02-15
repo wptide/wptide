@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"strconv"
 	"syscall"
-	"io"
 	"os"
 )
 
@@ -22,13 +21,6 @@ var (
 	// Using exec.Command as a variable so that we can mock it in tests.
 	execCommand = exec.Command
 )
-
-// @todo Remove after interface is added to wptide/pkg
-type PostProcessor interface {
-	audit.Processor
-	SetReport(reader io.Reader)
-	Parent(processor audit.Processor)
-}
 
 type Processor struct {
 	Standard       string            // The standard to run for this process.
@@ -166,7 +158,7 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	p.errCheck(err, result)
 	for _, proc := range p.PostProcessors {
 		// @todo Replace PostProcessor with audit.PostProcessor when merged with wptide/pkg
-		if proc, ok := proc.(PostProcessor); ok && err == nil {
+		if proc, ok := proc.(audit.PostProcessor); ok && err == nil {
 			fileReader.Seek(0, 0) // Rewind file.
 			proc.Parent(p)
 			proc.SetReport(fileReader)

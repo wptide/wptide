@@ -1,8 +1,8 @@
 hash: fdd1b08279c9d1296025941be3daef0114a49cc15efa9156f13b14aa2c9c6959
-updated: 2018-02-06T13:38:31.171163787+11:00
+updated: 2018-02-15T11:39:34.155017144+11:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: f36920a0f7a246abe598d73b37b245199aabd3ad
+  version: 1588380f5050a9cb8bfb57f043b9f8fff674aff9
   subpackages:
   - aws
   - aws/awserr
@@ -35,15 +35,15 @@ imports:
   - service/sqs/sqsiface
   - service/sts
 - name: github.com/go-ini/ini
-  version: 32e4c1e6bc4e7d0d8451aa6b75200d19e37a536a
+  version: 32e4be5f41bb918afb6e37c07426e2ddbcb6647e
 - name: github.com/hhatto/gocloc
   version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
 - name: github.com/jmespath/go-jmespath
-  version: dd801d4f4ce7ac746e7e7b4489d2fa600b3b096b
+  version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 9eb748c57ff5872149d9fd5793b79b5b79c0c674
+  version: 15ceed3eed6cd398f49ddb4b8b0bdc55803c91c2
   subpackages:
   - audit
   - audit/info
@@ -68,4 +68,6 @@ imports:
   - internal/tokenizer
 - name: gopkg.in/toqueteos/substring.v1
   version: c5f61671513240ddf5563635cc4a90e9f3ae4710
-testImports: []
+testImports:
+- name: github.com/pkg/errors
+  version: 30136e27e2ac8d167177e8a583aa4c3fea5be833
