@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"strconv"
 	"syscall"
+	"io"
+	"os"
 )
 
 var (
@@ -21,10 +23,17 @@ var (
 	execCommand = exec.Command
 )
 
+// @todo Remove after interface is added to wptide/pkg
+type PostProcessor interface {
+	audit.Processor
+	SetReport(reader io.Reader)
+	Parent(processor audit.Processor)
+}
+
 type Processor struct {
-	Standard       string          // The standard to run for this process.
+	Standard       string            // The standard to run for this process.
 	PostProcessors []audit.Processor // A post process to run on the results.
-	Parallel       int             // Number of parallel phpcs cli processes (phpcs setting).
+	Parallel       int               // Number of parallel phpcs cli processes (phpcs setting).
 	Encoding       string
 	RuntimeSet     []string // String array in format "key value" per entry.
 	ReportFile     string
@@ -111,35 +120,21 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 
 	cmdArgs = append(cmdArgs, p.FilesPath)
 	cmdArgs = append(cmdArgs, "-q")
-	fmt.Println(cmdArgs)
+
 	// Prepare the command and set the stdOut pipe.
 	cmd := execCommand(cmdName, cmdArgs...)
 
 	cmdReader, err := cmd.StdoutPipe()
-	//p.errCheck(err, result)
-
-	errReader, err := cmd.StderrPipe()
-	//p.errCheck(err, result)
+	p.errCheck(err, result)
 
 	// Start the command.
 	err = cmd.Start()
-	//p.errCheck(err, result)
+	p.errCheck(err, result)
 
 	// Read stdout pipe.
+	// Note: phpcs does not write to Stderr so nothing to read there.
 	resultBytes, err := ioutil.ReadAll(cmdReader)
-	//p.errCheck(err, result)
-
-	// Read stderr pipe.
-	errorBytes, err := ioutil.ReadAll(errReader)
-	//p.errCheck(err, result)
-
-	if len(errorBytes) > 0 {
-		r[p.Kind()] = nil
-		r[p.Kind()+"Error"] = errors.New("phpcs (" + p.standard() + ") command failed: " + string(errorBytes))
-
-		log.Log(msg.Title, r[p.Kind()+"Error"])
-		return
-	}
+	p.errCheck(err, result)
 
 	// Wait for command to exit and stdio to be read.
 	r[p.Kind()+"ExitCode"] = 0
@@ -152,8 +147,6 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 		}
 	}
 
-	fmt.Println(string(errorBytes))
-
 	log.Log(msg.Title, fmt.Sprintf("phpcs output:\n %s", strings.TrimSpace(string(resultBytes))))
 
 	// We already have a reference to the report file, so letss upload and get the storage reference in a result.
@@ -161,27 +154,36 @@ func (p *Processor) Process(msg message.Message, result *audit.Result) {
 	fullResults, err := p.uploadToStorage(r)
 	p.errCheck(err, result)
 
-	auditResult := &tide.AuditResult{}
+	// Initialise the result and set the "Full" entry to the uploaded file.
+	r[p.Kind()] = &tide.AuditResult{}
+	if fullResults != nil {
+		auditResults := r[p.Kind()].(*tide.AuditResult)
+		auditResults.Full = fullResults.Full
+	}
 
 	// Run post processes.
+	fileReader, err := os.Open(p.ReportFilePath)
+	p.errCheck(err, result)
 	for _, proc := range p.PostProcessors {
-		proc.Process(msg, &r)
+		// @todo Replace PostProcessor with audit.PostProcessor when merged with wptide/pkg
+		if proc, ok := proc.(PostProcessor); ok && err == nil {
+			fileReader.Seek(0, 0) // Rewind file.
+			proc.Parent(p)
+			proc.SetReport(fileReader)
+			log.Log(msg.Title, "Post-Processing: "+proc.Kind())
+			proc.Process(msg, &r)
+		}
 	}
 
-	//// @todo Add pre-post-process and post-process results as required.
-	if fullResults != nil {
-		auditResult.Full = fullResults.Full
-		auditResult.Details.Type = fullResults.Full.Type
-		auditResult.Details.Key = fullResults.Full.Key
-		auditResult.Details.BucketName = fullResults.Full.BucketName
+	// If our Details are empty, then we assume we want Full here.
+	emptyResult := tide.AuditResult{}
+	if r[p.Kind()].(*tide.AuditResult).Details == emptyResult.Details {
+		full := r[p.Kind()].(*tide.AuditResult).Full
+		auditResults := r[p.Kind()].(*tide.AuditResult)
+		auditResults.Details.Type = full.Type
+		auditResults.Details.Key = full.Key
+		auditResults.Details.BucketName = full.BucketName
 	}
-	//
-	//auditResult.Summary = &tide.AuditSummary{
-	//	// @todo
-	//	//PhpcsSummary: results,
-	//}
-
-	r[p.Kind()] = auditResult
 
 	log.Log(msg.Title, fmt.Sprintf("phpcs (%s) process completed with exit code: %d\n", p.standard(), r[p.Kind()+"ExitCode"]))
 }

@@ -13,6 +13,8 @@ import (
 	"github.com/wptide/pkg/storage"
 	"os"
 	"github.com/wptide/pkg/audit/ingest"
+	"io"
+	"io/ioutil"
 )
 
 var (
@@ -30,6 +32,43 @@ var (
 
 	storageProvider storage.StorageProvider
 )
+
+type mockProcessor struct {
+	Report        io.Reader
+	ParentProcess audit.Processor
+}
+
+func (m mockProcessor) Kind() string {
+	return "mock"
+}
+
+// Mocks a post processor.
+// Also serves as an example for building a post-processor.
+func (m *mockProcessor) Process(msg message.Message, result *audit.Result) {
+	r := *result
+
+	b, err := ioutil.ReadAll(m.Report)
+	if err != nil {
+		return
+	}
+
+	emptyResult := tide.AuditResult{}
+	auditResults := r[m.ParentProcess.Kind()].(*tide.AuditResult)
+
+	if auditResults.Summary == emptyResult.Summary {
+		auditResults.Summary = &tide.AuditSummary{}
+	} else {
+		auditResults.Error = string(b)
+	}
+}
+
+func (m *mockProcessor) SetReport(report io.Reader) {
+	m.Report = report
+}
+
+func (m *mockProcessor) Parent(parent audit.Processor) {
+	m.ParentProcess = parent
+}
 
 type mockStorage struct{}
 
@@ -101,32 +140,32 @@ func TestProcessor_Process(t *testing.T) {
 		args    args
 		hideLog bool
 	}{
-		//{
-		//	"PHPCS Audit",
-		//	&Processor{
-		//		Standard: "WordPress-Core",
-		//	},
-		//	args{
-		//		message.Message{},
-		//		&audit.Result{
-		//			"audits": []string{
-		//				"phpcs_wordpress-core",
-		//			},
-		//			"ingest": &ingest.Processor{
-		//				Dest: "./testdata/plugin",
-		//			},
-		//			"checksum":   "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
-		//			"tempFolder": currentDir + "/testdata/tmp",
-		//			"fileStore": &storageProvider,
-		//		},
-		//	},
-		//	true,
-		//},
+		{
+			"PHPCS Audit",
+			&Processor{
+				Standard: "WordPress-Core",
+			},
+			args{
+				message.Message{},
+				&audit.Result{
+					"audits": []string{
+						"phpcs_wordpress-core",
+					},
+					"ingest": &ingest.Processor{
+						Dest: "./testdata/plugin",
+					},
+					"checksum":   "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+					"tempFolder": currentDir + "/testdata/tmp",
+					"fileStore":  &storageProvider,
+				},
+			},
+			true,
+		},
 		{
 			"PHPCS Audit With RuntimeSet",
 			&Processor{
-				Standard: "PHPCompatibility",
-				RuntimeSet: []string{ "testVersion 5.2-" },
+				Standard:   "PHPCompatibility",
+				RuntimeSet: []string{"testVersion 5.2-"},
 			},
 			args{
 				message.Message{},
@@ -139,10 +178,56 @@ func TestProcessor_Process(t *testing.T) {
 					},
 					"checksum":   "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
 					"tempFolder": currentDir + "/testdata/tmp",
-					"fileStore": &storageProvider,
+					"fileStore":  &storageProvider,
 				},
 			},
-			false,
+			true,
+		},
+		{
+			"PHPCS Audit With PostProcess",
+			&Processor{
+				Standard:   "PHPCompatibility",
+				RuntimeSet: []string{"testVersion 5.2-"},
+				PostProcessors: []audit.Processor{
+					&mockProcessor{},
+				},
+			},
+			args{
+				message.Message{},
+				&audit.Result{
+					"audits": []string{
+						"phpcs_phpcompatibility",
+					},
+					"ingest": &ingest.Processor{
+						Dest: "./testdata/plugin",
+					},
+					"checksum":   "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+					"tempFolder": currentDir + "/testdata/tmp",
+					"fileStore":  &storageProvider,
+				},
+			},
+			true,
+		},
+		{
+			"Error: Invalid standard.",
+			&Processor{
+				Standard: "Invalid",
+			},
+			args{
+				message.Message{},
+				&audit.Result{
+					"audits": []string{
+						"phpcs_invalid",
+					},
+					"ingest": &ingest.Processor{
+						Dest: "./testdata/does_not_exist",
+					},
+					"checksum":   "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+					"tempFolder": currentDir + "/testdata/tmp",
+					"fileStore":  &storageProvider,
+				},
+			},
+			true,
 		},
 		{
 			"Error: No checksum",
