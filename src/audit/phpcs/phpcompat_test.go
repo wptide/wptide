@@ -24,9 +24,12 @@ func TestPhpCompat_Process(t *testing.T) {
 	parent := &Processor{
 		Standard: "phpcompatibility",
 	}
-	readerWordPress, _ := os.Open(testFiles["phpcompat"])
+	readerCompatSet1, _ := os.Open("./testdata/samples/phpcompat1.json")
+	readerCompatSet2, _ := os.Open("./testdata/samples/phpcompat2.json")
 	//readerFailed, _ := os.Open(testFiles["fail"])
 	//readerInvalid, _ := os.Open(testFiles["invalid"])
+
+	storageProvider = &mockStorage{}
 
 	type fields struct {
 		Report        io.Reader
@@ -42,9 +45,9 @@ func TestPhpCompat_Process(t *testing.T) {
 		args   args
 	}{
 		{
-			"PHPCS PhpCompatibility Standard",
+			"PhpCompatibility - Set 1",
 			fields{
-				Report:        readerWordPress,
+				Report:        readerCompatSet1,
 				ParentProcess: parent,
 			},
 			args{
@@ -53,6 +56,27 @@ func TestPhpCompat_Process(t *testing.T) {
 				},
 				&audit.Result{
 					"phpcs_phpcompatibility": &tide.AuditResult{},
+					"fileStore":  &storageProvider,
+					"tempFolder": "/tmp",
+					"checksum":   "39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e",
+				},
+			},
+		},
+		{
+			"PhpCompatibility - Set 2",
+			fields{
+				Report:        readerCompatSet2,
+				ParentProcess: parent,
+			},
+			args{
+				message.Message{
+					Title: "PhpCompatibility Standard",
+				},
+				&audit.Result{
+					"phpcs_phpcompatibility": &tide.AuditResult{},
+					"fileStore":  &storageProvider,
+					"tempFolder": "/tmp",
+					"checksum":   "39c7d71a68565ddd7b6a0fd68d94924d0db449a99541439b3ab8a477c5f1fc4e",
 				},
 			},
 		},

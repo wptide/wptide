@@ -50,6 +50,13 @@ func TestBreaksVersions(t *testing.T) {
 			[]string{"7.0", "7.1", "7.2"},
 		},
 		{
+			"PHPCompatibility.PHP.ForbiddenNames.cloneFound",
+			args{
+				"PHPCompatibility.PHP.ForbiddenNames.cloneFound",
+			},
+			[]string{"5.2", "5.3", "5.4", "5.5", "5.6", "7.0", "7.1", "7.2"},
+		},
+		{
 			// Warnings only, no breaks.
 			"PHPCompatibility.PHP.DeprecatedFunctions.mcrypt_generic_deinitDeprecated",
 			args{
@@ -272,6 +279,28 @@ func TestGetVersionParts(t *testing.T) {
 			"7.2.1",
 			"7.2",
 			"7.2",
+		},
+		{
+			"5.4",
+			args{
+				"5.4",
+				"5.2",
+			},
+			"5.2.0",
+			"5.4.45",
+			"5.4",
+			"5.4",
+		},
+		{
+			"5.0",
+			args{
+				"5.0",
+				"",
+			},
+			"5.2.0",
+			"5.2.0",
+			"5.2",
+			"5.0",
 		},
 	}
 	for _, tt := range tests {

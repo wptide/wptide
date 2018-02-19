@@ -19,6 +19,9 @@ import (
 
 var (
 	verbs = []string{
+
+		//"available since",
+
 		"not present", // or earlier
 		////"as of", // use "soft reserved"
 		"soft reserved", // "as of" "reserved keyword as of" , works like "deprecated"
@@ -37,6 +40,12 @@ var (
 		"and lower",
 		"<",
 		////"in PHP", // Probably don't need this one
+
+		"magic method",
+
+		"available since",
+
+		"since",
 	}
 )
 
@@ -74,17 +83,20 @@ func generateCompatibilityMap(input io.Reader, output io.Writer) {
 		log.Fatal(err)
 	}
 
-	sources := make(map[string]string)
+	sources := make(map[string]map[string]string)
 
 	for _, data := range fullResults.Files {
 		for _, msg := range data.Messages {
-			sources[msg.Source] = msg.Message
+			sources[msg.Source] = make(map[string]string)
+			sources[msg.Source]["message"] = msg.Message
+			sources[msg.Source]["type"] = msg.Type
 		}
 	}
 
 	output.Write([]byte("package phpcompat\n\nvar PhpCompatibilityMap = map[string]*Compatibility{\n"))
-	for src, msg := range sources {
-		sourceOutput := formatAsSourceCode(getSourceOutput(src, msg))
+	for src, item := range sources {
+		sourceOutput := formatAsSourceCode(getSourceOutput(src, item["message"], item["type"]))
+		//sourceOutput := formatAsSourceCode(getSourceOutput(src, item["message"]))
 		if len(sourceOutput) > 0 {
 			output.Write([]byte(sourceOutput))
 
@@ -147,16 +159,38 @@ func formatAsSourceCode(source string) string {
 	output := `
 	"` + key + `": &Compatibility{
 		Source: "` + key + `",` +
-	 	breaksOutput +
+		breaksOutput +
 		warnsOutput + `
 	},`
 
 	return output
 }
 
-func getSourceOutput(src, msg string) string {
+func getSourceOutput(src, msg, kind string) string {
 	line := fmt.Sprintf("%s\n\t%s\n", src, msg)
 	//line := fmt.Sprintf("%s\n", msg)
+
+	versions := getVersions(line)
+	var breaks *phpcompat.CompatibilityRange
+	var warns *phpcompat.CompatibilityRange
+
+	if strings.ToLower(kind) == "error" {
+		low, high, majorMinor, reported := phpcompat.GetVersionParts(versions[0], "")
+		breaks = &phpcompat.CompatibilityRange{
+			low,
+			high,
+			reported,
+			majorMinor,
+		}
+	} else {
+		low, high, majorMinor, reported := phpcompat.GetVersionParts(versions[0], "")
+		warns = &phpcompat.CompatibilityRange{
+			low,
+			high,
+			reported,
+			majorMinor,
+		}
+	}
 
 	matchList := strings.Join(verbs, "|")
 
@@ -164,9 +198,6 @@ func getSourceOutput(src, msg string) string {
 	matches := re.FindAllString(msg, -1)
 
 	if len(matches) > 0 {
-		versions := getVersions(line)
-		var breaks *phpcompat.CompatibilityRange
-		var warns *phpcompat.CompatibilityRange
 
 		matches = orderMatches(matches)
 
@@ -187,10 +218,10 @@ func getSourceOutput(src, msg string) string {
 			fallthrough
 		case "deprecated":
 
-			low, high, majorMinor, reported := phpcompat.GetVersionParts(versions[0], versions[0])
+			low, _, majorMinor, reported := phpcompat.GetVersionParts(versions[0], versions[0])
 			warns = &phpcompat.CompatibilityRange{
 				low,
-				high,
+				phpcompat.PhpLatest,
 				reported,
 				majorMinor,
 			}
@@ -282,26 +313,97 @@ func getSourceOutput(src, msg string) string {
 				reported,
 				majorMinor,
 			}
-		default:
-			mOut := strings.Join(matches, ",")
-			return mOut + "\n" + line + strings.Join(versions, ",") + "\n"
+
+		case "magic method":
+			low, high, majorMinor, reported := phpcompat.GetVersionParts("all", "")
+
+			breaks = &phpcompat.CompatibilityRange{
+				low,
+				high,
+				reported,
+				majorMinor,
+			}
+
+		case "available since":
+			if breaks != nil {
+				breaks.Low = "5.2.1"
+				breaks.High = phpcompat.PreviousVersion(breaks.MajorMinor)
+			}
+			if warns != nil {
+				warns.Low = "5.2.1"
+				warns.High = phpcompat.PreviousVersion(warns.MajorMinor)
+			}
+
+		case "since":
+			if breaks != nil {
+				breaks.High = phpcompat.PhpLatest
+			}
+			if warns != nil {
+				warns.High = phpcompat.PhpLatest
+			}
 		}
 
 		if breaks == nil && warns == nil {
 			return ""
 		}
-
-		report := phpcompat.Compatibility{
-			src,
-			breaks,
-			warns,
-		}
-
-		incompatString, _ := json.Marshal(report)
-
-		return string(incompatString)
 	}
-	return ""
+	report := phpcompat.Compatibility{
+		src,
+		breaks,
+		warns,
+	}
+
+	incompatString, _ := json.Marshal(report)
+
+	return string(incompatString)
+}
+
+func getSourceOutputByKind(src, msg, kind string) string {
+	line := fmt.Sprintf("%s\n\t%s\n", src, msg)
+
+	versions := getVersions(line)
+	var breaks *phpcompat.CompatibilityRange
+	var warns *phpcompat.CompatibilityRange
+
+	if strings.ToLower(kind) == "error" {
+		low, high, majorMinor, reported := phpcompat.GetVersionParts(versions[0], "")
+		breaks = &phpcompat.CompatibilityRange{
+			low,
+			high,
+			reported,
+			majorMinor,
+		}
+	} else {
+		low, high, majorMinor, reported := phpcompat.GetVersionParts(versions[0], "")
+		warns = &phpcompat.CompatibilityRange{
+			low,
+			high,
+			reported,
+			majorMinor,
+		}
+	}
+
+	matchList := strings.Join(verbs, "|")
+	var re = regexp.MustCompile(`(?i)` + matchList + ``)
+	matches := re.FindAllString(msg, -1)
+
+	if len(matches) > 0 {
+
+	}
+
+	if breaks == nil && warns == nil {
+		return ""
+	}
+
+	report := phpcompat.Compatibility{
+		src,
+		breaks,
+		warns,
+	}
+
+	incompatString, _ := json.Marshal(report)
+
+	return string(incompatString)
 }
 
 func getVersions(line string) []string {

@@ -144,7 +144,22 @@ func GetVersionParts(version, lowIn string) (low, high, majorMinor, reported str
 		}
 
 	} else {
-		low = lowIn
+		lowParts := strings.Split(lowIn, ".")
+		if len(lowParts) == 2 {
+			low = fmt.Sprintf("%s.%s", lowIn, "0")
+		} else {
+			low = lowIn
+		}
+	}
+
+	v, _ := semver.Make(majorMinor + ".0")
+	min, _ := semver.Make("5.2.0")
+
+	if v.LT(min) && majorMinor != "all" {
+		low = "5.2.0"
+		high = low
+		reported = majorMinor
+		majorMinor = "5.2"
 	}
 
 	reported = version
@@ -154,7 +169,12 @@ func GetVersionParts(version, lowIn string) (low, high, majorMinor, reported str
 
 func BreaksVersions(code string) []string {
 
-	compat := PhpCompatibilityMap[code]
+	compat, ok := PhpCompatibilityMap[code]
+
+	if ! ok {
+		fmt.Println(code)
+		return nil
+	}
 
 	broken := []string{}
 
@@ -172,6 +192,7 @@ func BreaksVersions(code string) []string {
 	failRange, _ := semver.ParseRange(rangeString)
 
 	for majorMinor, item := range phpVersions {
+
 		if failRange(semver.MustParse(item["max"])) {
 			broken = append(broken, majorMinor)
 		}

@@ -8,6 +8,7 @@ import (
 	"github.com/wptide/pkg/tide"
 	"encoding/json"
 	"fmt"
+	"github.com/xwp/go-tide/src/phpcompat"
 )
 
 // PhpcsSummary implements audit.PostProcessor.
@@ -55,16 +56,22 @@ func (p *PhpCompat) Process(msg message.Message, result *audit.Result) {
 
 		// Iterate files and only get summary data.
 		for filename, data := range fullResults.Files {
-			for _, msg := range data.Messages {
-				if _, ok := sources[msg.Source]; !ok {
-					sources[msg.Source] = make(map[string]interface{})
+			for _, sniffMessage := range data.Messages {
+
+				if _, ok := sources[sniffMessage.Source]; !ok {
+					sources[sniffMessage.Source] = make(map[string]interface{})
+					sources[sniffMessage.Source]["files"] = make(map[string]interface{})
+					sources[sniffMessage.Source]["breaks"] = phpcompat.BreaksVersions(sniffMessage.Source)
 				}
-				sources[msg.Source][filename] = msg
+				sources[sniffMessage.Source]["files"].(map[string]interface{})[filename] = sniffMessage
 			}
 		}
 
 		res, _ := json.Marshal(sources)
 		fmt.Println(string(res))
+		//parentPhpcs, _ := p.ParentProcess.(*Processor)
+		//fmt.Println(parentPhpcs.uploadToStorage(r))
+		//fmt.Println(parentPhpcs.reportPath(r))
 
 		summary := getPhpcsSummary(fullResults)
 

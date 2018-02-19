@@ -38,7 +38,6 @@ var (
 		"t17": "./testdata/samples/twentyseventeen-14-phpcs_wordpress.json",
 		"fail": "./testdata/nothing/here",
 		"invalid": "./testdata/samples/invalid-json.json",
-		"phpcompat": "./testdata/samples/all-phpcompat-sniffs.json",
 	}
 )
 
