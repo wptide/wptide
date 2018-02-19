@@ -7,19 +7,20 @@ import (
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/tide"
 	"encoding/json"
+	"fmt"
 )
 
 // PhpcsSummary implements audit.PostProcessor.
-type PhpcsSummary struct {
+type PhpCompat struct {
 	Report        io.Reader
 	ParentProcess audit.Processor
 }
 
-func (p PhpcsSummary) Kind() string {
-	return "phpcs_summary"
+func (p PhpCompat) Kind() string {
+	return "phpcs_phpcompat"
 }
 
-func (p *PhpcsSummary) Process(msg message.Message, result *audit.Result) {
+func (p *PhpCompat) Process(msg message.Message, result *audit.Result) {
 	r := *result
 
 	var byteSummary []byte
@@ -50,6 +51,21 @@ func (p *PhpcsSummary) Process(msg message.Message, result *audit.Result) {
 			return
 		}
 
+		sources := make(map[string]map[string]interface{})
+
+		// Iterate files and only get summary data.
+		for filename, data := range fullResults.Files {
+			for _, msg := range data.Messages {
+				if _, ok := sources[msg.Source]; !ok {
+					sources[msg.Source] = make(map[string]interface{})
+				}
+				sources[msg.Source][filename] = msg
+			}
+		}
+
+		res, _ := json.Marshal(sources)
+		fmt.Println(string(res))
+
 		summary := getPhpcsSummary(fullResults)
 
 		auditResults.Summary = &tide.AuditSummary{
@@ -58,34 +74,11 @@ func (p *PhpcsSummary) Process(msg message.Message, result *audit.Result) {
 	}
 }
 
-func getPhpcsSummary(fullResults tide.PhpcsResults) *tide.PhpcsSummary {
-	summary := &tide.PhpcsSummary{
-		ErrorsCount:   fullResults.Totals.Errors,
-		WarningsCount: fullResults.Totals.Warnings,
-		FilesCount:    len(fullResults.Files),
-		Files: make(map[string]struct {
-			Errors   int `json:"errors"`
-			Warnings int `json:"warnings"`
-		}),
-	}
 
-	// Iterate files and only get summary data.
-	for filename, data := range fullResults.Files {
-		summary.Files[filename] = struct {
-			Errors   int `json:"errors"`
-			Warnings int `json:"warnings"`
-		} {
-			data.Errors,
-			data.Warnings,
-		}
-	}
-	return summary
-}
-
-func (p *PhpcsSummary) SetReport(report io.Reader) {
+func (p *PhpCompat) SetReport(report io.Reader) {
 	p.Report = report
 }
 
-func (p *PhpcsSummary) Parent(parent audit.Processor) {
+func (p *PhpCompat) Parent(parent audit.Processor) {
 	p.ParentProcess = parent
 }

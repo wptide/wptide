@@ -10,23 +10,23 @@ import (
 	"github.com/wptide/pkg/tide"
 )
 
-func TestPhpcsSummary_Kind(t *testing.T) {
+func TestPhpCompat_Kind(t *testing.T) {
 	t.Run("Process Kind", func(t *testing.T) {
-		p := PhpcsSummary{}
-		if got := p.Kind(); got != "phpcs_summary" {
-			t.Errorf("Processor.Kind() = %v, Impossible, this should be phpcs_summary.", got)
+		p := PhpCompat{}
+		if got := p.Kind(); got != "phpcs_phpcompat" {
+			t.Errorf("Processor.Kind() = %v, Impossible, this should be phpcs_phpcompat.", got)
 		}
 	})
 }
 
-func TestPhpcsSummary_Process(t *testing.T) {
+func TestPhpCompat_Process(t *testing.T) {
 
 	parent := &Processor{
-		Standard: "wordpress",
+		Standard: "phpcompatibility",
 	}
-	readerWordPress, _ := os.Open(testFiles["t17"])
-	readerFailed, _ := os.Open(testFiles["fail"])
-	readerInvalid, _ := os.Open(testFiles["invalid"])
+	readerWordPress, _ := os.Open(testFiles["phpcompat"])
+	//readerFailed, _ := os.Open(testFiles["fail"])
+	//readerInvalid, _ := os.Open(testFiles["invalid"])
 
 	type fields struct {
 		Report        io.Reader
@@ -42,65 +42,24 @@ func TestPhpcsSummary_Process(t *testing.T) {
 		args   args
 	}{
 		{
-			"PHPCS WordPress Standard",
+			"PHPCS PhpCompatibility Standard",
 			fields{
 				Report:        readerWordPress,
 				ParentProcess: parent,
 			},
 			args{
 				message.Message{
-					Title: "WordPress Standard",
+					Title: "PhpCompatibility Standard",
 				},
 				&audit.Result{
-					"phpcs_wordpress": &tide.AuditResult{},
-				},
-			},
-		},
-		{
-			"PHPCS WordPress - No Parent Result",
-			fields{
-				Report:        readerWordPress,
-				ParentProcess: parent,
-			},
-			args{
-				message.Message{
-					Title: "WordPress Standard",
-				},
-				&audit.Result{},
-			},
-		},
-		{
-			"PHPCS WordPress - No Report Reader/File",
-			fields{
-				Report:        readerFailed,
-				ParentProcess: parent,
-			},
-			args{
-				message.Message{
-					Title: "WordPress Standard",
-				},
-				&audit.Result{},
-			},
-		},
-		{
-			"PHPCS WordPress - Invalid Report File",
-			fields{
-				Report:        readerInvalid,
-				ParentProcess: parent,
-			},
-			args{
-				message.Message{
-					Title: "WordPress Standard",
-				},
-				&audit.Result{
-					"phpcs_wordpress": &tide.AuditResult{},
+					"phpcs_phpcompatibility": &tide.AuditResult{},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &PhpcsSummary{
+			p := &PhpCompat{
 				Report:        tt.fields.Report,
 				ParentProcess: tt.fields.ParentProcess,
 			}
@@ -109,7 +68,7 @@ func TestPhpcsSummary_Process(t *testing.T) {
 	}
 }
 
-func TestPhpcsSummary_SetReport(t *testing.T) {
+func TestPhpCompat_SetReport(t *testing.T) {
 
 	parent := &Processor{}
 	reader, _ := os.Open(testFiles["t17"])
@@ -138,7 +97,7 @@ func TestPhpcsSummary_SetReport(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &PhpcsSummary{
+			p := &PhpCompat{
 				Report:        tt.fields.Report,
 				ParentProcess: tt.fields.ParentProcess,
 			}
@@ -147,8 +106,7 @@ func TestPhpcsSummary_SetReport(t *testing.T) {
 	}
 }
 
-func TestPhpcsSummary_Parent(t *testing.T) {
-
+func TestPhpCompat_Parent(t *testing.T) {
 	parent := &Processor{}
 	reader, _ := os.Open(testFiles["t17"])
 
@@ -176,7 +134,7 @@ func TestPhpcsSummary_Parent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &PhpcsSummary{
+			p := &PhpCompat{
 				Report:        tt.fields.Report,
 				ParentProcess: tt.fields.ParentProcess,
 			}
