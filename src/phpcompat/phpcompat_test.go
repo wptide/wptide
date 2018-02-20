@@ -64,6 +64,13 @@ func TestBreaksVersions(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			"Unknown.Code",
+			args{
+				"Unknown.Code",
+			},
+			nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -317,6 +324,25 @@ func TestGetVersionParts(t *testing.T) {
 			}
 			if gotReported != tt.wantReported {
 				t.Errorf("GetVersionParts() gotReported = %v, want %v", gotReported, tt.wantReported)
+			}
+		})
+	}
+}
+
+func TestPhpMajorVersions(t *testing.T) {
+	tests := []struct {
+		name string
+		want []string
+	}{
+		{
+			"Get all major.minor versions",
+			[]string{"5.2", "5.3", "5.4", "5.5", "5.6", "7.0", "7.1", "7.2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PhpMajorVersions(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("PhpMajorVersions() = %v, want %v", got, tt.want)
 			}
 		})
 	}

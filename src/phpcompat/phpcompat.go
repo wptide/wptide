@@ -172,7 +172,6 @@ func BreaksVersions(code string) []string {
 	compat, ok := PhpCompatibilityMap[code]
 
 	if ! ok {
-		fmt.Println(code)
 		return nil
 	}
 
@@ -201,4 +200,16 @@ func BreaksVersions(code string) []string {
 	sort.Strings(broken)
 
 	return broken
+}
+
+func PhpMajorVersions() []string {
+	versions := []string{}
+
+	for key, _ := range phpVersions {
+		versions = append(versions, key)
+	}
+
+	sort.Strings(versions)
+
+	return versions
 }
