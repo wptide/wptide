@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - 1.9
+
+install:
+  - go get -v github.com/Masterminds/glide
+  - cd $GOPATH/src/github.com/Masterminds/glide && go install && cd -
+  - glide install
+
+script:
+  - make test
