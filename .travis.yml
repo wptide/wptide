@@ -3,5 +3,7 @@ language: go
 go:
   - 1.9
 
+install: true
+
 script:
   - make test
