@@ -294,39 +294,6 @@ func TestPhpCompat_Parent(t *testing.T) {
 	}
 }
 
-func Test_getCompatibleVersions(t *testing.T) {
-	type args struct {
-		broken []string
-	}
-	tests := []struct {
-		name string
-		args args
-		want []string
-	}{
-		{
-			"5.6",
-			args{
-				[]string{"5.6"},
-			},
-			[]string{"5.2", "5.3", "5.4", "5.5", "7.0", "7.1", "7.2"},
-		},
-		{
-			"5.2, 5.3, 7.1, 7.2",
-			args{
-				[]string{"5.2", "5.3", "7.1", "7.2"},
-			},
-			[]string{"5.4", "5.5", "5.6", "7.0"},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getCompatibleVersions(tt.args.broken); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getCompatibleVersions() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestPhpCompat_summaryPath(t *testing.T) {
 	type fields struct {
 		Report        io.Reader

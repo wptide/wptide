@@ -7,15 +7,14 @@ import (
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/tide"
 	"encoding/json"
-	"github.com/xwp/go-tide/src/phpcompat"
 	"strings"
 	"errors"
 	"github.com/wptide/pkg/storage"
-	"sort"
+	"github.com/wptide/pkg/phpcompat"
 )
 
 var (
-	writeFile   = ioutil.WriteFile
+	writeFile = ioutil.WriteFile
 )
 
 // PhpcsSummary implements audit.PostProcessor.
@@ -76,7 +75,7 @@ func (p *PhpCompat) Process(msg message.Message, result *audit.Result) {
 				sources[sniffMessage.Source] = make(map[string]interface{})
 				sources[sniffMessage.Source]["files"] = make(map[string]interface{})
 				broken := phpcompat.BreaksVersions(sniffMessage.Source)
-				brokenVersions = mergeVersions(brokenVersions, broken)
+				brokenVersions = phpcompat.MergeVersions(brokenVersions, broken)
 				sources[sniffMessage.Source]["breaks"] = broken
 			}
 			sources[sniffMessage.Source]["files"].(map[string]interface{})[filename] = sniffMessage
@@ -109,7 +108,7 @@ func (p *PhpCompat) Process(msg message.Message, result *audit.Result) {
 		auditResults.Details = details.Details
 	}
 
-	auditResults.CompatibleVersions = getCompatibleVersions(brokenVersions)
+	auditResults.CompatibleVersions = phpcompat.ExcludeVersions(phpcompat.PhpMajorVersions(), brokenVersions)
 }
 
 func (p *PhpCompat) SetReport(report io.Reader) {
@@ -182,42 +181,4 @@ func (p PhpCompat) summaryPath(r audit.Result, fileSuffix string) (filename, pat
 	path = strings.TrimRight(tempFolder, "/") + "/" + filename
 
 	return
-}
-
-func mergeVersions(n ...[]string) []string {
-	merged := []string{}
-
-	for _, slice := range n {
-		for _, value := range slice {
-			if ! contains(merged, value) {
-				merged = append(merged, value)
-			}
-		}
-	}
-
-	return merged
-}
-
-// getCompatibleVersions removes the broken versions from the PhpMajorVersions.
-func getCompatibleVersions(broken []string) []string {
-
-	compatible := []string{}
-
-	for _, version := range phpcompat.PhpMajorVersions() {
-		if ! contains(broken, version) && ! contains(compatible, version) {
-			compatible = append(compatible, version)
-		}
-	}
-
-	sort.Strings(compatible)
-	return compatible
-}
-
-func contains(slice []string, value string) bool {
-	for _, item := range slice {
-		if item == value {
-			return true
-		}
-	}
-	return false
 }

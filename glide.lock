@@ -1,8 +1,8 @@
 hash: fdd1b08279c9d1296025941be3daef0114a49cc15efa9156f13b14aa2c9c6959
-updated: 2018-02-15T11:39:34.155017144+11:00
+updated: 2018-02-21T11:31:51.283498818+11:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: 1588380f5050a9cb8bfb57f043b9f8fff674aff9
+  version: f9a6880d84e16e2a37055793e17164a228d637f4
   subpackages:
   - aws
   - aws/awserr
@@ -20,6 +20,7 @@ imports:
   - aws/request
   - aws/session
   - aws/signer/v4
+  - internal/sdkrand
   - internal/shareddefaults
   - private/protocol
   - private/protocol/query
@@ -34,6 +35,8 @@ imports:
   - service/sqs
   - service/sqs/sqsiface
   - service/sts
+- name: github.com/blang/semver
+  version: a088618caaf34f5392024fc3386143873033fbea
 - name: github.com/go-ini/ini
   version: 32e4be5f41bb918afb6e37c07426e2ddbcb6647e
 - name: github.com/hhatto/gocloc
@@ -43,7 +46,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 15ceed3eed6cd398f49ddb4b8b0bdc55803c91c2
+  version: ff58daea2a09190e99279748a9f5d238a054180c
   subpackages:
   - audit
   - audit/info
