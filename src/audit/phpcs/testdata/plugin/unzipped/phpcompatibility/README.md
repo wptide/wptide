@@ -1,1 +1,0 @@
-This folder contains code to test for PHPCompatibility standards.

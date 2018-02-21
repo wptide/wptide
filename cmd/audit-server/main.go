@@ -20,7 +20,7 @@ import (
 	"github.com/wptide/pkg/source"
 	"fmt"
 	"os"
-	"github.com/xwp/go-tide/src/audit/phpcs"
+	"github.com/wptide/pkg/audit/phpcs"
 )
 
 var (

@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"github.com/xwp/go-tide/src/phpcompat"
+	"github.com/wptide/pkg/phpcompat"
 )
 
 var (
