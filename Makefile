@@ -1,5 +1,5 @@
 # Copy .env.dist to .env and update.
-include .env
+-include .env
 
 # Production environment variables **only** get applied to specific commands.
 # Copy .env.dist to .env.prod and update.
