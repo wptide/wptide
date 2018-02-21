@@ -9,4 +9,7 @@ vendor
 .DS_Store
 
 # GO Binary
-bin/lh-server
+bin/lighthouse-server
+
+# GO testdata report
+report.json

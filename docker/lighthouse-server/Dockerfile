@@ -32,7 +32,7 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
     && chmod +x /usr/bin/lh
 
 # Add the executable.
-ADD bin/lh-server /
+ADD bin/lighthouse-server /
 
 # Run the executable.
-CMD ["/lh-server"]
+CMD ["/lighthouse-server"]

@@ -4,7 +4,7 @@ services:
 
 ### Lighthouse Server ###########################################
     lighthouse-server:
-        image: ${IMAGE}:latest
+        image: ${LH_IMAGE}:latest
         environment:
             TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
             TIDE_API_HOST: ${TIDE_API_HOST}
