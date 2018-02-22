@@ -1,18 +1,25 @@
+# Lighthouse Server Docker settings.
+LH_TAG=${LH_IMAGE}:${VERSION}
+
+# Lighthouse Server GO settings.
+LH_BIN_PATH=bin/lighthouse-server
+LH_PKG_PATH=./cmd/lighthouse-server/...
+
 # Show available make commands.
 lighthouse.usage:
-	@echo "\tlighthouse.build.bin\n\t\t- Build the Lighthouse Server GO binary."
-	@echo "\tlighthouse.clean.bin\n\t\t- Clean the Lighthouse Server GO binary."
-	@echo "\tlighthouse.build.image\n\t\t- Build the Lighthouse Server Docker image."
-	@echo "\tlighthouse.build.up\n\t\t- Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up."
-	@echo "\tlighthouse.up\n\t\t- Run the Lighthouse Server Docker image in isolation with docker-compose up."
-	@echo "\tlighthouse.down\n\t\t- Stop the isolated Lighthouse Server Docker image with docker-compose down."
-	@echo "\tlighthouse.push.image\n\t\t- Push the Lighthouse Server Docker image to GCR."
-	@echo "\tlighthouse.clean.image\n\t\t- Clean the Lighthouse Server Docker image from the host machine."
-	@echo "\tlighthouse.build.cluster\n\t\t- Build the Lighthouse Server GKE cluster."
-	@echo "\tlighthouse.creds\n\t\t- Get the Lighthouse Server GKE cluster credentials."
-	@echo "\tlighthouse.deploy.cluster\n\t\t- Deploy the Lighthouse Server GKE cluster."
-	@echo "\tlighthouse.get.cluster\n\t\t- Get the Lighthouse Server GKE cluster status."
-	@echo "\tlighthouse.clean.cluster\n\t\t- Clean the Lighthouse Server GKE cluster."
+	@echo "\tlighthouse.build.bin:\n\t\t- Build the Lighthouse Server GO binary."
+	@echo "\tlighthouse.clean.bin:\n\t\t- Clean the Lighthouse Server GO binary."
+	@echo "\tlighthouse.build.image:\n\t\t- Build the Lighthouse Server Docker image."
+	@echo "\tlighthouse.build.up:\n\t\t- Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up."
+	@echo "\tlighthouse.up:\n\t\t- Run the Lighthouse Server Docker image in isolation with docker-compose up."
+	@echo "\tlighthouse.down:\n\t\t- Stop the isolated Lighthouse Server Docker image with docker-compose down."
+	@echo "\tlighthouse.push.image:\n\t\t- Push the Lighthouse Server Docker image to GCR."
+	@echo "\tlighthouse.clean.image:\n\t\t- Clean the Lighthouse Server Docker image from the host machine."
+	@echo "\tlighthouse.build.cluster:\n\t\t- Build the Lighthouse Server GKE cluster."
+	@echo "\tlighthouse.creds:\n\t\t- Get the Lighthouse Server GKE cluster credentials."
+	@echo "\tlighthouse.deploy.cluster:\n\t\t- Deploy the Lighthouse Server GKE cluster."
+	@echo "\tlighthouse.get.cluster:\n\t\t- Get the Lighthouse Server GKE cluster status."
+	@echo "\tlighthouse.clean.cluster:\n\t\t- Clean the Lighthouse Server GKE cluster."
 
 # Build the Lighthouse Server GO binary.
 lighthouse.build.bin:
