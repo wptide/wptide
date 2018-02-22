@@ -22,3 +22,26 @@ services:
             AWS_S3_SECRET: ${AWS_S3_SECRET}
             AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
         network_mode: host
+
+### PHPCS Server ###########################################
+    phpcs-server:
+        image: ${PHPCS_GKE_IMAGE}:latest
+        environment:
+            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
+            TIDE_API_HOST: ${TIDE_API_HOST}
+            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
+            TIDE_API_KEY: ${TIDE_API_KEY}
+            TIDE_API_SECRET: ${TIDE_API_SECRET}
+            TIDE_API_VERSION: ${TIDE_API_VERSION}
+            PHPCS_SQS_VERSION: ${PHPCS_SQS_VERSION}
+            PHPCS_SQS_REGION: ${PHPCS_SQS_REGION}
+            PHPCS_SQS_KEY: ${PHPCS_SQS_KEY}
+            PHPCS_SQS_SECRET: ${PHPCS_SQS_SECRET}
+            PHPCS_SQS_QUEUE_NAME: ${PHPCS_SQS_QUEUE_NAME}
+            PHPCS_S3_REGION: ${PHPCS_S3_REGION}
+            PHPCS_S3_KEY: ${PHPCS_S3_KEY}
+            PHPCS_S3_SECRET: ${PHPCS_S3_SECRET}
+            PHPCS_S3_BUCKET_NAME: ${PHPCS_S3_BUCKET_NAME}
+            PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
+            PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+        network_mode: host

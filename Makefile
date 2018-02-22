@@ -3,6 +3,7 @@
 
 # Production environment variables **only** get applied to specific commands.
 # Copy .env.dist to .env.prod and update.
+# @todo @valendesigns Please do what is required here for the phpcs server
 ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster))
     ifneq ($(strip $(wildcard .env.prod)),)
         include .env.prod
@@ -39,9 +40,11 @@ usage:
 	@echo "\tdown:\n\t\t- Stop the Docker images with docker-compose down."
 	@echo "\ttest:\n\t\t- Run the GO test suite."
 	@make lighthouse.usage
+	@make phpcs.usage
 
 # Include Makefiles.
 include docker/lighthouse-server/Makefile
+include docker/phpcs-server/Makefile
 
 # Install dependencies.
 deps:
@@ -55,13 +58,13 @@ config:
 	@gcloud config set container/new_scopes_behavior true
 
 # Build all the GO binaries.
-build.bins: lighthouse.build.bin
+build.bins: lighthouse.build.bin phpcs.build.bin
 
 # Clean all the GO binaries.
-clean.bins: lighthouse.clean.bin
+clean.bins: lighthouse.clean.bin phpcs.clean.bin
 
 # Build all the Docker images.
-build.images: deps clean.bins build.bins lighthouse.build.image
+build.images: deps clean.bins build.bins lighthouse.build.image phpcs.build.image
 
 # Rebuild & run the Docker images with docker-compose up.
 build.up: build.images up
