@@ -16,18 +16,11 @@ BUILD=`git rev-parse HEAD`
 # Docker settings.
 REPO=gcr.io/${PROJECT}
 
-# Lighthouse Docker settings.
-LH_TAG=${LH_IMAGE}:${VERSION}
-
 # GO settings.
 GOOS=linux
 GO=`which go`
 GOBUILD=CGO_ENABLED=0 GOOS=${GOOS} ${GO} build
 GOTEST=${GO} list -f '{{if len .TestGoFiles}}"go test -cover {{.ImportPath}}"{{end}}' ./... | xargs -L 1 sh -c
-
-# Lighthouse GO settings.
-LH_BIN_PATH=bin/lighthouse-server
-LH_PKG_PATH=./cmd/lighthouse-server/...
 
 # Setup -ldflags for go build.
 # Allows setting some global vars before compilation.
@@ -38,12 +31,12 @@ usage:
 	@echo "Please supply one of:"
 	@echo "\tdeps:\n\t\t- Install dependencies."
 	@echo "\tconfig:\n\t\t- Set GCP configurations."
-	@echo "\tbuild.bins\n\t\t- Build all the GO binaries."
-	@echo "\tclean.bins\n\t\t- Clean all the GO binaries."
-	@echo "\tbuild.images\n\t\t- Build all the Docker images."
-	@echo "\tbuild.up\n\t\t- Rebuild & run the Docker images with docker-compose up."
-	@echo "\tup\n\t\t- Run the Docker images with docker-compose up."
-	@echo "\tdown\n\t\t- Stop the Docker images with docker-compose down."
+	@echo "\tbuild.bins:\n\t\t- Build all the GO binaries."
+	@echo "\tclean.bins:\n\t\t- Clean all the GO binaries."
+	@echo "\tbuild.images:\n\t\t- Build all the Docker images."
+	@echo "\tbuild.up:\n\t\t- Rebuild & run the Docker images with docker-compose up."
+	@echo "\tup:\n\t\t- Run the Docker images with docker-compose up."
+	@echo "\tdown:\n\t\t- Stop the Docker images with docker-compose down."
 	@echo "\ttest:\n\t\t- Run the GO test suite."
 	@make lighthouse.usage
 
