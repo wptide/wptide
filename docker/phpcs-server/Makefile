@@ -59,8 +59,8 @@ phpcs.clean.image:
 
 # Build the PHPCS Server GKE cluster.
 phpcs.build.cluster: config
-	@gcloud beta container --project ${PROJECT} clusters create ${PHPCS_GKE_CLUSTER} \
-	--zone ${ZONE} \
+	@gcloud beta container --project ${GCP_PROJECT} clusters create ${PHPCS_GKE_CLUSTER} \
+	--zone ${GCP_ZONE} \
 	--cluster-version ${PHPCS_GKE_CLUSTER_VERSION} \
 	--machine-type ${PHPCS_GKE_MACHINE_TYPE} \
 	--image-type "COS" \
@@ -94,10 +94,10 @@ phpcs.deploy.cluster: config phpcs.creds
 	--env="PHPCS_SQS_KEY=${PHPCS_SQS_KEY}" \
 	--env="PHPCS_SQS_SECRET=${PHPCS_SQS_SECRET}" \
 	--env="PHPCS_SQS_QUEUE_NAME=${PHPCS_SQS_QUEUE_NAME}" \
-	--env="AWS_S3_REGION=${AWS_S3_REGION}" \
-	--env="AWS_S3_KEY=${AWS_S3_KEY}" \
-	--env="AWS_S3_SECRET=${AWS_S3_SECRET}" \
-	--env="AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}"
+	--env="LH_S3_REGION=${LH_S3_REGION}" \
+	--env="LH_S3_KEY=${LH_S3_KEY}" \
+	--env="LH_S3_SECRET=${LH_S3_SECRET}" \
+	--env="LH_S3_BUCKET_NAME=${LH_S3_BUCKET_NAME}"
 	@kubectl autoscale deployment ${PHPCS_GKE_CLUSTER} \
 	--cpu-percent=${PHPCS_GKE_CPU_PERCENT} \
 	--min=${PHPCS_GKE_MIN_PODS} \

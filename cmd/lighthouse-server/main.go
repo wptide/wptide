@@ -66,10 +66,10 @@ var (
 		secret string
 		queue  string
 	}{
-		env.GetEnv("AWS_SQS_LH_REGION", ""),
-		env.GetEnv("AWS_SQS_LH_KEY", ""),
-		env.GetEnv("AWS_SQS_LH_SECRET", ""),
-		env.GetEnv("AWS_SQS_LH_QUEUE_NAME", ""),
+		env.GetEnv("LH_SQS_REGION", ""),
+		env.GetEnv("LH_SQS_KEY", ""),
+		env.GetEnv("LH_SQS_SECRET", ""),
+		env.GetEnv("LH_SQS_QUEUE_NAME", ""),
 	}
 
 	// Lighthouse SQS configuration.
@@ -79,10 +79,10 @@ var (
 		secret string
 		bucket string
 	}{
-		env.GetEnv("AWS_S3_REGION", ""),
-		env.GetEnv("AWS_S3_KEY", ""),
-		env.GetEnv("AWS_S3_SECRET", ""),
-		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
+		env.GetEnv("LH_S3_REGION", ""),
+		env.GetEnv("LH_S3_KEY", ""),
+		env.GetEnv("LH_S3_SECRET", ""),
+		env.GetEnv("LH_S3_BUCKET_NAME", ""),
 	}
 
 	/** Channels **/

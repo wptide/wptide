@@ -27,17 +27,17 @@ var (
 		"TIDE_API_SECRET":   "tideapisecret",
 		"TIDE_API_VERSION":  "v1",
 		// AWS SQS settings
-		"AWS_SQS_LH_VERSION":    "2012-11-05",
-		"AWS_SQS_LH_REGION":     "us-west-2",
-		"AWS_SQS_LH_KEY":        "sqskey",
-		"AWS_SQS_LH_SECRET":     "sqssecret",
-		"AWS_SQS_LH_QUEUE_NAME": "test-queue",
+		"LH_SQS_VERSION":    "2012-11-05",
+		"LH_SQS_REGION":     "us-west-2",
+		"LH_SQS_KEY":        "sqskey",
+		"LH_SQS_SECRET":     "sqssecret",
+		"LH_SQS_QUEUE_NAME": "test-queue",
 		//
 		// AWS S3 settings
-		"AWS_S3_REGION":      "us-west-2",
-		"AWS_S3_KEY":         "s3key",
-		"AWS_S3_SECRET":      "s3secret",
-		"AWS_S3_BUCKET_NAME": "test-bucket",
+		"LH_S3_REGION":      "us-west-2",
+		"LH_S3_KEY":         "s3key",
+		"LH_S3_SECRET":      "s3secret",
+		"LH_S3_BUCKET_NAME": "test-bucket",
 		//
 		// LH Server settings
 		"LH_CONCURRENT_AUDITS":      "1",
@@ -257,10 +257,10 @@ func setupConfig() {
 		secret string
 		queue  string
 	}{
-		env.GetEnv("AWS_SQS_LH_REGION", ""),
-		env.GetEnv("AWS_SQS_LH_KEY", ""),
-		env.GetEnv("AWS_SQS_LH_SECRET", ""),
-		env.GetEnv("AWS_SQS_LH_QUEUE_NAME", ""),
+		env.GetEnv("LH_SQS_REGION", ""),
+		env.GetEnv("LH_SQS_KEY", ""),
+		env.GetEnv("LH_SQS_SECRET", ""),
+		env.GetEnv("LH_SQS_QUEUE_NAME", ""),
 	}
 }
 

@@ -1,5 +1,5 @@
 # Lighthouse Server Docker settings.
-LH_TAG=${LH_IMAGE}:${VERSION}
+LH_TAG=${LH_GKE_IMAGE}:${VERSION}
 
 # Lighthouse Server GO settings.
 LH_BIN_PATH=bin/lighthouse-server
@@ -35,7 +35,7 @@ lighthouse.clean.bin:
 lighthouse.build.image: deps lighthouse.clean.bin lighthouse.build.bin
 	@echo "Building Docker image [${REPO}/${LH_TAG}] ..."
 	@docker build -f docker/lighthouse-server/Dockerfile -t ${REPO}/${LH_TAG} --no-cache .
-	@docker tag ${REPO}/${LH_TAG} ${LH_IMAGE}:latest
+	@docker tag ${REPO}/${LH_TAG} ${LH_GKE_IMAGE}:latest
 
 # Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up.
 lighthouse.build.up: lighthouse.build.image lighthouse.up
@@ -55,58 +55,58 @@ lighthouse.push.image:
 # Clean the Lighthouse Server Docker image from the host machine.
 lighthouse.clean.image:
 	@docker rmi ${REPO}/${LH_TAG}
-	@docker rmi ${LH_IMAGE}:latest
+	@docker rmi ${LH_GKE_IMAGE}:latest
 
 # Build the Lighthouse Server GKE cluster.
 lighthouse.build.cluster: config
-	@gcloud beta container --project ${PROJECT} clusters create ${LH_CLUSTER} \
-	--zone ${ZONE} \
-	--cluster-version ${LH_CLUSTER_VERSION} \
-	--machine-type ${LH_MACHINE_TYPE} \
+	@gcloud beta container --project ${GCP_PROJECT} clusters create ${LH_GKE_CLUSTER} \
+	--zone ${GCP_ZONE} \
+	--cluster-version ${LH_GKE_CLUSTER_VERSION} \
+	--machine-type ${LH_GKE_MACHINE_TYPE} \
 	--image-type "COS" \
-	--disk-size ${LH_DISK_SIZE} \
+	--disk-size ${LH_GKE_DISK_SIZE} \
 	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
 	--preemptible \
-	--num-nodes ${LH_NUM_NODES} \
+	--num-nodes ${LH_GKE_NUM_NODES} \
 	--enable-cloud-logging \
 	--enable-cloud-monitoring \
 	--enable-autoscaling \
-	--min-nodes ${LH_MIN_NODES} \
-	--max-nodes ${LH_MAX_NODES} \
+	--min-nodes ${LH_GKE_MIN_NODES} \
+	--max-nodes ${LH_GKE_MAX_NODES} \
 	--enable-legacy-authorization \
 	--disable-addons HttpLoadBalancing
 
 # Get the Lighthouse Server GKE cluster credentials.
 lighthouse.creds:
-	@gcloud container clusters get-credentials ${LH_CLUSTER}
+	@gcloud container clusters get-credentials ${LH_GKE_CLUSTER}
 
 # Deploy the Lighthouse Server GKE cluster.
 lighthouse.deploy.cluster: config lighthouse.creds
-	@kubectl run ${LH_CLUSTER} --image=${REPO}/${LH_TAG} --replicas=${LH_REPLICAS} \
+	@kubectl run ${LH_GKE_CLUSTER} --image=${REPO}/${LH_TAG} --replicas=${LH_GKE_REPLICAS} \
 	--env="TIDE_API_AUTH_URL=${TIDE_API_AUTH_URL}" \
 	--env="TIDE_API_HOST=${TIDE_API_HOST}" \
 	--env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
 	--env="TIDE_API_KEY=${TIDE_API_KEY}" \
 	--env="TIDE_API_SECRET=${TIDE_API_SECRET}" \
 	--env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
- 	--env="AWS_SQS_LH_VERSION=${AWS_SQS_LH_VERSION}" \
-	--env="AWS_SQS_LH_REGION=${AWS_SQS_LH_REGION}" \
-	--env="AWS_SQS_LH_KEY=${AWS_SQS_LH_KEY}" \
-	--env="AWS_SQS_LH_SECRET=${AWS_SQS_LH_SECRET}" \
-	--env="AWS_SQS_LH_QUEUE_NAME=${AWS_SQS_LH_QUEUE_NAME}" \
-	--env="AWS_S3_REGION=${AWS_S3_REGION}" \
-	--env="AWS_S3_KEY=${AWS_S3_KEY}" \
-	--env="AWS_S3_SECRET=${AWS_S3_SECRET}" \
-	--env="AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}"
-	@kubectl autoscale deployment ${LH_CLUSTER} \
-	--cpu-percent=${LH_CPU_PERCENT} \
-	--min=${LH_MIN_PODS} \
-	--max=${LH_MAX_PODS}
+ 	--env="LH_SQS_VERSION=${LH_SQS_VERSION}" \
+	--env="LH_SQS_REGION=${LH_SQS_REGION}" \
+	--env="LH_SQS_KEY=${LH_SQS_KEY}" \
+	--env="LH_SQS_SECRET=${LH_SQS_SECRET}" \
+	--env="LH_SQS_QUEUE_NAME=${LH_SQS_QUEUE_NAME}" \
+	--env="LH_S3_REGION=${LH_S3_REGION}" \
+	--env="LH_S3_KEY=${LH_S3_KEY}" \
+	--env="LH_S3_SECRET=${LH_S3_SECRET}" \
+	--env="LH_S3_BUCKET_NAME=${LH_S3_BUCKET_NAME}"
+	@kubectl autoscale deployment ${LH_GKE_CLUSTER} \
+	--cpu-percent=${LH_GKE_CPU_PERCENT} \
+	--min=${LH_GKE_MIN_PODS} \
+	--max=${LH_GKE_MAX_PODS}
 
 # Get the Lighthouse Server GKE cluster status.
 lighthouse.get.cluster:
-	@kubectl get deployment ${LH_CLUSTER} -o yaml
+	@kubectl get deployment ${LH_GKE_CLUSTER} -o yaml
 
 # Clean the Lighthouse Server GKE cluster.
 lighthouse.clean.cluster: config
-	@gcloud container clusters delete ${LH_CLUSTER} -q
+	@gcloud container clusters delete ${LH_GKE_CLUSTER} -q

@@ -14,7 +14,7 @@ VERSION=0.1.0
 BUILD=`git rev-parse HEAD`
 
 # Docker settings.
-REPO=gcr.io/${PROJECT}
+REPO=gcr.io/${GCP_PROJECT}
 
 # GO settings.
 GOOS=linux
@@ -52,8 +52,8 @@ deps:
 
 # Set GCP configurations.
 config:
-	@gcloud config set project ${PROJECT}
-	@gcloud config set compute/zone ${ZONE}
+	@gcloud config set project ${GCP_PROJECT}
+	@gcloud config set compute/zone ${GCP_ZONE}
 	@gcloud config set container/new_scopes_behavior true
 
 # Build all the GO binaries.

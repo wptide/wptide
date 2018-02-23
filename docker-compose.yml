@@ -4,7 +4,7 @@ services:
 
 ### Lighthouse Server ###########################################
     lighthouse-server:
-        image: ${LH_IMAGE}:latest
+        image: ${LH_GKE_IMAGE}:latest
         environment:
             TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
             TIDE_API_HOST: ${TIDE_API_HOST}
@@ -12,15 +12,15 @@ services:
             TIDE_API_KEY: ${TIDE_API_KEY}
             TIDE_API_SECRET: ${TIDE_API_SECRET}
             TIDE_API_VERSION: ${TIDE_API_VERSION}
-            AWS_SQS_LH_VERSION: ${AWS_SQS_LH_VERSION}
-            AWS_SQS_LH_REGION: ${AWS_SQS_LH_REGION}
-            AWS_SQS_LH_KEY: ${AWS_SQS_LH_KEY}
-            AWS_SQS_LH_SECRET: ${AWS_SQS_LH_SECRET}
-            AWS_SQS_LH_QUEUE_NAME: ${AWS_SQS_LH_QUEUE_NAME}
-            AWS_S3_REGION: ${AWS_S3_REGION}
-            AWS_S3_KEY: ${AWS_S3_KEY}
-            AWS_S3_SECRET: ${AWS_S3_SECRET}
-            AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+            LH_SQS_VERSION: ${LH_SQS_VERSION}
+            LH_SQS_REGION: ${LH_SQS_REGION}
+            LH_SQS_KEY: ${LH_SQS_KEY}
+            LH_SQS_SECRET: ${LH_SQS_SECRET}
+            LH_SQS_QUEUE_NAME: ${LH_SQS_QUEUE_NAME}
+            LH_S3_REGION: ${LH_S3_REGION}
+            LH_S3_KEY: ${LH_S3_KEY}
+            LH_S3_SECRET: ${LH_S3_SECRET}
+            LH_S3_BUCKET_NAME: ${LH_S3_BUCKET_NAME}
         network_mode: host
 
 ### PHPCS Server ###########################################
