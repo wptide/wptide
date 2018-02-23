@@ -3,8 +3,7 @@
 
 # Production environment variables **only** get applied to specific commands.
 # Copy .env.dist to .env.prod and update.
-# @todo @valendesigns Please do what is required here for the phpcs server
-ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster))
+ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster))
     ifneq ($(strip $(wildcard .env.prod)),)
         include .env.prod
     endif
