@@ -27,20 +27,20 @@ var (
 		"TIDE_API_SECRET":   "tideapisecret",
 		"TIDE_API_VERSION":  "v1",
 		// AWS SQS settings
-		"LH_SQS_VERSION":    "2012-11-05",
-		"LH_SQS_REGION":     "us-west-2",
-		"LH_SQS_KEY":        "sqskey",
-		"LH_SQS_SECRET":     "sqssecret",
-		"LH_SQS_QUEUE_NAME": "test-queue",
+		"PHPCS_SQS_VERSION":    "2012-11-05",
+		"PHPCS_SQS_REGION":     "us-west-2",
+		"PHPCS_SQS_KEY":        "sqskey",
+		"PHPCS_SQS_SECRET":     "sqssecret",
+		"PHPCS_SQS_QUEUE_NAME": "test-queue",
 		//
 		// AWS S3 settings
-		"LH_S3_REGION":      "us-west-2",
-		"LH_S3_KEY":         "s3key",
-		"LH_S3_SECRET":      "s3secret",
-		"LH_S3_BUCKET_NAME": "test-bucket",
+		"PHPCS_S3_REGION":      "us-west-2",
+		"PHPCS_S3_KEY":         "s3key",
+		"PHPCS_S3_SECRET":      "s3secret",
+		"PHPCS_S3_BUCKET_NAME": "test-bucket",
 		//
-		// LH Server settings
-		"LH_CONCURRENT_AUDITS":      "1",
+		// PHPCS Server settings
+		"PHPCS_CONCURRENT_AUDITS":      "1",
 	}
 )
 
@@ -249,17 +249,16 @@ func Test_main(t *testing.T) {
 	}
 }
 func setupConfig() {
-	// Setup lhConfig
-	lhConfig = struct {
+	queueConfig = struct {
 		region string
 		key    string
 		secret string
 		queue  string
 	}{
-		env.GetEnv("LH_SQS_REGION", ""),
-		env.GetEnv("LH_SQS_KEY", ""),
-		env.GetEnv("LH_SQS_SECRET", ""),
-		env.GetEnv("LH_SQS_QUEUE_NAME", ""),
+		env.GetEnv("AWS_SQS_REGION", ""),
+		env.GetEnv("AWS_SQS_KEY", ""),
+		env.GetEnv("AWS_SQS_SECRET", ""),
+		env.GetEnv("AWS_SQS_QUEUE_NAME", ""),
 	}
 }
 

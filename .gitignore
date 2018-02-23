@@ -10,6 +10,7 @@ vendor
 
 # GO Binary
 bin/lighthouse-server
+bin/phpcs-server
 
 # GO testdata report
 report.json

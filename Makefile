@@ -3,7 +3,7 @@
 
 # Production environment variables **only** get applied to specific commands.
 # Copy .env.dist to .env.prod and update.
-ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster))
+ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster))
     ifneq ($(strip $(wildcard .env.prod)),)
         include .env.prod
     endif
@@ -14,7 +14,7 @@ VERSION=0.1.0
 BUILD=`git rev-parse HEAD`
 
 # Docker settings.
-REPO=gcr.io/${PROJECT}
+REPO=gcr.io/${GCP_PROJECT}
 
 # GO settings.
 GOOS=linux
@@ -39,9 +39,11 @@ usage:
 	@echo "\tdown:\n\t\t- Stop the Docker images with docker-compose down."
 	@echo "\ttest:\n\t\t- Run the GO test suite."
 	@make lighthouse.usage
+	@make phpcs.usage
 
 # Include Makefiles.
 include docker/lighthouse-server/Makefile
+include docker/phpcs-server/Makefile
 
 # Install dependencies.
 deps:
@@ -50,18 +52,18 @@ deps:
 
 # Set GCP configurations.
 config:
-	@gcloud config set project ${PROJECT}
-	@gcloud config set compute/zone ${ZONE}
+	@gcloud config set project ${GCP_PROJECT}
+	@gcloud config set compute/zone ${GCP_ZONE}
 	@gcloud config set container/new_scopes_behavior true
 
 # Build all the GO binaries.
-build.bins: lighthouse.build.bin
+build.bins: lighthouse.build.bin phpcs.build.bin
 
 # Clean all the GO binaries.
-clean.bins: lighthouse.clean.bin
+clean.bins: lighthouse.clean.bin phpcs.clean.bin
 
 # Build all the Docker images.
-build.images: deps clean.bins build.bins lighthouse.build.image
+build.images: deps clean.bins build.bins lighthouse.build.image phpcs.build.image
 
 # Rebuild & run the Docker images with docker-compose up.
 build.up: build.images up

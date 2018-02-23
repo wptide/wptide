@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/wptide/pkg/audit"
 	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/audit/lighthouse"
 	"github.com/wptide/pkg/audit/tide"
 	tideApi "github.com/wptide/pkg/tide"
 	"github.com/wptide/pkg/tide/api"
@@ -21,6 +20,7 @@ import (
 	"github.com/wptide/pkg/source"
 	"fmt"
 	"os"
+	"github.com/wptide/pkg/audit/phpcs"
 )
 
 var (
@@ -33,13 +33,13 @@ var (
 	TideClient tideApi.ClientInterface = &api.Client{}
 
 	// messageProvider is the primary source of messages to process.
-	messageProvider message.MessageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
+	messageProvider message.MessageProvider = sqs.NewSqsProvider(queueConfig.region, queueConfig.key, queueConfig.secret, queueConfig.queue)
 
 	// storageProvider is the cloud storage service for storing files.
-	storageProvider storage.StorageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
+	storageProvider storage.StorageProvider = s3.NewS3Provider(s3Config.region, s3Config.key, s3Config.secret, s3Config.bucket)
 
 	// Temp folder for downloaded files.
-	tempFolder = env.GetEnv("LH_TEMP_FOLDER", "/tmp")
+	tempFolder = env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp")
 
 	/** Service Configurations **/
 	// Tide API configuration.
@@ -59,35 +59,35 @@ var (
 		env.GetEnv("TIDE_API_VERSION", ""),
 	}
 
-	// Lighthouse SQS configuration.
-	lhConfig = struct {
+	// SQS configuration.
+	queueConfig = struct {
 		region string
 		key    string
 		secret string
 		queue  string
 	}{
-		env.GetEnv("LH_SQS_REGION", ""),
-		env.GetEnv("LH_SQS_KEY", ""),
-		env.GetEnv("LH_SQS_SECRET", ""),
-		env.GetEnv("LH_SQS_QUEUE_NAME", ""),
+		env.GetEnv("PHPCS_SQS_REGION", ""),
+		env.GetEnv("PHPCS_SQS_KEY", ""),
+		env.GetEnv("PHPCS_SQS_SECRET", ""),
+		env.GetEnv("PHPCS_SQS_QUEUE_NAME", ""),
 	}
 
-	// Lighthouse SQS configuration.
-	lhS3Config = struct {
+	// S3 configuration.
+	s3Config = struct {
 		region string
 		key    string
 		secret string
 		bucket string
 	}{
-		env.GetEnv("LH_S3_REGION", ""),
-		env.GetEnv("LH_S3_KEY", ""),
-		env.GetEnv("LH_S3_SECRET", ""),
-		env.GetEnv("LH_S3_BUCKET_NAME", ""),
+		env.GetEnv("PHPCS_S3_REGION", ""),
+		env.GetEnv("PHPCS_S3_KEY", ""),
+		env.GetEnv("PHPCS_S3_SECRET", ""),
+		env.GetEnv("PHPCS_S3_BUCKET_NAME", ""),
 	}
 
 	/** Channels **/
 	// Number of concurrent audits.
-	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
+	bufferSize, _ = strconv.Atoi(env.GetEnv("PHPCS_CONCURRENT_AUDITS", "5"))
 	buffer        = make(chan struct{}, bufferSize)
 
 	// Create a channel that can terminate the app.
@@ -119,7 +119,18 @@ var (
 	processes = []audit.Processor{
 		&ingest.Processor{},
 		&info.Processor{},
-		&lighthouse.Processor{},
+		&phpcs.Processor{
+			Standard: "WordPress",
+			PostProcessors: []audit.Processor{
+				&phpcs.PhpcsSummary{},
+			},
+		},
+		&phpcs.Processor{
+			Standard: "PHPCompatibility",
+			PostProcessors: []audit.Processor{
+				&phpcs.PhpCompat{},
+			},
+		},
 		&tide.Processor{},
 	}
 )
@@ -281,7 +292,8 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 		"client":     &client,
 		"tempFolder": tempFolder,
 		"audits": []string{
-			"lighthouse",
+			"phpcs_wordpress",
+			"phpcs_phpcompatibility",
 		},
 		"fileStore": &storageProvider,
 	}

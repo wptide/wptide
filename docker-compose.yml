@@ -4,7 +4,7 @@ services:
 
 ### Lighthouse Server ###########################################
     lighthouse-server:
-        image: ${LH_IMAGE}:latest
+        image: ${LH_GKE_IMAGE}:latest
         environment:
             TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
             TIDE_API_HOST: ${TIDE_API_HOST}
@@ -12,13 +12,37 @@ services:
             TIDE_API_KEY: ${TIDE_API_KEY}
             TIDE_API_SECRET: ${TIDE_API_SECRET}
             TIDE_API_VERSION: ${TIDE_API_VERSION}
-            AWS_SQS_LH_VERSION: ${AWS_SQS_LH_VERSION}
-            AWS_SQS_LH_REGION: ${AWS_SQS_LH_REGION}
-            AWS_SQS_LH_KEY: ${AWS_SQS_LH_KEY}
-            AWS_SQS_LH_SECRET: ${AWS_SQS_LH_SECRET}
-            AWS_SQS_LH_QUEUE_NAME: ${AWS_SQS_LH_QUEUE_NAME}
-            AWS_S3_REGION: ${AWS_S3_REGION}
-            AWS_S3_KEY: ${AWS_S3_KEY}
-            AWS_S3_SECRET: ${AWS_S3_SECRET}
-            AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+            LH_SQS_VERSION: ${LH_SQS_VERSION}
+            LH_SQS_REGION: ${LH_SQS_REGION}
+            LH_SQS_KEY: ${LH_SQS_KEY}
+            LH_SQS_SECRET: ${LH_SQS_SECRET}
+            LH_SQS_QUEUE_NAME: ${LH_SQS_QUEUE_NAME}
+            LH_S3_REGION: ${LH_S3_REGION}
+            LH_S3_KEY: ${LH_S3_KEY}
+            LH_S3_SECRET: ${LH_S3_SECRET}
+            LH_S3_BUCKET_NAME: ${LH_S3_BUCKET_NAME}
+            LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
+        network_mode: host
+
+### PHPCS Server ###########################################
+    phpcs-server:
+        image: ${PHPCS_GKE_IMAGE}:latest
+        environment:
+            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
+            TIDE_API_HOST: ${TIDE_API_HOST}
+            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
+            TIDE_API_KEY: ${TIDE_API_KEY}
+            TIDE_API_SECRET: ${TIDE_API_SECRET}
+            TIDE_API_VERSION: ${TIDE_API_VERSION}
+            PHPCS_SQS_VERSION: ${PHPCS_SQS_VERSION}
+            PHPCS_SQS_REGION: ${PHPCS_SQS_REGION}
+            PHPCS_SQS_KEY: ${PHPCS_SQS_KEY}
+            PHPCS_SQS_SECRET: ${PHPCS_SQS_SECRET}
+            PHPCS_SQS_QUEUE_NAME: ${PHPCS_SQS_QUEUE_NAME}
+            PHPCS_S3_REGION: ${PHPCS_S3_REGION}
+            PHPCS_S3_KEY: ${PHPCS_S3_KEY}
+            PHPCS_S3_SECRET: ${PHPCS_S3_SECRET}
+            PHPCS_S3_BUCKET_NAME: ${PHPCS_S3_BUCKET_NAME}
+            PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
+            PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
         network_mode: host
