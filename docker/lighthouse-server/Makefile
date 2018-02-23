@@ -98,8 +98,7 @@ lighthouse.deploy.cluster: config lighthouse.creds
 	--env="LH_S3_KEY=${LH_S3_KEY}" \
 	--env="LH_S3_SECRET=${LH_S3_SECRET}" \
 	--env="LH_S3_BUCKET_NAME=${LH_S3_BUCKET_NAME}" \
-	--env="LH_CONCURRENT_AUDITS=${LH_CONCURRENT_AUDITS}" \
-	--env="LH_DEFAULT_REQUEST_CLIENT=${LH_DEFAULT_REQUEST_CLIENT}"
+	--env="LH_CONCURRENT_AUDITS=${LH_CONCURRENT_AUDITS}"
 	@kubectl autoscale deployment ${LH_GKE_CLUSTER} \
 	--cpu-percent=${LH_GKE_CPU_PERCENT} \
 	--min=${LH_GKE_MIN_PODS} \

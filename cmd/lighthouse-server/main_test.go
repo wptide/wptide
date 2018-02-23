@@ -41,7 +41,6 @@ var (
 		//
 		// LH Server settings
 		"LH_CONCURRENT_AUDITS":      "1",
-		"LH_DEFAULT_REQUEST_CLIENT": "test_client",
 	}
 )
 

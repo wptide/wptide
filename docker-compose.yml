@@ -22,7 +22,6 @@ services:
             LH_S3_SECRET: ${LH_S3_SECRET}
             LH_S3_BUCKET_NAME: ${LH_S3_BUCKET_NAME}
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
-            LH_DEFAULT_REQUEST_CLIENT: ${LH_DEFAULT_REQUEST_CLIENT}
         network_mode: host
 
 ### PHPCS Server ###########################################
