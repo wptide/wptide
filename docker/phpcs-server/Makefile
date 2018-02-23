@@ -94,10 +94,10 @@ phpcs.deploy.cluster: config phpcs.creds
 	--env="PHPCS_SQS_KEY=${PHPCS_SQS_KEY}" \
 	--env="PHPCS_SQS_SECRET=${PHPCS_SQS_SECRET}" \
 	--env="PHPCS_SQS_QUEUE_NAME=${PHPCS_SQS_QUEUE_NAME}" \
-	--env="LH_S3_REGION=${LH_S3_REGION}" \
-	--env="LH_S3_KEY=${LH_S3_KEY}" \
-	--env="LH_S3_SECRET=${LH_S3_SECRET}" \
-	--env="LH_S3_BUCKET_NAME=${LH_S3_BUCKET_NAME}"
+	--env="PHPCS_S3_REGION=${PHPCS_S3_REGION}" \
+	--env="PHPCS_S3_KEY=${PHPCS_S3_KEY}" \
+	--env="PHPCS_S3_SECRET=${PHPCS_S3_SECRET}" \
+	--env="PHPCS_S3_BUCKET_NAME=${PHPCS_S3_BUCKET_NAME}"
 	@kubectl autoscale deployment ${PHPCS_GKE_CLUSTER} \
 	--cpu-percent=${PHPCS_GKE_CPU_PERCENT} \
 	--min=${PHPCS_GKE_MIN_PODS} \
