@@ -11,6 +11,7 @@ RUN set -x \
         php7-simplexml \
         php7-tokenizer \
         php7-xmlwriter \
+        ca-certificates \
     && apk add --no-cache -t .build-deps \
         curl \
         php7-json \
