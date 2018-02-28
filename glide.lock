@@ -70,6 +70,8 @@ imports:
   - tide
   - tide/api
   - util
+  - sync
+  - wporg
 - name: gopkg.in/src-d/enry.v1
   version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
   subpackages:
