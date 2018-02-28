@@ -35,7 +35,6 @@ var (
 	// Allow us to quit the server with a channel. Good for tests.
 	quit = make(chan struct{}, 1)
 
-	// messagesProcessor sync.MessagesProcessor
 	client = &wporg.Client{}
 
 	// Checks to see if we need to send an update.
