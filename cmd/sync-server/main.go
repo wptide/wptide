@@ -12,15 +12,6 @@ import (
 	"strconv"
 )
 
-type config struct {
-	awsRegion    string
-	awsKey       string
-	awsSecret    string
-	awsQueue     string
-	active       bool
-	tideEndpoint string
-}
-
 var (
 	// Sync Server config.
 	serverActive    = strings.ToLower(env.GetEnv("SS_ACTIVE", "off")) == "on"
@@ -35,11 +26,13 @@ var (
 	// Allow us to quit the server with a channel. Good for tests.
 	quit = make(chan struct{}, 1)
 
+	// Fetches themes and plugins from the WordPress.org API.
 	client = &wporg.Client{}
 
 	// Checks to see if we need to send an update.
 	checkerDBPath = env.GetEnv("SS_DATA", "./db")
 
+	// Init the scribble (flat file) db used for checking currency of results.
 	checker sync.UpdateChecker = scribbleChecker{
 		db: newScribbleChecker(checkerDBPath),
 	}
@@ -86,16 +79,21 @@ var (
 		providers: make(map[string]message.MessageProvider),
 	}
 
+	// Tide API settings.
 	apiVersion  = env.GetEnv("TIDE_API_VERSION", "v1")
 	apiProtocol = env.GetEnv("TIDE_API_PROTOCOL", "https")
 	apiHost     = env.GetEnv("TIDE_API_HOST", "wptide.org")
 	apiEndpoint = fmt.Sprintf("%s://%s/api/tide/%s/audit", apiProtocol, apiHost, apiVersion)
 )
 
+// fetcher returns a channel of RepoProjects to be processed by workers. It uses the
+// "generator" concurrency pattern for feeding a channel.
 func fetcher(projectType, category string, bufferSize int, token chan struct{}, maxPages int) <-chan wporg.RepoProject {
 
+	// The new channel that will be processed by the workers.
 	out := make(chan wporg.RepoProject, bufferSize)
 
+	// Feed the channel concurrently.
 	go func(token chan struct{}) {
 
 		// Don't do anything until a token is available.
@@ -158,18 +156,25 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 	return out
 }
 
+// pool starts a number of infoWorkers. This uses a "worker" pattern where each worker will
+// read from a projects channel to process the results.
 func pool(workers int, projects <-chan wporg.RepoProject, checker sync.UpdateChecker, dispatcher sync.Dispatcher, messages chan *message.Message) {
 	for i := 0; i < workers; i++ {
 		go infoWorker(projects, checker, dispatcher, messages)
 	}
 }
 
+// infoWorker reads a project from the projects channel, runs it through the update check
+// and (conditionally) sends it to the dispatcher which loads up the job queue.
 func infoWorker(projects <-chan wporg.RepoProject, checker sync.UpdateChecker, dispatcher sync.Dispatcher, messages chan *message.Message) {
 	for {
 		select {
 		case project := <-projects:
-			if checker.UpdateCheck(project) {
+			// If this project is not in sync (or forced), then sent it to the queue.
+			if checker.UpdateCheck(project) || forcedSync {
 				if err := dispatcher.Dispatch(project); err == nil {
+					// If its been successfully added to the queue then change the
+					// project state.
 					checker.RecordUpdate(project)
 				} else {
 					log.Println(project.Name, "not successfully dispatched. Not recording as updated.")
