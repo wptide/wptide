@@ -1,8 +1,8 @@
-hash: 69085ee047e3bc5f21d15d64f861d7a880e7e6b53305fc3263eadc2bfde673bf
-updated: 2018-02-28T16:54:49.877335943+11:00
+hash: 1247cfc96c7bb10720c466f7f4140cd681441f4b68272d5c591d760c1fc83c49
+updated: 2018-03-01T10:34:48.43380008+11:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: ce48e67ca697079662aee65a13202f37a185962b
+  version: 9a79087b1148376f4dd860c188c948479e2def3b
   subpackages:
   - aws
   - aws/awserr
@@ -36,7 +36,7 @@ imports:
   - service/sqs/sqsiface
   - service/sts
 - name: github.com/blang/semver
-  version: a088618caaf34f5392024fc3386143873033fbea
+  version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
   version: 32e4be5f41bb918afb6e37c07426e2ddbcb6647e
 - name: github.com/hhatto/gocloc
@@ -50,7 +50,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 5aba414515dd0e77d3f07fc61670f09fc6e81dc4
+  version: 74635f86066d431422d9babf3284e4d35c948337
   subpackages:
   - audit
   - audit/info
@@ -67,10 +67,10 @@ imports:
   - source/zip
   - storage
   - storage/s3
+  - sync
   - tide
   - tide/api
   - util
-  - sync
   - wporg
 - name: gopkg.in/src-d/enry.v1
   version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
