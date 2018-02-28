@@ -14,8 +14,8 @@ import (
 	"time"
 	"errors"
 	"github.com/wptide/pkg/message"
-	"github.com/xwp/go-tide/src/sync"
-	"github.com/xwp/go-tide/src/wporg"
+	"github.com/wptide/pkg/sync"
+	"github.com/wptide/pkg/wporg"
 	"os"
 )
 

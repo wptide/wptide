@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/xwp/go-tide/src/sync"
+	"github.com/wptide/pkg/sync"
 	"github.com/wptide/pkg/message"
-	"github.com/xwp/go-tide/src/wporg"
+	"github.com/wptide/pkg/wporg"
 	"time"
 	"fmt"
 	"strings"

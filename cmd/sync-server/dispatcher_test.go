@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/wptide/pkg/message"
-	"github.com/xwp/go-tide/src/wporg"
+	"github.com/wptide/pkg/wporg"
 	"errors"
 	"log"
 	"bytes"

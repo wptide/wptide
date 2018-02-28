@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/xwp/go-tide/src/wporg"
+	"github.com/wptide/pkg/wporg"
 	"github.com/nanobox-io/golang-scribble"
 	"errors"
 	"sync"

@@ -16,5 +16,7 @@ import:
   - source
   - storage
   - storage/s3
+  - sync
   - tide
   - tide/api
+  - wporg

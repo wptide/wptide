@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 	"github.com/nanobox-io/golang-scribble"
-	"github.com/xwp/go-tide/src/wporg"
+	"github.com/wptide/pkg/wporg"
 	"os"
 )
 
