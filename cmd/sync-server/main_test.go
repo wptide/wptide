@@ -12,12 +12,11 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/oakmound/oak/fileutil"
-	"github.com/pkg/errors"
+	"errors"
 	"github.com/wptide/pkg/message"
 	"github.com/xwp/go-tide/src/sync"
 	"github.com/xwp/go-tide/src/wporg"
+	"os"
 )
 
 var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -27,17 +26,17 @@ var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWrit
 	for _, part := range parts {
 		switch part {
 		case "request[page]=1":
-			file, _ := fileutil.Open("./testdata/themes_request1.json")
+			file, _ := os.Open("./testdata/themes_request1.json")
 			defer file.Close()
 			io.Copy(w, file)
 			return
 		case "request[page]=2":
-			file, _ := fileutil.Open("./testdata/themes_request2.json")
+			file, _ := os.Open("./testdata/themes_request2.json")
 			defer file.Close()
 			io.Copy(w, file)
 			return
 		case "request[page]=3":
-			file, _ := fileutil.Open("./testdata/themes_request3.json")
+			file, _ := os.Open("./testdata/themes_request3.json")
 			defer file.Close()
 			io.Copy(w, file)
 			return
@@ -59,17 +58,17 @@ var mockPluginsApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWri
 	for _, part := range parts {
 		switch part {
 		case "request[page]=1":
-			file, _ := fileutil.Open("./testdata/plugins_request1.json")
+			file, _ := os.Open("./testdata/plugins_request1.json")
 			defer file.Close()
 			io.Copy(w, file)
 			return
 		case "request[page]=2":
-			file, _ := fileutil.Open("./testdata/plugins_request2.json")
+			file, _ := os.Open("./testdata/plugins_request2.json")
 			defer file.Close()
 			io.Copy(w, file)
 			return
 		case "request[page]=3":
-			file, _ := fileutil.Open("./testdata/plugins_request3.json")
+			file, _ := os.Open("./testdata/plugins_request3.json")
 			defer file.Close()
 			io.Copy(w, file)
 			return

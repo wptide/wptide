@@ -1,11 +1,13 @@
 package: github.com/xwp/go-tide
 import:
+- package: github.com/nanobox-io/golang-scribble
 - package: github.com/wptide/pkg
   subpackages:
   - audit
   - audit/info
   - audit/ingest
   - audit/lighthouse
+  - audit/phpcs
   - audit/tide
   - env
   - log

@@ -5,7 +5,7 @@ import (
 
 	"github.com/wptide/pkg/message"
 	"github.com/xwp/go-tide/src/wporg"
-	"github.com/pkg/errors"
+	"errors"
 	"log"
 	"bytes"
 )

@@ -1,8 +1,8 @@
-hash: fdd1b08279c9d1296025941be3daef0114a49cc15efa9156f13b14aa2c9c6959
-updated: 2018-02-21T12:08:36.533944982+11:00
+hash: 69085ee047e3bc5f21d15d64f861d7a880e7e6b53305fc3263eadc2bfde673bf
+updated: 2018-02-28T16:54:49.877335943+11:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: f9a6880d84e16e2a37055793e17164a228d637f4
+  version: ce48e67ca697079662aee65a13202f37a185962b
   subpackages:
   - aws
   - aws/awserr
@@ -41,8 +41,12 @@ imports:
   version: 32e4be5f41bb918afb6e37c07426e2ddbcb6647e
 - name: github.com/hhatto/gocloc
   version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
+- name: github.com/jcelliott/lumber
+  version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
   version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
+- name: github.com/nanobox-io/golang-scribble
+  version: ced58d671850da57ce8c11315424513b608083d7
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg

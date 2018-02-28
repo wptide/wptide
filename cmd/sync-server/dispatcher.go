@@ -5,7 +5,7 @@ import (
 	"github.com/xwp/go-tide/src/wporg"
 	"github.com/wptide/pkg/message/sqs"
 	"log"
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type sqsDispatcher struct {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-
 	"github.com/nanobox-io/golang-scribble"
 	"github.com/xwp/go-tide/src/wporg"
 	"os"
