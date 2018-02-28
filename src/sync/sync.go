@@ -5,10 +5,6 @@ import (
 	"github.com/xwp/go-tide/src/wporg"
 )
 
-type Synchronizer struct {
-
-}
-
 type Dispatcher interface{
 	Dispatch(project wporg.RepoProject) error
 	Init() error
