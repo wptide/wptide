@@ -29,16 +29,23 @@ type RepoProject struct {
 	ShortDescription string `json:"short_description"`
 	Description      string `json:"description"`
 	DownloadLink     string `json:"download_link"`
+	// Type is excluded from the json object as this does not come
+	// from either the plugin or theme APIs.
 	Type             string `json:"-"`
 }
 
 type ApiResponse struct {
 	Info    ApiInfo       `json:"info"`
+	// Type is excluded from the json object as this does not come
+	// from either the plugin or theme APIs.
 	Type    string        `json:"-"`
 	Plugins []RepoProject `json:"plugins,omitempty"`
 	Themes  []RepoProject `json:"themes,omitempty"`
 }
 
+// alternateApiResponse is identical to ApiResponse except for the
+// Plugins field which expects an alternate json response from the
+// plugins API. (some inconsistencies with responses were noticed)
 type alternateApiResponse struct {
 	Info    ApiInfo                `json:"info"`
 	Type    string                 `json:"-"`
@@ -46,6 +53,8 @@ type alternateApiResponse struct {
 	Themes  []RepoProject          `json:"themes,omitempty"`
 }
 
+// Requester describes an interface for requesting projects from an API.
+// Client below implements this interface.
 type Requester interface {
 	// Request performs the request to the WordPress.org API's.
 	// `source` is likely to be:
@@ -127,6 +136,7 @@ func (c Client) Request(source, projectType, category string, perPage, page int)
 	return &results, nil
 }
 
+// RequestThemes is a convenience method.
 func (c *Client) RequestThemes(category string, perPage, page int) (*ApiResponse, error) {
 	if c.themeAPI == "" {
 		c.themeAPI = themesApiUrl
@@ -134,6 +144,7 @@ func (c *Client) RequestThemes(category string, perPage, page int) (*ApiResponse
 	return c.Request(c.themeAPI, "themes", category, perPage, page)
 }
 
+// RequestPlugins is a convenience method.
 func (c *Client) RequestPlugins(category string, perPage, page int) (*ApiResponse, error) {
 	if c.pluginAPI == "" {
 		c.pluginAPI = pluginsApiUrl
@@ -141,10 +152,12 @@ func (c *Client) RequestPlugins(category string, perPage, page int) (*ApiRespons
 	return c.Request(c.pluginAPI, "plugins", category, perPage, page)
 }
 
+// SetPluginApiSource allows to set an alternate plugins API source.
 func (c *Client) SetPluginApiSource(source string) {
 	c.pluginAPI = source
 }
 
+// SetThemeApiSource allows to set an alternate themes API source.
 func (c *Client) SetThemeApiSource(source string) {
 	c.themeAPI = source
 }
