@@ -1,0 +1,54 @@
+{
+  "info": {
+    "page": 2,
+    "pages": 3,
+    "results": 15
+  },
+  "plugins": {
+    "plugin-6": {
+      "name": "Plugin 6",
+      "slug": "plugin-6",
+      "version": "6.0.0",
+      "last_updated": "2018-02-21",
+      "short_description": "Plugin 6 Short",
+      "description": "",
+      "download_link": "http://example.local/plugin-6-6.0.0.zip"
+    },
+    "plugin-7": {
+      "name": "Plugin 7",
+      "slug": "plugin-7",
+      "version": "7.0.0",
+      "last_updated": "2018-02-22",
+      "short_description": "Plugin 7 Short",
+      "description": "",
+      "download_link": "http://example.local/plugin-7-7.0.0.zip"
+    },
+    "plugin-8": {
+      "name": "Plugin 8",
+      "slug": "plugin-8",
+      "version": "8.0.0",
+      "last_updated": "2018-02-23",
+      "short_description": "Plugin 8 Short",
+      "description": "",
+      "download_link": "http://example.local/plugin-8-8.0.0.zip"
+    },
+    "plugin-9": {
+      "name": "Plugin 9",
+      "slug": "plugin-9",
+      "version": "9.0.0",
+      "last_updated": "2018-02-24",
+      "short_description": "Plugin 9 Short",
+      "description": "",
+      "download_link": "http://example.local/plugin-9-9.0.0.zip"
+    },
+    "plugin-10": {
+      "name": "Plugin 10",
+      "slug": "plugin-10",
+      "version": "10.0.0",
+      "last_updated": "2018-02-25",
+      "short_description": "Plugin 10 Short",
+      "description": "",
+      "download_link": "http://example.local/plugin-10-10.0.0.zip"
+    }
+  }
+}

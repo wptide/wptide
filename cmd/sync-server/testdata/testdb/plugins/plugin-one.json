@@ -1,0 +1,7 @@
+{
+  "name": "Plugin One",
+  "short_description": "Plugin One Description",
+  "slug": "plugin-one",
+  "version": "1.0.0",
+  "last_updated": "2018-02-28"
+}
