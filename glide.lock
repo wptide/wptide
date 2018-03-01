@@ -1,5 +1,5 @@
 hash: 1247cfc96c7bb10720c466f7f4140cd681441f4b68272d5c591d760c1fc83c49
-updated: 2018-03-01T10:34:48.43380008+11:00
+updated: 2018-03-01T14:09:16.168039844+11:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: 9a79087b1148376f4dd860c188c948479e2def3b
@@ -50,7 +50,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 74635f86066d431422d9babf3284e4d35c948337
+  version: 6d535d9fd470735a0a43ea98d9e42342e8cc3457
   subpackages:
   - audit
   - audit/info
