@@ -24,7 +24,7 @@ services:
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
         network_mode: host
 
-### PHPCS Server ###########################################
+### PHPCS Server ################################################
     phpcs-server:
         image: ${PHPCS_GKE_IMAGE}:latest
         environment:
@@ -45,4 +45,37 @@ services:
             PHPCS_S3_BUCKET_NAME: ${PHPCS_S3_BUCKET_NAME}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
             PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+        network_mode: host
+
+### Sync Server #################################################
+    sync-server:
+        image: ${SYNC_GKE_IMAGE}:latest
+        environment:
+            TIDE_API_HOST: ${TIDE_API_HOST}
+            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
+            TIDE_API_VERSION: ${TIDE_API_VERSION}
+            SYNC_ACTIVE: ${SYNC_ACTIVE}
+            SYNC_API_BROWSE_CATEGORY: ${SYNC_API_BROWSE_CATEGORY}
+            SYNC_DATA: ${SYNC_DATA}
+            SYNC_DEFAULT_CLIENT: ${SYNC_DEFAULT_CLIENT}
+            SYNC_DEFAULT_VISIBILITY: ${SYNC_DEFAULT_VISIBILITY}
+            SYNC_FORCE_AUDITS: ${SYNC_FORCE_AUDITS}
+            SYNC_ITEMS_PER_PAGE: ${SYNC_ITEMS_PER_PAGE}
+            SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
+            SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
+            SYNC_SQS_KEY: ${SYNC_SQS_KEY}
+            SYNC_SQS_QUEUE: ${SYNC_SQS_QUEUE}
+            SYNC_SQS_QUEUE_NAME: ${SYNC_SQS_QUEUE_NAME}
+            SYNC_SQS_REGION: ${SYNC_SQS_REGION}
+            SYNC_SQS_SECRET: ${SYNC_SQS_SECRET}
+            SYNC_SQS_THEME_KEY: ${SYNC_SQS_THEME_KEY}
+            SYNC_SQS_THEME_QUEUE: ${SYNC_SQS_THEME_QUEUE}
+            SYNC_SQS_THEME_QUEUE_NAME: ${SYNC_SQS_THEME_QUEUE_NAME}
+            SYNC_SQS_THEME_REGION: ${SYNC_SQS_THEME_REGION}
+            SYNC_SQS_THEME_SECRET: ${SYNC_SQS_THEME_SECRET}
+            SYNC_SQS_PLUGIN_KEY: ${SYNC_SQS_PLUGIN_KEY}
+            SYNC_SQS_PLUGIN_QUEUE: ${SYNC_SQS_PLUGIN_QUEUE}
+            SYNC_SQS_PLUGIN_QUEUE_NAME: ${SYNC_SQS_PLUGIN_QUEUE_NAME}
+            SYNC_SQS_PLUGIN_REGION: ${SYNC_SQS_PLUGIN_REGION}
+            SYNC_SQS_PLUGIN_SECRET: ${SYNC_SQS_PLUGIN_SECRET}
         network_mode: host

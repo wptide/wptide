@@ -9,8 +9,7 @@ vendor
 .DS_Store
 
 # GO Binary
-bin/lighthouse-server
-bin/phpcs-server
+bin/*-server
 
 # GO testdata report
 report.json

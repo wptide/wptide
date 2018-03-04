@@ -46,7 +46,7 @@ phpcs.up:
 
 # Stop the isolated PHPCS Server Docker image with docker-compose down.
 phpcs.down:
-	@docker-compose down phpcs-server
+	@docker-compose down
 
 # Push the PHPCS Server Docker image to GCR.
 phpcs.push.image:

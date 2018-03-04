@@ -14,14 +14,14 @@ import (
 
 var (
 	// Sync Server config.
-	serverActive    = strings.ToLower(env.GetEnv("SS_ACTIVE", "off")) == "on"
-	forcedSync      = strings.ToLower(env.GetEnv("SS_FORCE_AUDITS", "no")) == "yes"
-	apiClient       = env.GetEnv("SS_DEFAULT_CLIENT", "wporg")
-	auditVisibility = env.GetEnv("SS_DEFAULT_VISIBILITY", "public")
-	perPage, _      = strconv.Atoi(env.GetEnv("SS_ITEMS_PER_PAGE", "250"))
-	poolSize, _     = strconv.Atoi(env.GetEnv("SS_POOL_WORKERS", "250"))
-	browseCategory  = env.GetEnv("SS_API_BROWSE_CATEGORY", "updated")
-	poolDelay, _     = strconv.Atoi(env.GetEnv("SS_POOL_DELAY", "300"))
+	serverActive    = strings.ToLower(env.GetEnv("SYNC_ACTIVE", "off")) == "on"
+	forcedSync      = strings.ToLower(env.GetEnv("SYNC_FORCE_AUDITS", "no")) == "yes"
+	apiClient       = env.GetEnv("SYNC_DEFAULT_CLIENT", "wporg")
+	auditVisibility = env.GetEnv("SYNC_DEFAULT_VISIBILITY", "public")
+	perPage, _      = strconv.Atoi(env.GetEnv("SYNC_ITEMS_PER_PAGE", "250"))
+	poolSize, _     = strconv.Atoi(env.GetEnv("SYNC_POOL_WORKERS", "250"))
+	browseCategory  = env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated")
+	poolDelay, _    = strconv.Atoi(env.GetEnv("SYNC_POOL_DELAY", "300"))
 
 	// Allow us to quit the server with a channel. Good for tests.
 	quit = make(chan struct{}, 1)
@@ -30,7 +30,7 @@ var (
 	client = &wporg.Client{}
 
 	// Checks to see if we need to send an update.
-	checkerDBPath = env.GetEnv("SS_DATA", "./db")
+	checkerDBPath = env.GetEnv("SYNC_DATA", "./db")
 
 	// Init the scribble (flat file) db used for checking currency of results.
 	checker sync.UpdateChecker = scribbleChecker{
@@ -49,30 +49,30 @@ var (
 			Accepts  string // "all" or "themes" or "plugins"
 		}{
 			"primary": {
-				env.GetEnv("SS_SQS_REGION", ""),
-				env.GetEnv("SS_SQS_KEY", ""),
-				env.GetEnv("SS_SQS_SECRET", ""),
-				env.GetEnv("SS_SQS_QUEUE_NAME", ""),
+				env.GetEnv("SYNC_SQS_REGION", ""),
+				env.GetEnv("SYNC_SQS_KEY", ""),
+				env.GetEnv("SYNC_SQS_SECRET", ""),
+				env.GetEnv("SYNC_SQS_QUEUE_NAME", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("SS_SQS_QUEUE", "on")) == "on",
+				strings.ToLower(env.GetEnv("SYNC_SQS_QUEUE", "on")) == "on",
 				"all",
 			},
 			"themes": {
-				env.GetEnv("SS_THEME_SQS_REGION", ""),
-				env.GetEnv("SS_THEME_SQS_KEY", ""),
-				env.GetEnv("SS_THEME_SQS_SECRET", ""),
-				env.GetEnv("SS_THEME_SQS_QUEUE_NAME", ""),
+				env.GetEnv("SYNC_SQS_THEME_REGION", ""),
+				env.GetEnv("SYNC_SQS_THEME_KEY", ""),
+				env.GetEnv("SYNC_SQS_THEME_SECRET", ""),
+				env.GetEnv("SYNC_SQS_THEME_QUEUE_NAME", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("SS_THEME_SQS_QUEUE", "off")) == "on",
+				strings.ToLower(env.GetEnv("SYNC_SQS_THEME_QUEUE", "off")) == "on",
 				"themes",
 			},
 			"plugins": {
-				env.GetEnv("SS_PLUGIN_SQS_REGION", ""),
-				env.GetEnv("SS_PLUGIN_SQS_KEY", ""),
-				env.GetEnv("SS_PLUGIN_SQS_SECRET", ""),
-				env.GetEnv("SS_PLUGIN_SQS_QUEUE", ""),
+				env.GetEnv("SYNC_SQS_PLUGIN_REGION", ""),
+				env.GetEnv("SYNC_SQS_PLUGIN_KEY", ""),
+				env.GetEnv("SYNC_SQS_PLUGIN_SECRET", ""),
+				env.GetEnv("SYNC_SQS_PLUGIN_QUEUE_NAME", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("SS_PLUGIN_SQS_QUEUE", "off")) == "on",
+				strings.ToLower(env.GetEnv("SYNC_SQS_PLUGIN_QUEUE", "off")) == "on",
 				"plugins",
 			},
 		},
@@ -218,10 +218,10 @@ func defaultAudits() *[]message.Audit {
 
 func main() {
 
-	// SS_ACTIVE must be set to "on". This is to ensure you know what you are
+	// SYNC_ACTIVE must be set to "on". This is to ensure you know what you are
 	// doing and not flooding message queues.
 	if ! serverActive {
-		log.Println("Sync Server not active. Please set ENV variable `SS_ACTIVE=on`.")
+		log.Println("Sync Server not active. Please set ENV variable `SYNC_ACTIVE=on`.")
 		return;
 	}
 
