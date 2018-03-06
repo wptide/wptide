@@ -1,5 +1,5 @@
-hash: 1247cfc96c7bb10720c466f7f4140cd681441f4b68272d5c591d760c1fc83c49
-updated: 2018-03-05T21:07:31.32149123-08:00
+hash: fdd1b08279c9d1296025941be3daef0114a49cc15efa9156f13b14aa2c9c6959
+updated: 2018-03-06T14:21:51.439109228+11:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: aace5875a5c3b85a3902c6d72b9caed301d64cce
@@ -38,7 +38,7 @@ imports:
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
-  version: 32e4be5f41bb918afb6e37c07426e2ddbcb6647e
+  version: e88632e2fbbd517932de8a0af39beb223b03ae35
 - name: github.com/hhatto/gocloc
   version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
 - name: github.com/jcelliott/lumber
@@ -50,7 +50,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 5ed4887d69c410a537f0297855faea6292577a9c
+  version: 841841ea7cc440ef2e61f5871cd58912e8158d06
   subpackages:
   - audit
   - audit/info
