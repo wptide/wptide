@@ -50,6 +50,8 @@ services:
 ### Sync Server #################################################
     sync-server:
         image: ${SYNC_GKE_IMAGE}:latest
+        volumes:
+            - ./data/sync-server:/srv/data
         environment:
             TIDE_API_HOST: ${TIDE_API_HOST}
             TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}

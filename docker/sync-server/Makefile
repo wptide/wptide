@@ -22,7 +22,6 @@ sync.usage:
 	@echo "\tsync.deploy.cluster:\n\t\t- Deploy the Sync Server GKE cluster."
 	@echo "\tsync.get.cluster:\n\t\t- Get the Sync Server GKE cluster status."
 	@echo "\tsync.clean.cluster:\n\t\t- Clean the Sync Server GKE cluster."
-	@echo "\tsync.update.certs:\n\t\t- Get CA Root Certs from curl mirror."
 
 # Build the Sync Server GO binary.
 sync.build.bin:
@@ -125,7 +124,3 @@ sync.get.cluster:
 # Clean the Sync Server GKE cluster.
 sync.clean.cluster: config
 	@gcloud container clusters delete ${SYNC_GKE_CLUSTER} -q
-
-# Get CA Certs for scratch file.
-sync.update.certs:
-	@curl --remote-name --time-cond cacert.pem https://curl.haxx.se/ca/cacert.pem

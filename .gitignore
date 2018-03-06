@@ -14,5 +14,5 @@ bin/*-server
 # GO testdata report
 report.json
 
-# Sync Server `db`
-db
+# Server data
+data
