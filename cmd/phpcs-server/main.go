@@ -127,6 +127,7 @@ var (
 		},
 		&phpcs.Processor{
 			Standard: "PHPCompatibility",
+			RuntimeSet: []string{"testVersion 5.2-"},
 			PostProcessors: []audit.Processor{
 				&phpcs.PhpCompat{},
 			},
