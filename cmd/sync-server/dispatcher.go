@@ -4,7 +4,6 @@ import (
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/wporg"
 	"github.com/wptide/pkg/message/sqs"
-	"log"
 	"errors"
 )
 
@@ -22,8 +21,6 @@ type sqsDispatcher struct {
 }
 
 func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
-
-	log.Println("Dispatching:", project.Name, project.Type)
 
 	msg := &message.Message{
 		ResponseAPIEndpoint: apiEndpoint,
@@ -58,9 +55,7 @@ func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
 		if queue.Active && (queue.Accepts == project.Type || queue.Accepts == "all") {
 			err := queueProvider.SendMessage(msg)
 			if err != nil {
-				log.Println(err)
-			} else {
-				log.Println("[" + queue.Queue + "] received:", project.Name)
+				return err
 			}
 		}
 	}

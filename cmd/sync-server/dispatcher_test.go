@@ -168,7 +168,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 				},
 			},
 			false,
-			false,
+			true,
 		},
 	}
 	for _, tt := range tests {

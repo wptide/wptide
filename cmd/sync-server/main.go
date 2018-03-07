@@ -177,7 +177,7 @@ func infoWorker(projects <-chan wporg.RepoProject, checker sync.UpdateChecker, d
 					// project state.
 					checker.RecordUpdate(project)
 				} else {
-					log.Println(project.Name, "not successfully dispatched. Not recording as updated.")
+					log.Println(project.Name, err)
 				}
 			}
 		}
