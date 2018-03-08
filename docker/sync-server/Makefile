@@ -79,8 +79,10 @@ sync.build.cluster: config
 	--num-nodes 1 \
 	--enable-cloud-logging \
 	--enable-cloud-monitoring \
-	--enable-legacy-authorization \
-	--disable-addons HttpLoadBalancing
+	--enable-autoscaling \
+	--min-nodes 1 \
+	--max-nodes 1 \
+	--enable-legacy-authorization
 
 # Get the Sync Server GKE cluster credentials.
 sync.creds:
@@ -88,7 +90,7 @@ sync.creds:
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds
-	@kubectl run ${SYNC_GKE_CLUSTER} --image=${REPO}/${SYNC_TAG} \
+	@kubectl run ${SYNC_GKE_CLUSTER} --image=${REPO}/${SYNC_TAG} --replicas=1 \
 	--env="TIDE_API_HOST=${TIDE_API_HOST}" \
 	--env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
 	--env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
