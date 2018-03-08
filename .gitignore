@@ -14,5 +14,8 @@ bin/*-server
 # GO testdata report
 report.json
 
+# Output of Overalls, specifically when used with Travis CI & Coveralls
+*.coverprofile
+
 # Server data
 data
