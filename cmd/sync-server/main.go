@@ -48,32 +48,23 @@ var (
 			Active   bool
 			Accepts  string // "all" or "themes" or "plugins"
 		}{
-			"primary": {
-				env.GetEnv("SYNC_SQS_REGION", ""),
-				env.GetEnv("SYNC_SQS_KEY", ""),
-				env.GetEnv("SYNC_SQS_SECRET", ""),
-				env.GetEnv("SYNC_SQS_QUEUE_NAME", ""),
+			"phpcs": {
+				env.GetEnv("PHPCS_SQS_REGION", ""),
+				env.GetEnv("PHPCS_SQS_KEY", ""),
+				env.GetEnv("PHPCS_SQS_SECRET", ""),
+				env.GetEnv("PHPCS_SQS_QUEUE_NAME", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("SYNC_SQS_QUEUE", "on")) == "on",
+				strings.ToLower(env.GetEnv("PHPCS_SQS_QUEUE", "on")) == "on",
 				"all",
 			},
-			"themes": {
-				env.GetEnv("SYNC_SQS_THEME_REGION", ""),
-				env.GetEnv("SYNC_SQS_THEME_KEY", ""),
-				env.GetEnv("SYNC_SQS_THEME_SECRET", ""),
-				env.GetEnv("SYNC_SQS_THEME_QUEUE_NAME", ""),
+			"lighthouse": {
+				env.GetEnv("LH_SQS_REGION", ""),
+				env.GetEnv("LH_SQS_KEY", ""),
+				env.GetEnv("LH_SQS_SECRET", ""),
+				env.GetEnv("LH_SQS_QUEUE_NAME", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("SYNC_SQS_THEME_QUEUE", "off")) == "on",
+				strings.ToLower(env.GetEnv("LH_SQS_QUEUE", "off")) == "on",
 				"themes",
-			},
-			"plugins": {
-				env.GetEnv("SYNC_SQS_PLUGIN_REGION", ""),
-				env.GetEnv("SYNC_SQS_PLUGIN_KEY", ""),
-				env.GetEnv("SYNC_SQS_PLUGIN_SECRET", ""),
-				env.GetEnv("SYNC_SQS_PLUGIN_QUEUE_NAME", ""),
-				apiEndpoint,
-				strings.ToLower(env.GetEnv("SYNC_SQS_PLUGIN_QUEUE", "off")) == "on",
-				"plugins",
 			},
 		},
 		providers: make(map[string]message.MessageProvider),
