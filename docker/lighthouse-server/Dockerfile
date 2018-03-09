@@ -29,10 +29,14 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
     && apk add --virtual .run-deps $runDeps \
     && apk del .build-deps \
     && rm -rf /var/lib/apk/lists/* /usr/share/doc/* /usr/share/man/* /usr/share/info/* /var/cache/apk/* \
-    && chmod +x /usr/bin/lh
+    && chmod +x /usr/bin/lh \
+    && mkdir -p /srv/data
 
 # Add the executable.
 ADD bin/lighthouse-server /
+
+# Set the working directory.
+WORKDIR /srv/data
 
 # Run the executable.
 CMD ["/lighthouse-server"]
