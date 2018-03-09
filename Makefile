@@ -3,7 +3,7 @@
 
 # Production environment variables **only** get applied to specific commands.
 # Copy .env.dist to .env.prod and update.
-ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster))
+ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster sync.deploy.cluster))
     ifneq ($(strip $(wildcard .env.prod)),)
         include .env.prod
     endif
@@ -40,10 +40,12 @@ usage:
 	@echo "\ttest:\n\t\t- Run the GO test suite."
 	@make lighthouse.usage
 	@make phpcs.usage
+	@make sync.usage
 
 # Include Makefiles.
 include docker/lighthouse-server/Makefile
 include docker/phpcs-server/Makefile
+include docker/sync-server/Makefile
 
 # Install dependencies.
 deps:
@@ -57,13 +59,13 @@ config:
 	@gcloud config set container/new_scopes_behavior true
 
 # Build all the GO binaries.
-build.bins: lighthouse.build.bin phpcs.build.bin
+build.bins: lighthouse.build.bin phpcs.build.bin sync.build.bin
 
 # Clean all the GO binaries.
-clean.bins: lighthouse.clean.bin phpcs.clean.bin
+clean.bins: lighthouse.clean.bin phpcs.clean.bin sync.clean.bin
 
 # Build all the Docker images.
-build.images: deps clean.bins build.bins lighthouse.build.image phpcs.build.image
+build.images: deps clean.bins build.bins lighthouse.build.image phpcs.build.image sync.build.image
 
 # Rebuild & run the Docker images with docker-compose up.
 build.up: build.images up

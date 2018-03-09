@@ -296,6 +296,7 @@ func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer
 		kind := proc.Kind()
 		if r[kind+"Error"] != nil {
 			errors = append(errors, r[kind+"Error"].(error))
+			tidelog.Log(msg.Title, fmt.Sprintf("%s process error: %s", kind, r[kind+"Error"].(error)))
 		}
 	}
 

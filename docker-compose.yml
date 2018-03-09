@@ -24,7 +24,7 @@ services:
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
         network_mode: host
 
-### PHPCS Server ###########################################
+### PHPCS Server ################################################
     phpcs-server:
         image: ${PHPCS_GKE_IMAGE}:latest
         environment:
@@ -45,4 +45,34 @@ services:
             PHPCS_S3_BUCKET_NAME: ${PHPCS_S3_BUCKET_NAME}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
             PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+        network_mode: host
+
+### Sync Server #################################################
+    sync-server:
+        image: ${SYNC_GKE_IMAGE}:latest
+        volumes:
+            - ./data/sync-server:/srv/data
+        environment:
+            TIDE_API_HOST: ${TIDE_API_HOST}
+            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
+            TIDE_API_VERSION: ${TIDE_API_VERSION}
+            SYNC_ACTIVE: ${SYNC_ACTIVE}
+            SYNC_API_BROWSE_CATEGORY: ${SYNC_API_BROWSE_CATEGORY}
+            SYNC_DATA: ${SYNC_DATA}
+            SYNC_DEFAULT_CLIENT: ${SYNC_DEFAULT_CLIENT}
+            SYNC_DEFAULT_VISIBILITY: ${SYNC_DEFAULT_VISIBILITY}
+            SYNC_FORCE_AUDITS: ${SYNC_FORCE_AUDITS}
+            SYNC_ITEMS_PER_PAGE: ${SYNC_ITEMS_PER_PAGE}
+            SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
+            SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
+            PHPCS_SQS_KEY: ${PHPCS_SQS_KEY}
+            PHPCS_SQS_QUEUE: ${PHPCS_SQS_QUEUE}
+            PHPCS_SQS_QUEUE_NAME: ${PHPCS_SQS_QUEUE_NAME}
+            PHPCS_SQS_REGION: ${PHPCS_SQS_REGION}
+            PHPCS_SQS_SECRET: ${PHPCS_SQS_SECRET}
+            LH_SQS_KEY: ${LH_SQS_KEY}
+            LH_SQS_QUEUE: ${LH_SQS_QUEUE}
+            LH_SQS_QUEUE_NAME: ${LH_SQS_QUEUE_NAME}
+            LH_SQS_REGION: ${LH_SQS_REGION}
+            LH_SQS_SECRET: ${LH_SQS_SECRET}
         network_mode: host

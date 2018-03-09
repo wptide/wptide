@@ -1,0 +1,54 @@
+{
+  "info": {
+    "page": 1,
+    "pages": 3,
+    "results": 15
+  },
+  "themes": [
+    {
+      "name": "Theme 1",
+      "slug": "theme-1",
+      "version": "1.0.0",
+      "last_updated": "2018-02-21",
+      "description": "Theme 1 Short",
+      "short_description": "",
+      "download_link": ""
+    },
+    {
+      "name": "Theme 2",
+      "slug": "theme-2",
+      "version": "2.0.0",
+      "last_updated": "2018-02-22",
+      "description": "Theme 2 Short",
+      "short_description": "",
+      "download_link": ""
+    },
+    {
+      "name": "Theme 3",
+      "slug": "theme-3",
+      "version": "3.0.0",
+      "last_updated": "2018-02-23",
+      "description": "Theme 3 Short",
+      "short_description": "",
+      "download_link": ""
+    },
+    {
+      "name": "Theme 4",
+      "slug": "theme-4",
+      "version": "4.0.0",
+      "last_updated": "2018-02-24",
+      "description": "Theme 4 Short",
+      "short_description": "",
+      "download_link": ""
+    },
+    {
+      "name": "Theme 5",
+      "slug": "theme-5",
+      "version": "5.0.0",
+      "last_updated": "2018-02-25",
+      "description": "Theme 5 Short",
+      "short_description": "",
+      "download_link": ""
+    }
+  ]
+}

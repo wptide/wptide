@@ -46,7 +46,7 @@ lighthouse.up:
 
 # Stop the isolated Lighthouse Server Docker image with docker-compose down.
 lighthouse.down:
-	@docker-compose down lighthouse-server
+	@docker-compose down
 
 # Push the Lighthouse Server Docker image to GCR.
 lighthouse.push.image:

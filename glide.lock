@@ -41,8 +41,12 @@ imports:
   version: e88632e2fbbd517932de8a0af39beb223b03ae35
 - name: github.com/hhatto/gocloc
   version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
+- name: github.com/jcelliott/lumber
+  version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
   version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
+- name: github.com/nanobox-io/golang-scribble
+  version: ced58d671850da57ce8c11315424513b608083d7
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
@@ -63,9 +67,11 @@ imports:
   - source/zip
   - storage
   - storage/s3
+  - sync
   - tide
   - tide/api
   - util
+  - wporg
 - name: gopkg.in/src-d/enry.v1
   version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
   subpackages:
