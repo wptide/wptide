@@ -170,7 +170,7 @@ func infoWorker(projects <-chan wporg.RepoProject, checker sync.UpdateChecker, d
 	for {
 		select {
 		case project := <-projects:
-			// If this project is not in sync (or forced), then sent it to the queue.
+			// If this project is not in sync (or forced), then send it to the queue.
 			if checker.UpdateCheck(project) || forcedSync {
 				if err := dispatcher.Dispatch(project); err == nil {
 					// If its been successfully added to the queue then change the
