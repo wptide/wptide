@@ -46,7 +46,31 @@ The following outlines the components added to Tide in order to integrate Lighth
 
 #### Process
 The following demonstrates how a WordPress theme is run through a Lighthouse audit and has its results stored and returned via the Tide API.
-@todo
+1. `tide-cluster`
+   - Starts all Tide services and listens...
+@todo add screenshot
+2. `lh-server`
+   - authenticate with Tide API    
+@todo add screenshot
+   - polls a job queue (SQS) for messages to process
+@todo add screenshot
+   - downloads theme and calculates checksum
+@todo add screenshot
+   - runs source through `gocloc` to get code information
+   - scans source for Theme header information (required for Lighthouse Audit)
+@todo add screenshot
+   - runs theme through `lighthouse-cli` at `https://wp-themes.com/<theme-slug>` and keeps polling for next job.
+@todo add screenshot
+   - saves full report to a file store (S3)
+@todo add screenshot
+   - grabs subset of results `reportCategories` with only:
+     - category name
+     - score
+     - Description
+@todo add screenshot
+   - bundles summary result and reference to full report as a message payload
+   - payload sent to Tide API instance
+@todo add screenshot
 
 #### Lighthouse Results in Tide API
 The following are example responses from the Tide API showing a summary of a Lighthouse audit and a detailed result of a Lighthouse audit.
