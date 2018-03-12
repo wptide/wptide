@@ -2,7 +2,10 @@
 
 [![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Tide services responsible for polling the WordPress.org APIs for themes and plugins to audit ("Sync Server"), for running audits and sending the results to the Tide API service ("Audit Server"), and for running Google Lighthouse audits against themes in the WordPress.org repository ("Lighthouse Server").
+Tide services are responsible for the following:
+- The Sync Server polls the WordPress.org API's for themes and plugins to process and writes them to a queue.
+- The PHPCS Server reads messages from a queue and runs reports against both plugins and themes, then sends the results back to the Tide API.
+- The Lighthouse Server reads messages from a queue and runs Google Lighthouse reports against the themes only, then sends the results back to the Tide API.
 
 ## Table of Contents
 @todo
