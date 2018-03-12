@@ -32,7 +32,17 @@ Lighthouse auditing of WordPress themes has been integrated by running each them
 
 Components:
 The following outlines the components added to Tide in order to integrate Lighthouse in overall Tide auditing of WordPress themes.
-@todo
+1. Docker Container
+   - Lighthouse CLI
+   - Lighthouse Audit Server binary (lh-server)
+   **Note:** Uses an Alpine Image with working Chromium version. Produces consistent results with Lighthouse Chrome extension. Allows reduced image size of 432MB.
+2. Go Lighthouse Server Source Code
+   - `cmd/lh-server` for binary
+   - `src` for packages
+   - `vendor` for imported packages
+     - [github.com/aws/aws-sdk-go](https://github.com/aws/aws-sdk-go)
+     - [github.com/hhatto/gocloc](https://github.com/hhatto/gocloc)
+   - Running Tide cluster
 
 Process:
 The following demonstrates how a WordPress theme is run through a Lighthouse audit and has its results stored and returned via the Tide API.
