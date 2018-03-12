@@ -27,10 +27,10 @@ Tide services are responsible for the following:
 ### Lighthouse Server
 This section outlines the components included in the Lighthouse integration with Tide, demonstrates how the integration processes Lighthouse audits of WordPress.org themes, and provides examples of the Tide API with Lighthouse audit results.
 
-Status:
+#### Status
 Lighthouse auditing of WordPress themes has been integrated by running each theme from wp-themes.com through the Lighthouse CLI, stores the full report, and includes the summary results and a link to the full report in the Tide API. This currently functions locally, XWP is working to get this running on GCP.
 
-Components:
+#### Components
 The following outlines the components added to Tide in order to integrate Lighthouse in overall Tide auditing of WordPress themes.
 1. Docker Container
    - Lighthouse CLI
@@ -44,11 +44,11 @@ The following outlines the components added to Tide in order to integrate Lighth
      - [github.com/hhatto/gocloc](https://github.com/hhatto/gocloc)
    - Running Tide cluster
 
-Process:
+#### Process
 The following demonstrates how a WordPress theme is run through a Lighthouse audit and has its results stored and returned via the Tide API.
 @todo
 
-Lighthouse Results in Tide API:
+#### Lighthouse Results in Tide API
 The following are example responses from the Tide API showing a summary of a Lighthouse audit and a detailed result of a Lighthouse audit.
 @todo
 
