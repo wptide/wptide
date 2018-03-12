@@ -27,12 +27,15 @@ RUN set -x \
     && $VENDOR/bin/phpcs --config-set installed_paths $VENDOR/wp-coding-standards/wpcs,$VENDOR/wimg/php-compatibility \
     && rm /usr/local/bin/composer \
     && apk del --purge .build-deps \
-    && mkdir -p /phpcs
+    && mkdir -p /srv/data
 
 ENV PATH=$PATH:$VENDOR/bin/
 
 # Add the executable.
 ADD bin/phpcs-server /
+
+# Set the working directory.
+WORKDIR /srv/data
 
 # Run the executable.
 CMD ["/phpcs-server"]
