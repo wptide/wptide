@@ -12,13 +12,16 @@ Tide services responsible for polling the WordPress.org APIs for themes and plug
 
 ### Usage
 
-#### WPCS Auditing
+### PHP_CodeSniffer (PHPCS) Server
 @todo
 
-#### PHP Compatibility Auditing
+#### WordPress Coding Standards (WPCS)
 @todo
 
-#### Google Lighthouse Auditing
+#### PHP Compatibility
+@todo
+
+### Lighthouse Server
 This section outlines the components included in the Lighthouse integration with Tide, demonstrates how the integration processes Lighthouse audits of WordPress.org themes, and provides examples of the Tide API with Lighthouse audit results.
 
 Status:
