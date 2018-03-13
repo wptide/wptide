@@ -48,31 +48,39 @@ The following outlines the components added to Tide in order to integrate Lighth
 The following demonstrates how a WordPress theme is run through a Lighthouse audit and has its results stored and returned via the Tide API.
 1. `tide-cluster`
    - Starts all Tide services and listens...
-   
+
    ![](docs/screenshots/starts-all-tide-services-and-listens.png)
 2. `lighthouse-server`
    - authenticate with Tide API    
-@todo add screenshot
+
+   ![](docs/screenshots/authenticate-with-tide-api.png)
    - polls a job queue (SQS) for messages to process
-@todo add screenshot
+
+   ![](docs/screenshots/polls-a-job-queue-for-messages-to-process.png)
    - downloads theme and calculates checksum
-@todo add screenshot
+
+   ![](docs/screenshots/downloads-theme-and-calculates-checksum.png)
    - runs source through `gocloc` to get code information
    - scans source for Theme header information (required for Lighthouse Report)
-@todo add screenshot
+
+   ![](docs/screenshots/scans-source-for-theme-header-info.png)
    - runs theme through `lighthouse` at `https://wp-themes.com/<theme-slug>` and keeps polling for next job.
-@todo add screenshot
+
+   ![](docs/screenshots/runs-theme-through-lighthouse-and-keeps-polling-for-next-job.png)
    - take full report and generate detailed report
    - saves full report to a file store (S3)
-@todo add screenshot
+
+   ![](docs/screenshots/saves-full-report-to-a-file-store.png)
    - grabs subset of results `reportCategories` with only:
      - category name
      - score
      - Description
-@todo add screenshot
+
+   ![](docs/screenshots/grabs-subset-of-results.png)
    - bundles summary result and reference to full report as a message payload
    - payload sent to Tide API instance
-@todo add screenshot
+
+   ![](docs/screenshots/payload-sent-to-tide-api-instance.png)
 
 #### Lighthouse Results in Tide API
 The following are example responses from the Tide API showing a summary of a Lighthouse audit and a detailed result of a Lighthouse audit.
