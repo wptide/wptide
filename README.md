@@ -34,22 +34,23 @@ Lighthouse auditing of WordPress themes has been integrated by running each them
 The following outlines the components added to Tide in order to integrate Lighthouse in overall Tide auditing of WordPress themes.
 1. Docker Container
    - Lighthouse CLI
-   - Lighthouse Audit Server binary (lh-server)
+   - Lighthouse Server binary (lighthouse-server)
    **Note:** Uses an Alpine Image with working Chromium version. Produces consistent results with Lighthouse Chrome extension. Allows reduced image size of 432MB.
 2. Go Lighthouse Server Source Code
-   - `cmd/lh-server` for binary
+   - `cmd/lighthouse-server` for binary
    - `src` for packages
    - `vendor` for imported packages
-     - [github.com/aws/aws-sdk-go](https://github.com/aws/aws-sdk-go)
-     - [github.com/hhatto/gocloc](https://github.com/hhatto/gocloc)
+     - [github.com/nanobox-io/golang-scribble](https://github.com/nanobox-io/golang-scribble)
+     - [github.com/wptide/pkg](https://github.com/wptide/pkg)
    - Running Tide cluster
 
 #### Process
 The following demonstrates how a WordPress theme is run through a Lighthouse audit and has its results stored and returned via the Tide API.
 1. `tide-cluster`
    - Starts all Tide services and listens...
+   
    ![](docs/screenshots/starts-all-tide-services-and-listens.png)
-2. `lh-server`
+2. `lighthouse-server`
    - authenticate with Tide API    
 @todo add screenshot
    - polls a job queue (SQS) for messages to process
@@ -57,10 +58,11 @@ The following demonstrates how a WordPress theme is run through a Lighthouse aud
    - downloads theme and calculates checksum
 @todo add screenshot
    - runs source through `gocloc` to get code information
-   - scans source for Theme header information (required for Lighthouse Audit)
+   - scans source for Theme header information (required for Lighthouse Report)
 @todo add screenshot
-   - runs theme through `lighthouse-cli` at `https://wp-themes.com/<theme-slug>` and keeps polling for next job.
+   - runs theme through `lighthouse` at `https://wp-themes.com/<theme-slug>` and keeps polling for next job.
 @todo add screenshot
+   - take full report and generate detailed report
    - saves full report to a file store (S3)
 @todo add screenshot
    - grabs subset of results `reportCategories` with only:
