@@ -5,6 +5,8 @@ services:
 ### Lighthouse Server ###########################################
     lighthouse-server:
         image: ${LH_GKE_IMAGE}:latest
+        volumes:
+            - ./data/lighthouse-server:/srv/data
         environment:
             TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
             TIDE_API_HOST: ${TIDE_API_HOST}
@@ -27,6 +29,8 @@ services:
 ### PHPCS Server ################################################
     phpcs-server:
         image: ${PHPCS_GKE_IMAGE}:latest
+        volumes:
+            - ./data/phpcs-server:/srv/data
         environment:
             TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
             TIDE_API_HOST: ${TIDE_API_HOST}
