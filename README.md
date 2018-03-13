@@ -48,7 +48,7 @@ The following outlines the components added to Tide in order to integrate Lighth
 The following demonstrates how a WordPress theme is run through a Lighthouse audit and has its results stored and returned via the Tide API.
 1. `tide-cluster`
    - Starts all Tide services and listens...
-@todo add screenshot
+   ![](docs/screenshots/starts-all-tide-services-and-listens.png)
 2. `lh-server`
    - authenticate with Tide API    
 @todo add screenshot
