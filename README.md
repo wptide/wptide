@@ -83,8 +83,19 @@ The following demonstrates how a WordPress theme is run through a Lighthouse aud
    ![](docs/screenshots/payload-sent-to-tide-api-instance.png)
 
 #### Lighthouse Results in Tide API
-The following are example responses from the Tide API showing a summary of a Lighthouse audit and a detailed result of a Lighthouse audit.
-@todo
+The following are example responses from the Tide API showing a summary of a Lighthouse report and a detailed result of a Lighthouse report.
+
+##### Checksum Endpoint (Summary Only)
+https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172a5ccccf23fe6b2f3d28bd?standards=lighthouse
+
+![](docs/screenshots/checksum-endpoint-summary-only.png)
+
+##### Checksum Endpoint (Details Included)
+https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172a5ccccf23fe6b2f3d28bd?standards=lighthouse&details=all
+
+![](docs/screenshots/checksum-endpoint-details-included.png)
+
+**Note:** Results for details is exactly the same as the output from a Lighthouse CI report.
 
 ### Contributing
 @todo
