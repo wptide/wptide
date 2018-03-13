@@ -98,7 +98,7 @@ https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172
 **Note:** Results for details is exactly the same as the output from a Lighthouse CI report.
 
 ### Contributing
-@todo
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Credits
 Props: [@rheinardkorf](https://github.com/rheinardkorf), [@valendesigns](https://github.com/valendesigns)
