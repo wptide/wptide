@@ -7,8 +7,22 @@ Tide services are responsible for the following:
 - The PHPCS Server reads messages from a queue and runs reports against both plugins and themes, then sends the results back to the Tide API.
 - The Lighthouse Server reads messages from a queue and runs Google Lighthouse reports against the themes only, then sends the results back to the Tide API.
 
-## Table of Contents
-@todo
+## [Table of Contents](#table-of-contents)
+   + [Setup](#setup)
+   + [Usage](#usage)
+   + [PHP_CodeSniffer (PHPCS) Server](#php-codesniffer--phpcs--server)
+     - [WordPress Coding Standards (WPCS)](#wordpress-coding-standards--wpcs-)
+     - [PHP Compatibility](#php-compatibility)
+   + [Lighthouse Server](#lighthouse-server)
+     - [Status](#status)
+     - [Components](#components)
+     - [Process](#process)
+     - [Lighthouse Results in Tide API](#lighthouse-results-in-tide-api)
+       * [Checksum Endpoint (Summary Only)](#checksum-endpoint--summary-only-)
+       * [Checksum Endpoint (Details Included)](#checksum-endpoint--details-included-)
+   + [Contributing](#contributing)
+   + [Credits](#credits)
+   + [License](#license)
 
 ### Setup
 @todo
