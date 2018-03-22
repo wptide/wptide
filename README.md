@@ -1,13 +1,15 @@
-# GO Tide
+# ![Tide](docs/images/logo.png)
 
 [![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+> A rising tide lifts all boats.
+> -- United States President, John F. Kennedy (borrowed from the New England Council)
 
-Tide services are responsible for the following:
-- The Sync Server polls the WordPress.org API's for themes and plugins to process and writes them to a queue.
-- The PHPCS Server reads messages from a queue and runs reports against both plugins and themes, then sends the results back to the Tide API.
-- The Lighthouse Server reads messages from a queue and runs Google Lighthouse reports against the themes only, then sends the results back to the Tide API.
+An automated tool to provide insight into WordPress code and highlight areas to improve the quality of plugins and themes.
+
+We believe the web can be better. With Tide, the code which underpins every website can be more standardized, faster, and more secure. Tide is focused on WordPress, because no other platform has as large an impact on the state of the web. Tide raises the quality of code one plugin or theme at a time, by elevating the importance of code quality in the developer consciousness. **Because a rising Tide lifts all boats.**
 
 ## [Table of Contents](#table-of-contents)
+   + [Introduction](#introduction)
    + [Setup](#setup)
    + [Usage](#usage)
    + [PHP_CodeSniffer (PHPCS) Server](#php-codesniffer--phpcs--server)
@@ -23,6 +25,12 @@ Tide services are responsible for the following:
    + [Contributing](#contributing)
    + [Credits](#credits)
    + [License](#license)
+
+### Introduction
+Tide services are responsible for the following:
+- The Sync Server polls the WordPress.org API's for themes and plugins to process and writes them to a queue.
+- The PHPCS Server reads messages from a queue and runs reports against both plugins and themes, then sends the results back to the Tide API.
+- The Lighthouse Server reads messages from a queue and runs Google Lighthouse reports against the themes only, then sends the results back to the Tide API.
 
 ### Setup
 @todo
@@ -63,38 +71,38 @@ The following demonstrates how a WordPress theme is run through a Lighthouse aud
 1. `tide-cluster`
    - Starts all Tide services and listens...
 
-   ![](docs/screenshots/starts-all-tide-services-and-listens.png)
+   ![](docs/images/starts-all-tide-services-and-listens.png)
 2. `lighthouse-server`
    - authenticate with Tide API    
 
-   ![](docs/screenshots/authenticate-with-tide-api.png)
+   ![](docs/images/authenticate-with-tide-api.png)
    - polls a job queue (SQS) for messages to process
 
-   ![](docs/screenshots/polls-a-job-queue-for-messages-to-process.png)
+   ![](docs/images/polls-a-job-queue-for-messages-to-process.png)
    - downloads theme and calculates checksum
 
-   ![](docs/screenshots/downloads-theme-and-calculates-checksum.png)
+   ![](docs/images/downloads-theme-and-calculates-checksum.png)
    - runs source through `gocloc` to get code information
    - scans source for Theme header information (required for Lighthouse Report)
 
-   ![](docs/screenshots/scans-source-for-theme-header-info.png)
+   ![](docs/images/scans-source-for-theme-header-info.png)
    - runs theme through `lighthouse` at `https://wp-themes.com/<theme-slug>` and keeps polling for next job.
 
-   ![](docs/screenshots/runs-theme-through-lighthouse-and-keeps-polling-for-next-job.png)
+   ![](docs/images/runs-theme-through-lighthouse-and-keeps-polling-for-next-job.png)
    - take full report and generate detailed report
    - saves full report to a file store (S3)
 
-   ![](docs/screenshots/saves-full-report-to-a-file-store.png)
+   ![](docs/images/saves-full-report-to-a-file-store.png)
    - grabs subset of results `reportCategories` with only:
      - category name
      - score
      - Description
 
-   ![](docs/screenshots/grabs-subset-of-results.png)
+   ![](docs/images/grabs-subset-of-results.png)
    - bundles summary result and reference to full report as a message payload
    - payload sent to Tide API instance
 
-   ![](docs/screenshots/payload-sent-to-tide-api-instance.png)
+   ![](docs/images/payload-sent-to-tide-api-instance.png)
 
 #### Lighthouse Results in Tide API
 The following are example responses from the Tide API showing a summary of a Lighthouse report and a detailed result of a Lighthouse report.
@@ -102,12 +110,12 @@ The following are example responses from the Tide API showing a summary of a Lig
 ##### Checksum Endpoint (Summary Only)
 https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172a5ccccf23fe6b2f3d28bd?standards=lighthouse
 
-![](docs/screenshots/checksum-endpoint-summary-only.png)
+![](docs/images/checksum-endpoint-summary-only.png)
 
 ##### Checksum Endpoint (Details Included)
 https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172a5ccccf23fe6b2f3d28bd?standards=lighthouse&details=all
 
-![](docs/screenshots/checksum-endpoint-details-included.png)
+![](docs/images/checksum-endpoint-details-included.png)
 
 **Note:** Results for details is exactly the same as the output from a Lighthouse CI report.
 
