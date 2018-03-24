@@ -14,7 +14,6 @@ Before submitting your contribution, please make sure to take a moment and read 
 
 - Checkout a topic branch from `develop` and merge back against `develop`.
     - If you are not familiar with branching please read [_A successful Git branching model_](http://nvie.com/posts/a-successful-git-branching-model/) before you go any further.
-- Follow the [WordPress Coding Standards](https://make.wordpress.org/core/handbook/coding-standards/).
 - If adding a new feature:
     - Add accompanying test case.
     - Provide convincing reason to add this feature. Ideally you should open a suggestion issue first and have it green-lit before working on it.
@@ -22,4 +21,4 @@ Before submitting your contribution, please make sure to take a moment and read 
     - Provide detailed description of the bug in the PR. Live demo preferred.
     - Add appropriate test coverage if applicable.
 
-Travis CI will run the unit tests and perform sniffs against the WordPress Coding Standards whenever you push changes to your PR. Tests are required to pass successfully for a merge to be considered.
+Travis CI will run the unit tests whenever you push changes to your PR. Tests are required to pass successfully for a merge to be considered.
