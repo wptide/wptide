@@ -23,6 +23,7 @@ We believe the web can be better. With Tide, the code which underpins every webs
        * [Checksum Endpoint (Summary Only)](#checksum-endpoint--summary-only-)
        * [Checksum Endpoint (Details Included)](#checksum-endpoint--details-included-)
    + [Contributing](#contributing)
+   + [Contact Us](#contact-us)
    + [Credits](#credits)
    + [License](#license)
 
@@ -121,6 +122,9 @@ https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+### Contact Us
+Have questions? Don't open an Issue, come join us in the [`#tide` channel](https://wordpress.slack.com/messages/C7TK8FBUJ/) in [WordPress Slack](https://make.wordpress.org/chat/). Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
 
 ### Credits
 Props: [@rheinardkorf](https://github.com/rheinardkorf), [@valendesigns](https://github.com/valendesigns), [@danlouw](https://github.com/danlouw), [@jeffpaul](https://github.com/jeffpaul)
