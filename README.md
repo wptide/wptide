@@ -123,7 +123,7 @@ https://tide.local/api/tide/v1/audit/ab38727534cbeeef043faf1e54a786e22e4e7c6a172
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Credits
-Props: [@rheinardkorf](https://github.com/rheinardkorf), [@valendesigns](https://github.com/valendesigns)
+Props: [@rheinardkorf](https://github.com/rheinardkorf), [@valendesigns](https://github.com/valendesigns), [@danlouw](https://github.com/danlouw), [@jeffpaul](https://github.com/jeffpaul)
 
 ### License
 Tide utilizes an [MIT license](https://github.com/xwp/go-tide/blob/master/LICENSE).
