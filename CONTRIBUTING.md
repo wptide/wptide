@@ -2,6 +2,10 @@
 
 Before submitting your contribution, please make sure to take a moment and read through the following guidelines.
 
+## Code of Conduct
+
+This project and everyone participating in it is governed by the [Tide Code of Conduct](https://github.com/xwp/go-tide/blob/master/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to engage@xwp.co.
+
 ## Issue Reporting Guidelines
 
 - The Issue list of this repo is **exclusively** for bug reports and feature requests.
