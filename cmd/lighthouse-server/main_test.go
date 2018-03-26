@@ -1,20 +1,15 @@
 package main
 
 import (
-	"reflect"
-	"testing"
-
-	"github.com/wptide/pkg/message"
-	tideApi "github.com/wptide/pkg/tide"
-	"os"
-	"errors"
-	"github.com/wptide/pkg/env"
-	"time"
-	"log"
 	"bytes"
-	"github.com/wptide/pkg/audit"
-	"net/http/httptest"
-	"net/http"
+	"log"
+	"os"
+	"testing"
+	"time"
+
+	"github.com/wptide/pkg/env"
+	"github.com/wptide/pkg/message"
+	"github.com/wptide/pkg/payload"
 )
 
 var (
@@ -40,78 +35,144 @@ var (
 		"LH_S3_BUCKET_NAME": "test-bucket",
 		//
 		// LH Server settings
-		"LH_CONCURRENT_AUDITS":      "1",
+		"LH_CONCURRENT_AUDITS": "1",
 	}
 )
 
-var fileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-}))
+func Test_initProcesses(t *testing.T) {
 
-type mockMessageProvider struct {
-	Type string
-}
-
-func (m mockMessageProvider) SendMessage(msg *message.Message) error {
-	return nil
-}
-func (m mockMessageProvider) GetNextMessage() (*message.Message, error) {
-	switch m.Type {
-	case "critical":
-		pErr := message.NewProviderError("Critical issue.")
-		pErr.Type = message.ErrCritcal
-		return nil, pErr
-	case "quota":
-		pErr := message.NewProviderError("Over quota.")
-		pErr.Type = message.ErrOverQuota
-		return nil, pErr
-	case "message":
-		return &message.Message{}, nil
-	case "lenError":
-		return &message.Message{Title: "lenError"}, nil
-	default:
-		return nil, nil
-	}
-}
-func (m mockMessageProvider) DeleteMessage(ref *string) error {
-	return nil
-}
-
-type mockTide struct {
-	apiError bool
-}
-
-func (m mockTide) Authenticate(clientId, clientSecret, authEndpoint string) error {
-	if clientId == "error" {
-		return errors.New("something went wrong")
-	}
-	return nil
-}
-
-func (m mockTide) SendPayload(method, endpoint, data string) (string, error) {
-
-	if m.apiError {
-		return "", errors.New("API error")
+	type args struct {
+		source <-chan message.Message
+		config processConfig
 	}
 
-	return "", nil
-}
-
-type mockProcess struct{}
-
-func (m mockProcess) Process(msg message.Message, result *audit.Result) {
-	r := *result;
-	if msg.Title == "lenError" {
-		r["mockError"] = errors.New("something went wrong")
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			"Valid Processes",
+			args{
+				make(chan message.Message),
+				processConfig{
+					igTempFolder:      "./testdata/tmp",
+					lhTempFolder:      "./testdata/tmp",
+					lhStorageProvider: &mockStorage{},
+					resPayloaders: map[string]payload.Payloader{
+						"tide": &mockPayloader{},
+					},
+				},
+			},
+			false,
+		},
+		{
+			"No Config",
+			args{
+				source: make(chan message.Message),
+			},
+			true,
+		},
+		{
+			"No Source",
+			args{
+				config: processConfig{
+					igTempFolder:      "./testdata/tmp",
+					lhTempFolder:      "./testdata/tmp",
+					lhStorageProvider: &mockStorage{},
+					resPayloaders: map[string]payload.Payloader{
+						"tide": &mockPayloader{},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"Ingest temp folder missing",
+			args{
+				make(chan message.Message),
+				processConfig{
+					lhTempFolder:      "./testdata/tmp",
+					lhStorageProvider: &mockStorage{},
+					resPayloaders: map[string]payload.Payloader{
+						"tide": &mockPayloader{},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"Lighthouse temp folder missing",
+			args{
+				make(chan message.Message),
+				processConfig{
+					igTempFolder:      "./testdata/tmp",
+					lhStorageProvider: &mockStorage{},
+					resPayloaders: map[string]payload.Payloader{
+						"tide": &mockPayloader{},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"Lighthouse storage provider missing",
+			args{
+				make(chan message.Message),
+				processConfig{
+					igTempFolder: "./testdata/tmp",
+					lhTempFolder: "./testdata/tmp",
+					resPayloaders: map[string]payload.Payloader{
+						"tide": &mockPayloader{},
+					},
+				},
+			},
+			true,
+		},
+		{
+			"Response payloaders missing",
+			args{
+				make(chan message.Message),
+				processConfig{
+					igTempFolder:      "./testdata/tmp",
+					lhTempFolder:      "./testdata/tmp",
+					lhStorageProvider: &mockStorage{},
+				},
+			},
+			true,
+		},
+		{
+			"Valid Processes with messages",
+			args{
+				make(chan message.Message),
+				processConfig{
+					igTempFolder:      "./testdata/tmp",
+					lhTempFolder:      "./testdata/tmp",
+					lhStorageProvider: &mockStorage{},
+					resPayloaders: map[string]payload.Payloader{
+						"tide": &mockPayloader{},
+					},
+				},
+			},
+			false,
+		},
 	}
-}
-func (m mockProcess) Kind() string {
-	return "mock"
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			_, err := initProcesses(tt.args.source, tt.args.config)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("initProcesses() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
 }
 
 func Test_main(t *testing.T) {
 
-	tempWriter := bytes.Buffer{}
-	log.SetOutput(&tempWriter)
+	b := bytes.Buffer{}
+	log.SetOutput(&b)
 
 	var value string
 	for key, val := range envTest {
@@ -138,21 +199,31 @@ func Test_main(t *testing.T) {
 	defer func() { messageProvider = cMessageProvider }()
 
 	type args struct {
-		messageChannel chan *message.Message
+		messageChannel chan message.Message
 		timeOut        time.Duration
-		msg            *message.Message
+		msg            message.Message
 		parseFlags     bool
 		version        bool
 		authError      bool
 		flagUrl        *string
 		flagOutput     *string
 		flagVisibility *string
+		altConfig      *processConfig
 	}
 
 	tests := []struct {
-		name string
-		args args
+		name     string
+		args     args
 	}{
+		{
+			"Run Main - Process Config Error (missing)",
+			args{
+				messageChannel: make(chan message.Message, 1),
+				timeOut:        1,
+				msg:            message.Message{},
+				altConfig:      &processConfig{},
+			},
+		},
 		{
 			"Run Main",
 			args{
@@ -163,9 +234,9 @@ func Test_main(t *testing.T) {
 		{
 			"Run Main - Custom Message",
 			args{
-				messageChannel: make(chan *message.Message, 1),
+				messageChannel: make(chan message.Message, 1),
 				timeOut:        1,
-				msg:            &message.Message{},
+				msg:            message.Message{},
 			},
 		},
 		{
@@ -193,7 +264,7 @@ func Test_main(t *testing.T) {
 			"Run Main - URL and Visibility Flag set",
 			args{
 				timeOut:        1,
-				flagUrl:        &[]string{fileServer.URL + "/test.zip"}[0],
+				flagUrl:        &[]string{testFileServer.URL + "/test.zip"}[0],
 				flagVisibility: &[]string{"public"}[0],
 			},
 		},
@@ -204,6 +275,15 @@ func Test_main(t *testing.T) {
 			// Parse the flags.
 			bParseFlags = tt.args.parseFlags
 
+			// Alternate config.
+			if tt.args.altConfig != nil {
+				oldConf := procCfg
+				procCfg = *tt.args.altConfig
+				defer func() {
+					procCfg = oldConf
+				}()
+			}
+
 			// -output
 			if tt.args.flagOutput != nil && *tt.args.flagOutput != "" {
 				flagOutput = tt.args.flagOutput
@@ -212,7 +292,6 @@ func Test_main(t *testing.T) {
 			// -url
 			if tt.args.flagUrl != nil && *tt.args.flagUrl != "" {
 				flagUrl = tt.args.flagUrl
-				cMessage = nil
 			}
 
 			// -visibility
@@ -227,7 +306,11 @@ func Test_main(t *testing.T) {
 			}
 
 			if tt.args.authError {
+				oldId := tideConfig.id
 				tideConfig.id = "error"
+				defer func() {
+					tideConfig.id = oldId
+				}()
 			}
 
 			// Run as goroutine and wait for terminate signal.
@@ -243,11 +326,12 @@ func Test_main(t *testing.T) {
 			}
 
 			// Sleep for one second. Allows for one poll action.
-			time.Sleep(time.Millisecond * tt.args.timeOut)
+			time.Sleep(time.Millisecond * 100 * tt.args.timeOut)
 			terminateChannel <- struct{}{}
 		})
 	}
 }
+
 func setupConfig() {
 	// Setup lhConfig
 	lhConfig = struct {
@@ -261,98 +345,90 @@ func setupConfig() {
 		env.GetEnv("LH_SQS_SECRET", ""),
 		env.GetEnv("LH_SQS_QUEUE_NAME", ""),
 	}
-}
 
-func Test_messageChannel(t *testing.T) {
-
-	tempWriter := bytes.Buffer{}
-	log.SetOutput(&tempWriter)
-
-	type args struct {
-		provider  message.MessageProvider
-		buffer    chan struct{}
-		processes []audit.Processor
-	}
-	tests := []struct {
-		name string
-		args args
-		want reflect.Type
+	tideConfig = struct {
+		id           string
+		secret       string
+		authEndpoint string
+		host         string
+		protocol     string
+		version      string
 	}{
-		{
-			"Successful Message",
-			args{
-				provider: &mockMessageProvider{
-					Type: "message",
-				},
-			},
-			reflect.TypeOf(make(chan *message.Message)),
-		},
-		{
-			"Critical Error Message",
-			args{
-				provider: &mockMessageProvider{
-					Type: "critical",
-				},
-			},
-			reflect.TypeOf(make(chan *message.Message)),
-		},
-		{
-			"Over Quota Message",
-			args{
-				provider: &mockMessageProvider{
-					Type: "quota",
-				},
-			},
-			reflect.TypeOf(make(chan *message.Message)),
-		},
+		env.GetEnv("TIDE_API_KEY", ""),
+		env.GetEnv("TIDE_API_SECRET", ""),
+		env.GetEnv("TIDE_API_AUTH_URL", ""),
+		env.GetEnv("TIDE_API_HOST", ""),
+		env.GetEnv("TIDE_API_PROTOCOL", ""),
+		env.GetEnv("TIDE_API_VERSION", ""),
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := messageChannel(tt.args.provider, tt.args.buffer); !reflect.DeepEqual(reflect.TypeOf(got), tt.want) {
-				t.Errorf("messageChannel() = %v, want %v", got, tt.want)
-			}
-		})
+
+	lhS3Config = struct {
+		region string
+		key    string
+		secret string
+		bucket string
+	}{
+		env.GetEnv("LH_S3_REGION", ""),
+		env.GetEnv("LH_S3_KEY", ""),
+		env.GetEnv("LH_S3_SECRET", ""),
+		env.GetEnv("LH_S3_BUCKET_NAME", ""),
 	}
 }
 
-func Test_processMessage(t *testing.T) {
-
+func Test_pollProvider(t *testing.T) {
 	type args struct {
-		msg    *message.Message
-		client tideApi.ClientInterface
-		buffer <-chan struct{}
+		c        chan message.Message
+		provider message.MessageProvider
+		buffer   chan struct{}
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			"No Error Message",
+			"Poll Messages",
 			args{
-				&message.Message{},
-				&mockTide{},
-				nil,
+				make(chan message.Message),
+				&mockMessageProvider{
+					"message",
+				},
+				make(chan struct{}, 1),
 			},
 		},
 		{
-			"Error Message",
+			"Poll Messages - Critical Error",
 			args{
-				&message.Message{
-					Title: "lenError",
+				make(chan message.Message),
+				&mockMessageProvider{
+					"critical",
 				},
-				&mockTide{},
-				nil,
+				make(chan struct{}, 1),
+			},
+		},
+		{
+			"Poll Messages - Quota Error",
+			args{
+				make(chan message.Message),
+				&mockMessageProvider{
+					"quota",
+				},
+				make(chan struct{}, 1),
+			},
+		},
+		{
+			"Poll Messages - Message Length Error",
+			args{
+				make(chan message.Message),
+				&mockMessageProvider{
+					"lenError",
+				},
+				make(chan struct{}, 1),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			processes = []audit.Processor{
-				&mockProcess{},
-			}
-
-			go processMessage(tt.args.msg, tt.args.client, tt.args.buffer)
-			time.Sleep(time.Millisecond * 1)
+			pollProvider(tt.args.c, tt.args.provider, tt.args.buffer)
 		})
 	}
 }
