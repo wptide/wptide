@@ -50,7 +50,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: d0598ae9a4b6333a0892b12137bc20e648aa0189
+  version: 90aed69802c9bb23c5f88329478fc614f5c72286
   subpackages:
   - audit
   - audit/info
