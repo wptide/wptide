@@ -19,7 +19,7 @@ ${CYAN}The ${RESET}${BOLD}.env${RESET}${CYAN} file is sourced even if a custom e
 All paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
 
 
-## Handle help parameters.
+## Handle cli parameters.
 for p in "$@";
 do
     case $p in
