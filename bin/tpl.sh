@@ -15,7 +15,8 @@ USAGE="usage: $0 [<options>]
     -f, --file      name of the .tpl file (without extension) (${RED}required${RESET})
     -e, --env       environment file used to source custom environment variables (${YELLOW}optional${RESET})
 
-${CYAN}The default ${RESET}${BOLD}.env${RESET}${CYAN} file is always sourced and all file paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
+${CYAN}The ${RESET}${BOLD}.env${RESET}${CYAN} file is sourced even if a custom environment file is used.
+All paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
 
 
 ## Handle help parameters.
