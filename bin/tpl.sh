@@ -8,20 +8,15 @@ CYAN=$(tput setaf 6)
 RESET=$(tput sgr0)
 
 ## CLI messages.
-HELP="Pass [${CYAN}--help${RESET}|${CYAN}-h${RESET}] as a cli argument for help using this script."
-ERROR="${RED}${BOLD}Error${RESET}:"
-USAGE="${BOLD}Usage${RESET}:
-    $0 {${RED}template${RESET}} {${RED}destination${RESET}} {${YELLOW}environment${RESET}}
-${BOLD}Notes${RESET}:${CYAN}
-    1. The default ${RESET}${BOLD}.env${RESET}${CYAN} file is always sourced.
-    2. All file paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}
-${BOLD}Arguments${RESET}:
-    ${CYAN}template${RESET}:
-        The template file used to generate the destination file. (${RED}required${RESET})
-    ${CYAN}destination${RESET}:
-        The destination file that is generated from the template file. (${RED}required${RESET})
-    ${CYAN}environment${RESET}:
-        The environment file used to source custom environment variables. (${YELLOW}optional${RESET})"
+USAGE="usage: $0 [<options>]
+
+    -h, --help      help with script usage
+    -p, --path      path to the template file (${RED}required${RESET})
+    -f, --file      name of the .tpl file (without extension) (${RED}required${RESET})
+    -e, --env       environment file used to source custom environment variables (${YELLOW}optional${RESET})
+
+${CYAN}The default ${RESET}${BOLD}.env${RESET}${CYAN} file is always sourced and all file paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
+
 
 ## Handle help parameters.
 for p in "$@";
@@ -29,36 +24,41 @@ do
     case $p in
     --help|-h)
         echo "${USAGE}"
-        exit 0;
+        exit 0
+        ;;
+    -p=*|--path=*)
+        TEMP_PATH="${p#*=}"
+        ;;
+    -f=*|--filename=*)
+        TEMP_FILENAME="${p#*=}"
+        ;;
+    -e=*|--env=*)
+        ENV_FILE="${p#*=}"
         ;;
     esac
 done
 
-## Validate cli arguments.
-if [ $# -lt 1 ]; then
-    echo "${ERROR}
-    Missing required {${RED}template${RESET}} and {${RED}destination${RESET}} arguments.
-    ${HELP}"
-    exit 1
-elif [ $# -lt 2 ]; then
-    echo "${ERROR}
-    Missing required {${RED}destination${RESET}} argument.
-    ${HELP}"
-    exit 1
-fi
-
 ## Check for envsubst command.
 if ! command -v envsubst >/dev/null 2>&1; then
-    echo "${ERROR}
-    Variable Interpolation failure. The ${RED}envsubst${RESET} command is not installed on your OS."
+    echo "${RED}error${RESET}: Variable Interpolation failure. The ${CYAN}envsubst${RESET} command is not installed on your OS."
     exit 1
 fi
 
-## Validate template file.
-if [ ! -e ${1} ]; then
-    echo "${ERROR}
-    The template file (${RED}${BOLD}${1}${RESET}) does not exist at the location provided.
-    ${HELP}"
+TEMP_FILE="${TEMP_PATH}${TEMP_FILENAME}.tpl"
+DEST_FILE="${TEMP_PATH}${TEMP_FILENAME}.yaml"
+
+## Validate cli arguments.
+if [ "$#" -eq 0 ]; then
+    echo "${USAGE}"
+    exit 1
+elif [ -z ${TEMP_PATH} ]; then
+    echo "${RED}error${RESET}: Missing required [path] argument. Example [-p=<dir-path/>] or [--path=<dir-path/>]."
+    exit 1
+elif [ -z ${TEMP_FILENAME} ]; then
+    echo "${RED}error${RESET}: Missing required [filename] argument. Example [-f=<filename>] or [--filename=<filename>]."
+    exit 1
+elif [ ! -e ${TEMP_FILE} ]; then
+    echo "${RED}error${RESET}: The template file [${CYAN}${TEMP_FILE}${RESET}] does not exist at the location provided."
     exit 1
 fi
 
@@ -68,9 +68,13 @@ if [ -e .env ]; then
 fi
 
 ## Source custom environment file.
-if [ ! -z ${3} ] && [ -e ${3} ]; then
-    export $(cat ${3} | grep -v ^# | xargs)
+if [ ! -z ${ENV_FILE} ]; then
+    if [ -e ${ENV_FILE} ]; then
+        export $(cat ${ENV_FILE} | grep -v ^# | xargs)
+    else
+        echo "${RED}error${RESET}: The environment file [${CYAN}${ENV_FILE}${RESET}] does not exist at the location provided."
+    fi
 fi
 
 ## Substitute environment variables and generate destination file.
-envsubst < "$1" > "$2"
+envsubst < "$TEMP_FILE" > "$DEST_FILE"
