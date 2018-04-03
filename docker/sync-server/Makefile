@@ -1,5 +1,5 @@
 # Sync Server Docker settings.
-SYNC_TAG=${SYNC_GKE_IMAGE}:${VERSION}
+export SYNC_TAG=${SYNC_GKE_IMAGE}:${VERSION}
 
 # Sync Server GO settings.
 SYNC_BIN_PATH=bin/sync-server
@@ -68,7 +68,7 @@ sync.clean.image:
 
 # Build the Sync Server GKE cluster.
 sync.build.cluster: config
-	@gcloud beta container --project ${GCP_PROJECT} clusters create ${SYNC_GKE_CLUSTER} \
+	@gcloud container --project ${GCP_PROJECT} clusters create ${SYNC_GKE_CLUSTER} \
 	--zone ${GCP_ZONE} \
 	--cluster-version ${SYNC_GKE_CLUSTER_VERSION} \
 	--machine-type ${SYNC_GKE_MACHINE_TYPE} \
@@ -78,11 +78,7 @@ sync.build.cluster: config
 	--preemptible \
 	--num-nodes 1 \
 	--enable-cloud-logging \
-	--enable-cloud-monitoring \
-	--enable-autoscaling \
-	--min-nodes 1 \
-	--max-nodes 1 \
-	--enable-legacy-authorization
+	--enable-cloud-monitoring
 
 # Get the Sync Server GKE cluster credentials.
 sync.creds:
@@ -90,29 +86,8 @@ sync.creds:
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds
-	@kubectl run ${SYNC_GKE_CLUSTER} --image=${REPO}/${SYNC_TAG} --replicas=1 \
-	--env="TIDE_API_HOST=${TIDE_API_HOST}" \
-	--env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
-	--env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
-	--env="SYNC_ACTIVE=${SYNC_ACTIVE}" \
-	--env="SYNC_API_BROWSE_CATEGORY=${SYNC_API_BROWSE_CATEGORY}" \
-	--env="SYNC_DATA=${SYNC_DATA}" \
-	--env="SYNC_DEFAULT_CLIENT=${SYNC_DEFAULT_CLIENT}" \
-	--env="SYNC_DEFAULT_VISIBILITY=${SYNC_DEFAULT_VISIBILITY}" \
-	--env="SYNC_FORCE_AUDITS=${SYNC_FORCE_AUDITS}" \
-	--env="SYNC_ITEMS_PER_PAGE=${SYNC_ITEMS_PER_PAGE}" \
-	--env="SYNC_POOL_DELAY=${SYNC_POOL_DELAY}" \
-	--env="SYNC_POOL_WORKERS=${SYNC_POOL_WORKERS}" \
-	--env="PHPCS_SQS_KEY=${PHPCS_SQS_KEY}" \
-	--env="PHPCS_SQS_QUEUE=${PHPCS_SQS_QUEUE}" \
-	--env="PHPCS_SQS_QUEUE_NAME=${PHPCS_SQS_QUEUE_NAME}" \
-	--env="PHPCS_SQS_REGION=${PHPCS_SQS_REGION}" \
-	--env="PHPCS_SQS_SECRET=${PHPCS_SQS_SECRET}" \
-	--env="LH_SQS_KEY=${LH_SQS_KEY}" \
-	--env="LH_SQS_QUEUE=${LH_SQS_QUEUE}" \
-	--env="LH_SQS_QUEUE_NAME=${LH_SQS_QUEUE_NAME}" \
-	--env="LH_SQS_REGION=${LH_SQS_REGION}" \
- 	--env="LH_SQS_SECRET=${LH_SQS_SECRET}"
+	@./bin/tpl.sh -p=docker/sync-server/ -f=app-deployment -e=.env.prod
+	@kubectl apply -f ./docker/sync-server/app-deployment.yaml
 
 # Get the Sync Server GKE cluster status.
 sync.get.cluster:
@@ -120,4 +95,5 @@ sync.get.cluster:
 
 # Clean the Sync Server GKE cluster.
 sync.clean.cluster: config
+	@kubectl delete -f ./docker/sync-server/app-deployment.yaml
 	@gcloud container clusters delete ${SYNC_GKE_CLUSTER} -q
