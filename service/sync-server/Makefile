@@ -86,7 +86,7 @@ sync.creds:
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds
-	@./bin/tpl -p=service/sync-server/kubernetes/ -f=deployment -e=.env.prod
+	@./bin/tpl -p=service/sync-server/kubernetes/ -f=deployment -e=.env.gke
 	@kubectl apply -f service/sync-server/kubernetes/deployment.yaml
 
 # Get the Sync Server GKE cluster status.

@@ -2,10 +2,10 @@
 -include .env
 
 # Production environment variables **only** get applied to specific commands.
-# Copy .env.dist to .env.prod and update.
+# Copy .env.dist to .env.gke and update.
 ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster sync.deploy.cluster))
-    ifneq ($(strip $(wildcard .env.prod)),)
-        include .env.prod
+    ifneq ($(strip $(wildcard .env.gke)),)
+        include .env.gke
     endif
 endif
 
