@@ -14,7 +14,7 @@ VERSION=0.1.0
 BUILD=`git rev-parse HEAD`
 
 # Docker settings.
-REPO=gcr.io/${GCP_PROJECT}
+export REPO=gcr.io/${GCP_PROJECT}
 
 # GO settings.
 GOOS=linux
