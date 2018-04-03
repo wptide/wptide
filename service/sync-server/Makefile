@@ -19,6 +19,7 @@ sync.usage:
 	@echo "\tsync.clean.image:\n\t\t- Clean the Sync Server Docker image from the host machine."
 	@echo "\tsync.build.cluster:\n\t\t- Build the Sync Server GKE cluster."
 	@echo "\tsync.creds:\n\t\t- Get the Sync Server GKE cluster credentials."
+	@echo "\tsync.tpl:\n\t\t- Generate the Sync Server GKE YAML template."
 	@echo "\tsync.deploy.cluster:\n\t\t- Deploy the Sync Server GKE cluster."
 	@echo "\tsync.get.cluster:\n\t\t- Get the Sync Server GKE cluster status."
 	@echo "\tsync.clean.cluster:\n\t\t- Clean the Sync Server GKE cluster."
@@ -84,16 +85,19 @@ sync.build.cluster: config
 sync.creds:
 	@gcloud container clusters get-credentials ${SYNC_GKE_CLUSTER}
 
-# Deploy the Sync Server GKE cluster.
-sync.deploy.cluster: config sync.creds
+# Generate the Sync Server GKE YAML template.
+sync.tpl:
 	@./bin/tpl -p=service/sync-server/kubernetes/ -f=deployment -e=.env.gke
+
+# Deploy the Sync Server GKE cluster.
+sync.deploy.cluster: config sync.creds sync.tpl
 	@kubectl apply -f service/sync-server/kubernetes/deployment.yaml
 
 # Get the Sync Server GKE cluster status.
-sync.get.cluster:
+sync.get.cluster: config sync.creds
 	@kubectl get deployment ${SYNC_GKE_CLUSTER} -o yaml
 
 # Clean the Sync Server GKE cluster.
-sync.clean.cluster: config
+sync.clean.cluster: config sync.creds sync.tpl
 	@kubectl delete -f service/sync-server/kubernetes/deployment.yaml
 	@gcloud container clusters delete ${SYNC_GKE_CLUSTER} -q
