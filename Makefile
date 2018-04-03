@@ -43,9 +43,9 @@ usage:
 	@make sync.usage
 
 # Include Makefiles.
-include docker/lighthouse-server/Makefile
-include docker/phpcs-server/Makefile
-include docker/sync-server/Makefile
+include service/lighthouse-server/Makefile
+include service/phpcs-server/Makefile
+include service/sync-server/Makefile
 
 # Install dependencies.
 deps:

@@ -36,7 +36,7 @@ sync.clean.bin:
 # Build the Sync Server Docker image.
 sync.build.image: deps sync.clean.bin sync.build.bin
 	@echo "Building Docker image [${REPO}/${SYNC_TAG}] ..."
-	@docker build -f docker/sync-server/Dockerfile -t ${REPO}/${SYNC_TAG} --no-cache .
+	@docker build -f service/sync-server/docker/Dockerfile -t ${REPO}/${SYNC_TAG} --no-cache .
 	@docker tag ${REPO}/${SYNC_TAG} ${SYNC_GKE_IMAGE}:latest
 
 # Rebuild & run the Sync Server Docker image in isolation with docker-compose up.
@@ -86,8 +86,8 @@ sync.creds:
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds
-	@./bin/tpl.sh -p=docker/sync-server/ -f=app-deployment -e=.env.prod
-	@kubectl apply -f ./docker/sync-server/app-deployment.yaml
+	@./bin/tpl.sh -p=service/sync-server/kubernetes/ -f=deployment -e=.env.prod
+	@kubectl apply -f service/sync-server/kubernetes/deployment.yaml
 
 # Get the Sync Server GKE cluster status.
 sync.get.cluster:
@@ -95,5 +95,5 @@ sync.get.cluster:
 
 # Clean the Sync Server GKE cluster.
 sync.clean.cluster: config
-	@kubectl delete -f ./docker/sync-server/app-deployment.yaml
+	@kubectl delete -f service/sync-server/kubernetes/deployment.yaml
 	@gcloud container clusters delete ${SYNC_GKE_CLUSTER} -q
