@@ -34,7 +34,7 @@ lighthouse.clean.bin:
 # Build the Lighthouse Server Docker image.
 lighthouse.build.image: deps lighthouse.clean.bin lighthouse.build.bin
 	@echo "Building Docker image [${REPO}/${LH_TAG}] ..."
-	@docker build -f docker/lighthouse-server/Dockerfile -t ${REPO}/${LH_TAG} --no-cache .
+	@docker build -f service/lighthouse-server/docker/Dockerfile -t ${REPO}/${LH_TAG} --no-cache .
 	@docker tag ${REPO}/${LH_TAG} ${LH_GKE_IMAGE}:latest
 
 # Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up.

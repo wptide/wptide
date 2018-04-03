@@ -34,7 +34,7 @@ phpcs.clean.bin:
 # Build the PHPCS Server Docker image.
 phpcs.build.image: deps phpcs.clean.bin phpcs.build.bin
 	@echo "Building Docker image [${REPO}/${PHPCS_TAG}] ..."
-	@docker build -f docker/phpcs-server/Dockerfile -t ${REPO}/${PHPCS_TAG} --no-cache .
+	@docker build -f service/phpcs-server/docker/Dockerfile -t ${REPO}/${PHPCS_TAG} --no-cache .
 	@docker tag ${REPO}/${PHPCS_TAG} ${PHPCS_GKE_IMAGE}:latest
 
 # Rebuild & run the PHPCS Server Docker image in isolation with docker-compose up.

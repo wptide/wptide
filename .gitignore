@@ -21,5 +21,4 @@ report.json
 data
 
 # GKE YAML Configurations
-deployment.yaml
-service.yaml
+**/*.yaml
