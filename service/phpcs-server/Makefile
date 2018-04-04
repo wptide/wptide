@@ -60,7 +60,7 @@ phpcs.clean.image:
 
 # Build the PHPCS Server GKE cluster.
 phpcs.build.cluster: config
-	@gcloud beta container --project ${GCP_PROJECT} clusters create ${PHPCS_GKE_CLUSTER} \
+	@gcloud container --project ${GCP_PROJECT} clusters create ${PHPCS_GKE_CLUSTER} \
 	--zone ${GCP_ZONE} \
 	--cluster-version ${PHPCS_GKE_CLUSTER_VERSION} \
 	--machine-type ${PHPCS_GKE_MACHINE_TYPE} \

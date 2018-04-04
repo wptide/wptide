@@ -60,7 +60,7 @@ lighthouse.clean.image:
 
 # Build the Lighthouse Server GKE cluster.
 lighthouse.build.cluster: config
-	@gcloud beta container --project ${GCP_PROJECT} clusters create ${LH_GKE_CLUSTER} \
+	@gcloud container --project ${GCP_PROJECT} clusters create ${LH_GKE_CLUSTER} \
 	--zone ${GCP_ZONE} \
 	--cluster-version ${LH_GKE_CLUSTER_VERSION} \
 	--machine-type ${LH_GKE_MACHINE_TYPE} \
