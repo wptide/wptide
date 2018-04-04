@@ -1,5 +1,5 @@
 # Lighthouse Server Docker settings.
-LH_TAG=${LH_GKE_IMAGE}:${VERSION}
+export LH_GCR_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${LH_GKE_IMAGE}:${VERSION}
 
 # Lighthouse Server GO settings.
 LH_BIN_PATH=bin/lighthouse-server
@@ -17,6 +17,7 @@ lighthouse.usage:
 	@echo "\tlighthouse.clean.image:\n\t\t- Clean the Lighthouse Server Docker image from the host machine."
 	@echo "\tlighthouse.build.cluster:\n\t\t- Build the Lighthouse Server GKE cluster."
 	@echo "\tlighthouse.creds:\n\t\t- Get the Lighthouse Server GKE cluster credentials."
+	@echo "\tlighthouse.tpl:\n\t\t- Generate the Lighthouse Server GKE YAML template."
 	@echo "\tlighthouse.deploy.cluster:\n\t\t- Deploy the Lighthouse Server GKE cluster."
 	@echo "\tlighthouse.get.cluster:\n\t\t- Get the Lighthouse Server GKE cluster status."
 	@echo "\tlighthouse.clean.cluster:\n\t\t- Clean the Lighthouse Server GKE cluster."
@@ -33,9 +34,9 @@ lighthouse.clean.bin:
 
 # Build the Lighthouse Server Docker image.
 lighthouse.build.image: deps lighthouse.clean.bin lighthouse.build.bin
-	@echo "Building Docker image [${REPO}/${LH_TAG}] ..."
-	@docker build -f docker/lighthouse-server/Dockerfile -t ${REPO}/${LH_TAG} --no-cache .
-	@docker tag ${REPO}/${LH_TAG} ${LH_GKE_IMAGE}:latest
+	@echo "Building Docker image [${LH_GCR_IMAGE_TAG}] ..."
+	@docker build -f service/lighthouse-server/docker/Dockerfile -t ${LH_GCR_IMAGE_TAG} --no-cache .
+	@docker tag ${LH_GCR_IMAGE_TAG} ${LH_GKE_IMAGE}:latest
 
 # Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up.
 lighthouse.build.up: lighthouse.build.image lighthouse.up
@@ -50,16 +51,16 @@ lighthouse.down:
 
 # Push the Lighthouse Server Docker image to GCR.
 lighthouse.push.image:
-	@gcloud docker -- push ${REPO}/${LH_TAG}
+	@gcloud docker -- push ${LH_GCR_IMAGE_TAG}
 
 # Clean the Lighthouse Server Docker image from the host machine.
 lighthouse.clean.image:
-	@docker rmi ${REPO}/${LH_TAG}
+	@docker rmi ${LH_GCR_IMAGE_TAG}
 	@docker rmi ${LH_GKE_IMAGE}:latest
 
 # Build the Lighthouse Server GKE cluster.
 lighthouse.build.cluster: config
-	@gcloud beta container --project ${GCP_PROJECT} clusters create ${LH_GKE_CLUSTER} \
+	@gcloud container --project ${GCP_PROJECT} clusters create ${LH_GKE_CLUSTER} \
 	--zone ${GCP_ZONE} \
 	--cluster-version ${LH_GKE_CLUSTER_VERSION} \
 	--machine-type ${LH_GKE_MACHINE_TYPE} \
@@ -72,42 +73,25 @@ lighthouse.build.cluster: config
 	--enable-cloud-monitoring \
 	--enable-autoscaling \
 	--min-nodes ${LH_GKE_MIN_NODES} \
-	--max-nodes ${LH_GKE_MAX_NODES} \
-	--enable-legacy-authorization \
-	--disable-addons HttpLoadBalancing
+	--max-nodes ${LH_GKE_MAX_NODES}
 
 # Get the Lighthouse Server GKE cluster credentials.
 lighthouse.creds:
 	@gcloud container clusters get-credentials ${LH_GKE_CLUSTER}
 
+# Generate the Lighthouse Server GKE YAML template.
+lighthouse.tpl:
+	@./bin/tpl -p=service/lighthouse-server/kubernetes/ -f=deployment -e=.env.gke
+
 # Deploy the Lighthouse Server GKE cluster.
-lighthouse.deploy.cluster: config lighthouse.creds
-	@kubectl run ${LH_GKE_CLUSTER} --image=${REPO}/${LH_TAG} --replicas=${LH_GKE_REPLICAS} \
-	--env="TIDE_API_AUTH_URL=${TIDE_API_AUTH_URL}" \
-	--env="TIDE_API_HOST=${TIDE_API_HOST}" \
-	--env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
-	--env="TIDE_API_KEY=${TIDE_API_KEY}" \
-	--env="TIDE_API_SECRET=${TIDE_API_SECRET}" \
-	--env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
- 	--env="LH_SQS_VERSION=${LH_SQS_VERSION}" \
-	--env="LH_SQS_REGION=${LH_SQS_REGION}" \
-	--env="LH_SQS_KEY=${LH_SQS_KEY}" \
-	--env="LH_SQS_SECRET=${LH_SQS_SECRET}" \
-	--env="LH_SQS_QUEUE_NAME=${LH_SQS_QUEUE_NAME}" \
-	--env="LH_S3_REGION=${LH_S3_REGION}" \
-	--env="LH_S3_KEY=${LH_S3_KEY}" \
-	--env="LH_S3_SECRET=${LH_S3_SECRET}" \
-	--env="LH_S3_BUCKET_NAME=${LH_S3_BUCKET_NAME}" \
-	--env="LH_CONCURRENT_AUDITS=${LH_CONCURRENT_AUDITS}"
-	@kubectl autoscale deployment ${LH_GKE_CLUSTER} \
-	--cpu-percent=${LH_GKE_CPU_PERCENT} \
-	--min=${LH_GKE_MIN_PODS} \
-	--max=${LH_GKE_MAX_PODS}
+lighthouse.deploy.cluster: config lighthouse.creds lighthouse.tpl
+	@kubectl apply -f service/lighthouse-server/kubernetes/deployment.yaml
 
 # Get the Lighthouse Server GKE cluster status.
-lighthouse.get.cluster:
+lighthouse.get.cluster: config lighthouse.creds
 	@kubectl get deployment ${LH_GKE_CLUSTER} -o yaml
 
 # Clean the Lighthouse Server GKE cluster.
-lighthouse.clean.cluster: config
+lighthouse.clean.cluster: config lighthouse.creds lighthouse.tpl
+	@kubectl delete -f service/lighthouse-server/kubernetes/deployment.yaml
 	@gcloud container clusters delete ${LH_GKE_CLUSTER} -q

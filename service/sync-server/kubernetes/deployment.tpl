@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sync-server-secret
+  name: ${SYNC_GKE_CLUSTER}-secret
 type: Opaque
 stringData:
   LH_SQS_KEY: $LH_SQS_KEY
@@ -12,7 +12,7 @@ stringData:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sync-server-pv-claim
+  name: ${SYNC_GKE_CLUSTER}-pv-claim
 spec:
   accessModes:
     - ReadWriteOnce
@@ -23,24 +23,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sync-server-deployment
+  name: ${SYNC_GKE_CLUSTER}-deployment
   labels:
-    app: sync-server
+    app: ${SYNC_GKE_CLUSTER}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sync-server
+      app: ${SYNC_GKE_CLUSTER}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: sync-server
+        app: ${SYNC_GKE_CLUSTER}
     spec:
       containers:
-      - image: ${REPO}/${SYNC_TAG}
-        name: sync-server
+      - image: ${SYNC_GCR_IMAGE_TAG}
+        name: ${SYNC_GKE_CLUSTER}
         env:
         - name: TIDE_API_HOST
           value: "${TIDE_API_HOST}"
@@ -69,7 +69,7 @@ spec:
         - name: PHPCS_SQS_KEY
           valueFrom:
             secretKeyRef:
-              name: sync-server-secret
+              name: ${SYNC_GKE_CLUSTER}-secret
               key: PHPCS_SQS_KEY
         - name: PHPCS_SQS_QUEUE
           value: "${PHPCS_SQS_QUEUE}"
@@ -80,12 +80,12 @@ spec:
         - name: PHPCS_SQS_SECRET
           valueFrom:
             secretKeyRef:
-              name: sync-server-secret
+              name: ${SYNC_GKE_CLUSTER}-secret
               key: PHPCS_SQS_SECRET
         - name: LH_SQS_KEY
           valueFrom:
             secretKeyRef:
-              name: sync-server-secret
+              name: ${SYNC_GKE_CLUSTER}-secret
               key: LH_SQS_KEY
         - name: LH_SQS_QUEUE
           value: "${LH_SQS_QUEUE}"
@@ -96,12 +96,12 @@ spec:
         - name: LH_SQS_SECRET
           valueFrom:
             secretKeyRef:
-              name: sync-server-secret
+              name: ${SYNC_GKE_CLUSTER}-secret
               key: LH_SQS_SECRET
         volumeMounts:
-        - name: sync-server-persistent-storage
+        - name: ${SYNC_GKE_CLUSTER}-persistent-storage
           mountPath: $SYNC_DATA
       volumes:
-      - name: sync-server-persistent-storage
+      - name: ${SYNC_GKE_CLUSTER}-persistent-storage
         persistentVolumeClaim:
-          claimName: sync-server-pv-claim
+          claimName: ${SYNC_GKE_CLUSTER}-pv-claim

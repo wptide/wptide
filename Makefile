@@ -1,20 +1,9 @@
 # Copy .env.dist to .env and update.
 -include .env
 
-# Production environment variables **only** get applied to specific commands.
-# Copy .env.dist to .env.prod and update.
-ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster sync.deploy.cluster))
-    ifneq ($(strip $(wildcard .env.prod)),)
-        include .env.prod
-    endif
-endif
-
 # Binary settings.
 VERSION=0.1.0
 BUILD=`git rev-parse HEAD`
-
-# Docker settings.
-export REPO=gcr.io/${GCP_PROJECT}
 
 # GO settings.
 GOOS=linux
@@ -43,9 +32,9 @@ usage:
 	@make sync.usage
 
 # Include Makefiles.
-include docker/lighthouse-server/Makefile
-include docker/phpcs-server/Makefile
-include docker/sync-server/Makefile
+include service/lighthouse-server/Makefile
+include service/phpcs-server/Makefile
+include service/sync-server/Makefile
 
 # Install dependencies.
 deps:
