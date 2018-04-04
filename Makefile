@@ -1,20 +1,9 @@
 # Copy .env.dist to .env and update.
 -include .env
 
-# Production environment variables **only** get applied to specific commands.
-# Copy .env.dist to .env.gke and update.
-ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),lighthouse.deploy.cluster phpcs.deploy.cluster sync.deploy.cluster))
-    ifneq ($(strip $(wildcard .env.gke)),)
-        include .env.gke
-    endif
-endif
-
 # Binary settings.
 VERSION=0.1.0
 BUILD=`git rev-parse HEAD`
-
-# Docker settings.
-export REPO=gcr.io/${GCP_PROJECT}
 
 # GO settings.
 GOOS=linux

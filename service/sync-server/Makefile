@@ -1,5 +1,5 @@
 # Sync Server Docker settings.
-export SYNC_TAG=${SYNC_GKE_IMAGE}:${VERSION}
+export SYNC_GCR_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${SYNC_GKE_IMAGE}:${VERSION}
 
 # Sync Server GO settings.
 SYNC_BIN_PATH=bin/sync-server
@@ -36,9 +36,9 @@ sync.clean.bin:
 
 # Build the Sync Server Docker image.
 sync.build.image: deps sync.clean.bin sync.build.bin
-	@echo "Building Docker image [${REPO}/${SYNC_TAG}] ..."
-	@docker build -f service/sync-server/docker/Dockerfile -t ${REPO}/${SYNC_TAG} --no-cache .
-	@docker tag ${REPO}/${SYNC_TAG} ${SYNC_GKE_IMAGE}:latest
+	@echo "Building Docker image [${SYNC_GCR_IMAGE_TAG}] ..."
+	@docker build -f service/sync-server/docker/Dockerfile -t ${SYNC_GCR_IMAGE_TAG} --no-cache .
+	@docker tag ${SYNC_GCR_IMAGE_TAG} ${SYNC_GKE_IMAGE}:latest
 
 # Rebuild & run the Sync Server Docker image in isolation with docker-compose up.
 sync.build.up: sync.build.image sync.up
@@ -60,11 +60,11 @@ sync.rm:
 
 # Push the Sync Server Docker image to GCR.
 sync.push.image:
-	@gcloud docker -- push ${REPO}/${SYNC_TAG}
+	@gcloud docker -- push ${SYNC_GCR_IMAGE_TAG}
 
 # Clean the Sync Server Docker image from the host machine.
 sync.clean.image:
-	@docker rmi ${REPO}/${SYNC_TAG}
+	@docker rmi ${SYNC_GCR_IMAGE_TAG}
 	@docker rmi ${SYNC_GKE_IMAGE}:latest
 
 # Build the Sync Server GKE cluster.

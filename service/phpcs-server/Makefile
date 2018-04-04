@@ -1,5 +1,5 @@
 # PHPCS Server Docker settings.
-export PHPCS_TAG=${PHPCS_GKE_IMAGE}:${VERSION}
+export PHPCS_GCR_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${PHPCS_GKE_IMAGE}:${VERSION}
 
 # PHPCS Server GO settings.
 PHPCS_BIN_PATH=bin/phpcs-server
@@ -34,9 +34,9 @@ phpcs.clean.bin:
 
 # Build the PHPCS Server Docker image.
 phpcs.build.image: deps phpcs.clean.bin phpcs.build.bin
-	@echo "Building Docker image [${REPO}/${PHPCS_TAG}] ..."
-	@docker build -f service/phpcs-server/docker/Dockerfile -t ${REPO}/${PHPCS_TAG} --no-cache .
-	@docker tag ${REPO}/${PHPCS_TAG} ${PHPCS_GKE_IMAGE}:latest
+	@echo "Building Docker image [${PHPCS_GCR_IMAGE_TAG}] ..."
+	@docker build -f service/phpcs-server/docker/Dockerfile -t ${PHPCS_GCR_IMAGE_TAG} --no-cache .
+	@docker tag ${PHPCS_GCR_IMAGE_TAG} ${PHPCS_GKE_IMAGE}:latest
 
 # Rebuild & run the PHPCS Server Docker image in isolation with docker-compose up.
 phpcs.build.up: phpcs.build.image phpcs.up
@@ -51,11 +51,11 @@ phpcs.down:
 
 # Push the PHPCS Server Docker image to GCR.
 phpcs.push.image:
-	@gcloud docker -- push ${REPO}/${PHPCS_TAG}
+	@gcloud docker -- push ${PHPCS_GCR_IMAGE_TAG}
 
 # Clean the PHPCS Server Docker image from the host machine.
 phpcs.clean.image:
-	@docker rmi ${REPO}/${PHPCS_TAG}
+	@docker rmi ${PHPCS_GCR_IMAGE_TAG}
 	@docker rmi ${PHPCS_GKE_IMAGE}:latest
 
 # Build the PHPCS Server GKE cluster.

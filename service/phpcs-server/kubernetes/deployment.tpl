@@ -30,7 +30,7 @@ spec:
         app: ${PHPCS_GKE_CLUSTER}
     spec:
       containers:
-      - image: ${REPO}/${PHPCS_TAG}
+      - image: ${PHPCS_GCR_IMAGE_TAG}
         name: ${PHPCS_GKE_CLUSTER}
         env:
         - name: TIDE_API_AUTH_URL

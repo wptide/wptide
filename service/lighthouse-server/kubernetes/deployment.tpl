@@ -30,7 +30,7 @@ spec:
         app: ${LH_GKE_CLUSTER}
     spec:
       containers:
-      - image: ${REPO}/${LH_TAG}
+      - image: ${LH_GCR_IMAGE_TAG}
         name: ${LH_GKE_CLUSTER}
         env:
         - name: TIDE_API_AUTH_URL

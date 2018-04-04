@@ -39,7 +39,7 @@ spec:
         app: ${SYNC_GKE_CLUSTER}
     spec:
       containers:
-      - image: ${REPO}/${SYNC_TAG}
+      - image: ${SYNC_GCR_IMAGE_TAG}
         name: ${SYNC_GKE_CLUSTER}
         env:
         - name: TIDE_API_HOST

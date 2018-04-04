@@ -1,5 +1,5 @@
 # Lighthouse Server Docker settings.
-export LH_TAG=${LH_GKE_IMAGE}:${VERSION}
+export LH_GCR_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${LH_GKE_IMAGE}:${VERSION}
 
 # Lighthouse Server GO settings.
 LH_BIN_PATH=bin/lighthouse-server
@@ -34,9 +34,9 @@ lighthouse.clean.bin:
 
 # Build the Lighthouse Server Docker image.
 lighthouse.build.image: deps lighthouse.clean.bin lighthouse.build.bin
-	@echo "Building Docker image [${REPO}/${LH_TAG}] ..."
-	@docker build -f service/lighthouse-server/docker/Dockerfile -t ${REPO}/${LH_TAG} --no-cache .
-	@docker tag ${REPO}/${LH_TAG} ${LH_GKE_IMAGE}:latest
+	@echo "Building Docker image [${LH_GCR_IMAGE_TAG}] ..."
+	@docker build -f service/lighthouse-server/docker/Dockerfile -t ${LH_GCR_IMAGE_TAG} --no-cache .
+	@docker tag ${LH_GCR_IMAGE_TAG} ${LH_GKE_IMAGE}:latest
 
 # Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up.
 lighthouse.build.up: lighthouse.build.image lighthouse.up
@@ -51,11 +51,11 @@ lighthouse.down:
 
 # Push the Lighthouse Server Docker image to GCR.
 lighthouse.push.image:
-	@gcloud docker -- push ${REPO}/${LH_TAG}
+	@gcloud docker -- push ${LH_GCR_IMAGE_TAG}
 
 # Clean the Lighthouse Server Docker image from the host machine.
 lighthouse.clean.image:
-	@docker rmi ${REPO}/${LH_TAG}
+	@docker rmi ${LH_GCR_IMAGE_TAG}
 	@docker rmi ${LH_GKE_IMAGE}:latest
 
 # Build the Lighthouse Server GKE cluster.
