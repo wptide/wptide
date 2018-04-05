@@ -81,7 +81,10 @@ phpcs.creds:
 
 # Generate the PHPCS Server GKE YAML template.
 phpcs.tpl:
-	@./bin/tpl -p=service/phpcs-server/kubernetes/ -f=deployment -e=.env.gke
+	@./bin/tpl \
+	-t=service/phpcs-server/kubernetes/deployment.tpl \
+	-d=service/phpcs-server/kubernetes/deployment.yaml \
+	-e=.env.gke
 
 # Deploy the PHPCS Server GKE cluster.
 phpcs.deploy.cluster: config phpcs.creds phpcs.tpl

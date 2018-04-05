@@ -81,7 +81,10 @@ lighthouse.creds:
 
 # Generate the Lighthouse Server GKE YAML template.
 lighthouse.tpl:
-	@./bin/tpl -p=service/lighthouse-server/kubernetes/ -f=deployment -e=.env.gke
+	@./bin/tpl \
+	-t=service/lighthouse-server/kubernetes/deployment.tpl \
+	-d=service/lighthouse-server/kubernetes/deployment.yaml \
+	-e=.env.gke
 
 # Deploy the Lighthouse Server GKE cluster.
 lighthouse.deploy.cluster: config lighthouse.creds lighthouse.tpl

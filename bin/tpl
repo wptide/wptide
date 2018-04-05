@@ -10,10 +10,11 @@ RESET=$(tput sgr0)
 ## CLI messages.
 USAGE="usage: $0 [<options>]
 
-    -h, --help      help with script usage
-    -p, --path      path to the template file (${RED}required${RESET})
-    -f, --file      name of the .tpl file (without extension) (${RED}required${RESET})
-    -e, --env       environment file used to source custom environment variables (${YELLOW}optional${RESET})
+    -h, --help          help with script usage
+    -t, --template      path to the template file (${RED}required${RESET})
+    -d, --destination   path to the destination file (${RED}required${RESET})
+    -v, --variables     only those environment variables that are referenced are substituted; must wrap with single quotes (${YELLOW}optional${RESET})
+    -e, --env           environment file used to source custom environment variables (${YELLOW}optional${RESET})
 
 ${CYAN}The ${RESET}${BOLD}.env${RESET}${CYAN} file is sourced even if a custom environment file is used.
 All paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
@@ -27,11 +28,14 @@ do
         echo "${USAGE}"
         exit 0
         ;;
-    -p=*|--path=*)
-        TEMP_PATH="${p#*=}"
+    -t=*|--template=*)
+        TEMP_FILE="${p#*=}"
         ;;
-    -f=*|--filename=*)
-        TEMP_FILENAME="${p#*=}"
+    -d=*|--destination=*)
+        DEST_FILE="${p#*=}"
+        ;;
+    -v=*|--variables=*)
+        SHELL_VARS="${p#*=}"
         ;;
     -e=*|--env=*)
         ENV_FILE="${p#*=}"
@@ -45,18 +49,15 @@ if ! command -v envsubst >/dev/null 2>&1; then
     exit 1
 fi
 
-TEMP_FILE="${TEMP_PATH}${TEMP_FILENAME}.tpl"
-DEST_FILE="${TEMP_PATH}${TEMP_FILENAME}.yaml"
-
 ## Validate cli arguments.
 if [ "$#" -eq 0 ]; then
     echo "${USAGE}"
     exit 1
-elif [ -z ${TEMP_PATH} ]; then
-    echo "${RED}error${RESET}: Missing required [path] argument. Example [-p=<dir-path/>] or [--path=<dir-path/>]."
+elif [ -z ${TEMP_FILE} ]; then
+    echo "${RED}error${RESET}: Missing required [template] argument. Example [-t=<dir-path/file.tpl>] or [--template=<dir-path/file.tpl>]."
     exit 1
-elif [ -z ${TEMP_FILENAME} ]; then
-    echo "${RED}error${RESET}: Missing required [filename] argument. Example [-f=<filename>] or [--filename=<filename>]."
+elif [ -z ${DEST_FILE} ]; then
+    echo "${RED}error${RESET}: Missing required [destination] argument. Example [-d=<dir-path/file.yaml>] or [--destination=<dir-path/file.yaml>]."
     exit 1
 elif [ ! -e ${TEMP_FILE} ]; then
     echo "${RED}error${RESET}: The template file [${CYAN}${TEMP_FILE}${RESET}] does not exist at the location provided."
@@ -78,4 +79,8 @@ if [ ! -z ${ENV_FILE} ]; then
 fi
 
 ## Substitute environment variables and generate destination file.
-envsubst < "$TEMP_FILE" > "$DEST_FILE"
+if [ ! -z ${SHELL_VARS} ]; then
+    envsubst "$SHELL_VARS" < "$TEMP_FILE" > "$DEST_FILE"
+else
+    envsubst < "$TEMP_FILE" > "$DEST_FILE"
+fi
