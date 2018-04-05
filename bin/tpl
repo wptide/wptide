@@ -74,5 +74,22 @@ if [ ! -z ${ENV_FILE} ]; then
     fi
 fi
 
+## WordPress unique Keys and Salts.
+uniqueKeys=(
+    AUTH_KEY
+    SECURE_AUTH_KEY
+    LOGGED_IN_KEY
+    NONCE_KEY
+    AUTH_SALT
+    SECURE_AUTH_SALT
+    LOGGED_IN_SALT
+    NONCE_SALT
+)
+
+## Export the unique Keys and Salts.
+for unique in "${uniqueKeys[@]}"; do
+    export "${unique}=`cat /dev/urandom | tr -dc [:print:] | tr -d '[:space:]\042\047\134' | head -c 64`"
+done
+
 ## Substitute environment variables and generate destination file.
 envsubst "`printf '${%s} ' $(sh -c "env|cut -d'=' -f1")`" < "$TEMP_FILE" > "$DEST_FILE"
