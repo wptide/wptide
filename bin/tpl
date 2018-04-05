@@ -13,7 +13,6 @@ USAGE="usage: $0 [<options>]
     -h, --help          help with script usage
     -t, --template      path to the template file (${RED}required${RESET})
     -d, --destination   path to the destination file (${RED}required${RESET})
-    -v, --variables     only those environment variables that are referenced are substituted; must wrap with single quotes (${YELLOW}optional${RESET})
     -e, --env           environment file used to source custom environment variables (${YELLOW}optional${RESET})
 
 ${CYAN}The ${RESET}${BOLD}.env${RESET}${CYAN} file is sourced even if a custom environment file is used.
@@ -33,9 +32,6 @@ do
         ;;
     -d=*|--destination=*)
         DEST_FILE="${p#*=}"
-        ;;
-    -v=*|--variables=*)
-        SHELL_VARS="${p#*=}"
         ;;
     -e=*|--env=*)
         ENV_FILE="${p#*=}"
@@ -79,8 +75,4 @@ if [ ! -z ${ENV_FILE} ]; then
 fi
 
 ## Substitute environment variables and generate destination file.
-if [ ! -z ${SHELL_VARS} ]; then
-    envsubst "$SHELL_VARS" < "$TEMP_FILE" > "$DEST_FILE"
-else
-    envsubst < "$TEMP_FILE" > "$DEST_FILE"
-fi
+envsubst "`printf '${%s} ' $(sh -c "env|cut -d'=' -f1")`" < "$TEMP_FILE" > "$DEST_FILE"
