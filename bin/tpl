@@ -18,7 +18,6 @@ USAGE="usage: $0 [<options>]
 ${CYAN}The ${RESET}${BOLD}.env${RESET}${CYAN} file is sourced even if a custom environment file is used.
 All paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
 
-
 ## Handle cli parameters.
 for p in "$@";
 do

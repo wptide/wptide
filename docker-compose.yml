@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.6'
 
 services:
 
@@ -9,11 +9,24 @@ services:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
             - ./service/api/php.ini:/opt/php71/lib/php.ini
-        links:
+        depends_on:
             - api-mysql
         ports:
             - 80:8080
         environment:
+            API_LOCAL_ADMIN_EMAIL: ${API_LOCAL_ADMIN_EMAIL}
+            API_LOCAL_ADMIN_PASSWORD: ${API_LOCAL_ADMIN_PASSWORD}
+            API_LOCAL_ADMIN_USER: ${API_LOCAL_ADMIN_USER}
+            API_LOCAL_DESCRIPTION: ${API_LOCAL_DESCRIPTION}
+            API_LOCAL_DOMAIN: ${API_LOCAL_DOMAIN}
+            API_LOCAL_THEME_NAME: ${API_LOCAL_THEME_NAME}
+            API_LOCAL_TITLE: ${API_LOCAL_TITLE}
+            API_LOCAL_SQL_HOST: ${API_LOCAL_SQL_HOST}
+            API_LOCAL_SQL_HOST_PORT: ${API_LOCAL_SQL_HOST_PORT}
+            API_LOCAL_SQL_DB: ${API_LOCAL_SQL_DB}
+            API_LOCAL_SQL_PASSWORD: ${API_LOCAL_SQL_PASSWORD}
+            API_LOCAL_SQL_ROOT_PASSWORD: ${API_LOCAL_SQL_ROOT_PASSWORD}
+            API_LOCAL_SQL_USER: ${API_LOCAL_SQL_USER}
             DOCUMENT_ROOT: /app/wordpress
             GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
 

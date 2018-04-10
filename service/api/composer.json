@@ -11,12 +11,11 @@
     "johnpbloch/wordpress-core": "4.9.5",
     "slowprog/composer-copy-file": "~0.2",
     "wpackagist-theme/twentyseventeen": "1.5",
-    "wpackagist-plugin/flush-opcache": "2.4",
-    "xwp/wordpress-tests-installer": "^1"
+    "wpackagist-plugin/flush-opcache": "2.4"
   },
   "require-dev": {
-    "wp-cli/wp-cli": "~1.5",
-    "xwp/wordpress-tests-installer": "^1"
+    "phpunit/phpunit": "~5.7",
+    "wp-cli/wp-cli": "~1.5"
   },
   "scripts": {
     "post-install-cmd": [
