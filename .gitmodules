@@ -1,0 +1,3 @@
+[submodule "service/api/wp-content/plugins/wp-tide-api"]
+	path = service/api/wp-content/plugins/wp-tide-api
+	url = git@github.com:wptide/wp-tide-api.git
