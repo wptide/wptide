@@ -88,7 +88,7 @@ uniqueKeys=(
 
 ## Export the unique Keys and Salts.
 for unique in "${uniqueKeys[@]}"; do
-    export "${unique}=`cat /dev/urandom | tr -dc [:print:] | tr -d '[:space:]\042\047\134' | head -c 64`"
+    export "${unique}=`LC_CTYPE=C; cat /dev/urandom | tr -dc [:print:] | tr -d '[:space:]\042\047\134' | head -c 64`"
 done
 
 ## Substitute environment variables and generate destination file.

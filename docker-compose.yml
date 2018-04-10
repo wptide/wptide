@@ -2,6 +2,34 @@ version: '3.1'
 
 services:
 
+### API #########################################################
+    api-php:
+        image: gcr.io/google-appengine/php71:latest
+        volumes:
+            - ./service/api:/app
+            - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
+            - ./service/api/php.ini:/opt/php71/lib/php.ini
+        links:
+            - api-mysql
+        ports:
+            - 80:8080
+        environment:
+            DOCUMENT_ROOT: /app/wordpress
+            GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
+
+    api-mysql:
+        image: mariadb:10.3
+        ports:
+            - 3306:3306
+        volumes:
+            - ./data/api/mysql:/var/lib/mysql
+            - ./service/api/wptests.sql:/docker-entrypoint-initdb.d/wptests.sql
+        environment:
+            MYSQL_DATABASE: ${API_LOCAL_SQL_DB}
+            MYSQL_PASSWORD: ${API_LOCAL_SQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${API_LOCAL_SQL_ROOT_PASSWORD}
+            MYSQL_USER: ${API_LOCAL_SQL_USER}
+
 ### Lighthouse Server ###########################################
     lighthouse-server:
         image: ${LH_GKE_IMAGE}:latest

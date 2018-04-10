@@ -22,3 +22,14 @@ data
 
 # GKE YAML Configurations
 **/*.yaml
+
+# API
+service/api/vendor
+service/api/wordpress
+service/api/wp-content/plugins/flush-opcache
+service/api/wp-content/themes/twentyseventeen
+service/api/wp-content/uploads
+service/api/app.yaml
+service/api/cron.yaml
+service/api/service-account.json
+service/api/wp-config.php
