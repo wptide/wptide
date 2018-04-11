@@ -1,4 +1,4 @@
 cron:
 - description: wordpress cron tasks
   url: /wp-cron.php
-  schedule: ${API_CLOUD_CRON_SCHEDULE}
+  schedule: ${API_GAE_CRON_SCHEDULE}
