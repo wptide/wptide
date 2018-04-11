@@ -3,7 +3,7 @@
 > A rising tide lifts all boats.
 > -- United States President, John F. Kennedy (borrowed from the New England Council)
 
-An automated tool to provide insight into WordPress code and highlight areas to improve the quality of plugins and themes.
+Tide is an automated tool to provide insight into WordPress code and highlight areas to improve the quality of plugins and themes.
 
 We believe the web can be better. With Tide, the code which underpins every website can be more standardized, faster, and more secure. Tide is focused on WordPress, because no other platform has as large an impact on the state of the web. Tide raises the quality of code one plugin or theme at a time, by elevating the importance of code quality in the developer consciousness. **Because a rising Tide lifts all boats.**
 
@@ -23,10 +23,10 @@ We believe the web can be better. With Tide, the code which underpins every webs
 
 ### Introduction
 Tide services are responsible for the following:
-- The API is responsible for implementing a web server and REST API.
-- The Sync Server polls the WordPress.org API's for themes and plugins to process and writes them to a queue.
-- The PHPCS Server reads messages from a queue and runs reports against both plugins and themes, then sends the results back to the Tide API.
-- The Lighthouse Server reads messages from a queue and runs Google Lighthouse reports against the themes only, then sends the results back to the Tide API.
+- The API implements MySQL, PHP-FPM, and an Nginx web server with WordPress installed serving a theme and a REST API.
+- The Sync Server is a Go binary that polls the WordPress.org API's for themes and plugins to process and writes them to a queue.
+- The PHPCS Server is a Go binary that reads messages from a queue and runs PHPCS reports against both plugins and themes, then sends the results back to the Tide API.
+- The Lighthouse Server is a Go binary that reads messages from a queue and runs Google Lighthouse reports against themes only, then sends the results back to the Tide API.
 
 ### Dependencies
 
