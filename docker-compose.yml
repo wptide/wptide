@@ -27,6 +27,19 @@ services:
             API_LOCAL_SQL_PASSWORD: ${API_LOCAL_SQL_PASSWORD}
             API_LOCAL_SQL_ROOT_PASSWORD: ${API_LOCAL_SQL_ROOT_PASSWORD}
             API_LOCAL_SQL_USER: ${API_LOCAL_SQL_USER}
+            AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+            AWS_S3_KEY: ${AWS_S3_KEY}
+            AWS_S3_REGION: ${AWS_S3_REGION}
+            AWS_S3_SECRET: ${AWS_S3_SECRET}
+            AWS_S3_VERSION: ${AWS_S3_VERSION}
+            AWS_SQS_KEY: ${AWS_SQS_KEY}
+            AWS_SQS_QUEUE_NAME: ${AWS_SQS_QUEUE_NAME}
+            AWS_SQS_REGION: ${AWS_SQS_REGION}
+            AWS_SQS_SECRET: ${AWS_SQS_SECRET}
+            AWS_SQS_VERSION: ${AWS_SQS_VERSION}
+            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
+            TIDE_API_KEY: ${TIDE_API_KEY}
+            TIDE_API_SECRET: ${TIDE_API_SECRET}
             DOCUMENT_ROOT: /app/wordpress
             GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
 
