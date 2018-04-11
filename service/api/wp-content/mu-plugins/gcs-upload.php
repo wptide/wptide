@@ -13,17 +13,17 @@ namespace Google\Cloud\Storage\WordPress;
 class Upload {
 
 	/**
-     * Use HTTPS Setting.
-     *
-     * @type string
-     */
+	 * Use HTTPS Setting.
+	 *
+	 * @type string
+	 */
 	const USE_HTTPS = 'gcs_upload_use_https';
 
 	/**
-     * Bucket Name Setting.
-     *
-     * @type string
-     */
+	 * Bucket Name Setting.
+	 *
+	 * @type string
+	 */
 	const BUCKET_NAME = 'gcs_upload_bucket_name';
 
 	/**
