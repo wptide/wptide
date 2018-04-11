@@ -115,6 +115,20 @@ $table_prefix  = 'wp_';
  */
 define( 'WP_DEBUG', ! $is_gae );
 
+// AWS S3 settings.
+define( 'AWS_S3_VERSION', getenv( 'AWS_S3_VERSION' ) );
+define( 'AWS_S3_REGION', getenv( 'AWS_S3_REGION' ) );
+define( 'AWS_S3_KEY', getenv( 'AWS_S3_KEY' ) );
+define( 'AWS_S3_SECRET', getenv( 'AWS_S3_SECRET' ) );
+define( 'AWS_S3_BUCKET_NAME', getenv( 'AWS_S3_BUCKET_NAME' ) );
+
+// AWS SQS settings.
+define( 'AWS_SQS_VERSION', getenv( 'AWS_SQS_VERSION' ) );
+define( 'AWS_SQS_REGION', getenv( 'AWS_SQS_REGION' ) );
+define( 'AWS_SQS_KEY', getenv( 'AWS_SQS_KEY' ) );
+define( 'AWS_SQS_SECRET', getenv( 'AWS_SQS_SECRET' ) );
+define( 'AWS_SQS_QUEUE_NAME', getenv( 'AWS_SQS_QUEUE_NAME' ) );
+
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
