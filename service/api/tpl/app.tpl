@@ -30,5 +30,6 @@ skip_files:
 - health-check.php
 - Makefile
 - service-account.json
+- setup.sh
 - wp-config.php
 - wptests.sql
