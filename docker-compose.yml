@@ -8,7 +8,7 @@ services:
         volumes:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
-            - ./service/api/php.ini:/opt/php71/lib/php.ini
+            - ./service/api/php.ini:/opt/php72/lib/php.ini
         depends_on:
             - api-mysql
         ports:
