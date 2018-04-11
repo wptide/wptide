@@ -12,6 +12,10 @@ We believe the web can be better. With Tide, the code which underpins every webs
    + [Dependencies](#dependencies)
    + [Setup]($setup)
    + [API](#api)
+   + [Lighthouse Server](#lighthouse-server)
+   + [PHPCS Server](#phpcs-server)
+   + [Sync Server](#sync-server)
+   + [Deployment](#deployment)
    + [Contributing](#contributing)
    + [Contact Us](#contact-us)
    + [Credits](#credits)
@@ -20,12 +24,9 @@ We believe the web can be better. With Tide, the code which underpins every webs
 ### Introduction
 Tide services are responsible for the following:
 - The API is responsible for implementing a web server and REST API.
-- The Sync Server polls the WordPress.org API's for themes and plugins 
-to process and writes them to a queue.
-- The PHPCS Server reads messages from a queue and runs reports against 
-both plugins and themes, then sends the results back to the Tide API.
-- The Lighthouse Server reads messages from a queue and runs Google Lighthouse 
-reports against the themes only, then sends the results back to the Tide API.
+- The Sync Server polls the WordPress.org API's for themes and plugins to process and writes them to a queue.
+- The PHPCS Server reads messages from a queue and runs reports against both plugins and themes, then sends the results back to the Tide API.
+- The Lighthouse Server reads messages from a queue and runs Google Lighthouse reports against the themes only, then sends the results back to the Tide API.
 
 ### Dependencies
 
@@ -44,8 +45,7 @@ cp .env.dist .env
 
 ```
 
-Update placeholder values in `.env` to reflect your environment. For example, 
-Tide API specific details; AWS key pairs; SQS queues and S3 buckets.
+Update placeholder values in `.env` to reflect your environment. For example, Tide API specific details; AWS key pairs; SQS queues and S3 buckets.
 
 Configure Google Cloud SDK with your account and the appropriate project ID:
 
@@ -59,20 +59,13 @@ Create an App Engine application within your new project:
 $ gcloud app create
 ```
 
-Then configure the App Engine default GCS bucket for later use. The default App
-Engine bucket is named YOUR_PROJECT_ID.appspot.com. Change the default Access
-Control List (ACL) of that bucket as follows:
+Then configure the App Engine default GCS bucket for later use. The default App Engine bucket is named YOUR_PROJECT_ID.appspot.com. Change the default Access Control List (ACL) of that bucket as follows:
 
 ```
 $ gsutil defacl ch -u AllUsers:R gs://YOUR_PROJECT_ID.appspot.com
 ```
 
-Go to the [the Credentials section][credentials-section] of your project in the
-Console. Click 'Create credentials' and then click 'Service account key.' For
-the Service account, select 'App Engine app default service account.' Then
-click 'Create' to create and download the JSON service account key to your
-local machine. Save it as `service-account.json` in the `service/api` directory 
-for use with connecting with both Cloud Storage and Cloud SQL.
+Go to the [the Credentials section][credentials-section] of your project in the Console. Click 'Create credentials' and then click 'Service account key.' For the Service account, select 'App Engine app default service account.' Then click 'Create' to create and download the JSON service account key to your local machine. Save it as `service-account.json` in the `service/api` directory for use with connecting with both Cloud Storage and Cloud SQL.
 
 ### API
 
@@ -100,16 +93,27 @@ Last run the setup script:
 make api.setup
 ```
 
-Run the setup script to initialize WordPress for the first time or if you would 
-like a convenient way to update the default values when you change certain 
-environment variables.
+Run the setup script to initialize WordPress for the first time or if you would like a convenient way to update the default values when you change certain environment variables.
 
-The local database is stored in the `data/api/mysql` directory. If you 
-ever need to start from scratch delete that directory and run `make api.setup` 
-again. Be sure to stop the API with `make down` and then start it again with 
-`make api.up`.
+The local database is stored in the `data/api/mysql` directory. If you ever need to start from scratch delete that directory and run `make api.setup` again. Be sure to stop the API with `make down` and then start it again with `make api.up`.
 
 Note: Running `make down` will stop all Docker services.
+
+### Lighthouse Server
+
+@todo
+
+### PHPCS Server
+
+@todo
+
+### Sync Server
+
+@todo
+
+### Deployment
+
+@todo
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.

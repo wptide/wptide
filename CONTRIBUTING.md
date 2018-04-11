@@ -1,10 +1,13 @@
 # Tide Contributing Guide
 
-Before submitting your contribution, please make sure to take a moment and read through the following guidelines.
+Before submitting your contribution, please make sure to take a moment and read 
+through the following guidelines.
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Tide Code of Conduct](https://github.com/xwp/go-tide/blob/master/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to engage@xwp.co.
+This project and everyone participating in it is governed by the 
+[Tide Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected 
+to uphold this code. Please report unacceptable behavior to engage@xwp.co.
 
 ## Issue Reporting Guidelines
 
