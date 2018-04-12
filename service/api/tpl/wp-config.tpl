@@ -55,7 +55,7 @@ define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/../wp-content' );
 
 // ** MySQL settings ** //
 if ( $is_gae ) {
-    define( 'DB_HOST',     ':/cloudsql/${GCP_PROJECT}:${GCP_REGION}:${API_GAE_SQL_DB}' );
+    define( 'DB_HOST',     ':/cloudsql/${GCP_PROJECT}:${GCP_REGION}:${API_GAE_SQL_INSTANCE_NAME}' );
     define( 'DB_NAME',     '${API_GAE_SQL_DB}' );
     define( 'DB_USER',     '${API_GAE_SQL_USER}' );
     define( 'DB_PASSWORD', '${API_GAE_SQL_PASSWORD}' );

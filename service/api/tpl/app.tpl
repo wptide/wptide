@@ -2,7 +2,7 @@ runtime: php
 env: flex
 
 beta_settings:
-  cloud_sql_instances: ${GCP_PROJECT}:${GCP_REGION}:${API_GAE_SQL_DB}
+  cloud_sql_instances: ${GCP_PROJECT}:${GCP_REGION}:${API_GAE_SQL_INSTANCE_NAME}
 
 runtime_config:
   document_root: wordpress
@@ -37,9 +37,7 @@ env_variables:
 
 skip_files:
 - tpl/
-- health-check.php
 - Makefile
 - service-account.json
 - setup.sh
-- wp-config.php
 - wptests.sql
