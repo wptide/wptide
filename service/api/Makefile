@@ -1,6 +1,9 @@
 # Show available make commands.
 api.usage:
 	@echo "\tapi.up:\n\t\t- Run the API Docker images in isolation with docker-compose up."
+	@echo "\tapi.down:\n\t\t- Take the isolated API Docker images down."
+	@echo "\tapi.stop:\n\t\t- Stop the isolated API Docker images with docker-compose stop."
+	@echo "\tapi.rm:\n\t\t- Remove the isolated API Docker images with docker-compose rm."
 	@echo "\tapi.composer:\n\t\t- Install the Composer dependencies."
 	@echo "\tapi.setup:\n\t\t- Run the setup script; API containers must be running to exec into."
 	@echo "\tapi.tpl:\n\t\t- Generate the API templates."
@@ -10,6 +13,17 @@ api.usage:
 # Run the API Docker images in isolation with docker-compose up.
 api.up:
 	@docker-compose up api-php
+
+# Take the isolated API Docker images down.
+api.down: api.stop api.rm
+
+# Stop the isolated API Docker images with docker-compose stop.
+api.stop:
+	@docker-compose stop api-php
+
+# Remove the isolated API Docker images with docker-compose rm.
+api.rm:
+	@docker-compose rm -f api-php
 
 # Install the Composer dependencies.
 api.composer: api.tpl

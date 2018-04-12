@@ -18,6 +18,8 @@ We believe the web can be better. With Tide, the code which underpins every webs
    + [PHPCS Server](#phpcs-server)
    + [Sync Server](#sync-server)
    + [Deployment](#deployment)
+       - [Google App Engine](#google-app-engine)
+       - [Google Kubernetes Engine](#google-kubernetes-engine)
    + [Contributing](#contributing)
    + [Contact Us](#contact-us)
    + [Credits](#credits)
@@ -97,23 +99,103 @@ make api.setup
 
 Run the setup script to initialize WordPress for the first time or if you would like a convenient way to update the default values when you change certain environment variables.
 
-The local database is stored in the `data/api/mysql` directory. If you ever need to start from scratch delete that directory and run `make api.setup` again. Be sure to stop the API with `make down` and then start it again with `make api.up`.
+The local database is stored in the `data/api/mysql` directory. If you ever need to start from scratch delete that directory and run `make api.setup` again. Be sure to stop the API with `make api.down` or `make down` and then start it again with `make api.up`.
 
 Note: Running `make down` will stop all Docker services.
 
 ### Lighthouse Server
 
-@todo
+First build the Lighthouse Server Docker image:
+
+```
+$ make lighthouse.build.image
+```
+
+Next start the Lighthouse Server in isolation:
+
+```
+$ make lighthouse.up
+```
+
+You can combine the previous two steps and simply run:
+
+```
+$ make lighthouse.build.up
+```
+
+Take the isolated Lighthouse Server down:
+
+```
+$ make lighthouse.down
+```
+
+@todo additional notes...
 
 ### PHPCS Server
 
-@todo
+First build the PHPCS Server Docker image:
+
+```
+$ make phpcs.build.image
+```
+
+Next start the PHPCS Server in isolation:
+
+```
+$ make phpcs.up
+```
+
+You can combine the previous two steps and simply run:
+
+```
+$ make phpcs.build.up
+```
+
+Take the isolated PHPCS Server down:
+
+```
+$ make phpcs.down
+```
+
+@todo additional notes...
 
 ### Sync Server
 
-@todo
+First build the Sync Server Docker image:
+
+```
+$ make sync.build.image
+```
+
+Next start the Sync Server in isolation:
+
+```
+$ make sync.up
+```
+
+You can combine the previous two steps and simply run:
+
+```
+$ make sync.build.up
+```
+
+Take the isolated Sync Server down:
+
+```
+$ make sync.down
+```
+
+@todo additional notes...
 
 ### Deployment
+
+@todo
+
+#### Google App Engine
+
+@todo
+
+#### Google Kubernetes Engine
 
 @todo
 

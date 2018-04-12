@@ -12,7 +12,9 @@ lighthouse.usage:
 	@echo "\tlighthouse.build.image:\n\t\t- Build the Lighthouse Server Docker image."
 	@echo "\tlighthouse.build.up:\n\t\t- Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up."
 	@echo "\tlighthouse.up:\n\t\t- Run the Lighthouse Server Docker image in isolation with docker-compose up."
-	@echo "\tlighthouse.down:\n\t\t- Stop the isolated Lighthouse Server Docker image with docker-compose down."
+	@echo "\tlighthouse.down:\n\t\t- Take the isolated Lighthouse Server Docker image down."
+	@echo "\tlighthouse.stop:\n\t\t- Stop the isolated Lighthouse Server Docker image with docker-compose stop."
+	@echo "\tlighthouse.rm:\n\t\t- Remove the isolated Lighthouse Server Docker image with docker-compose rm."
 	@echo "\tlighthouse.push.image:\n\t\t- Push the Lighthouse Server Docker image to GCR."
 	@echo "\tlighthouse.clean.image:\n\t\t- Clean the Lighthouse Server Docker image from the host machine."
 	@echo "\tlighthouse.build.cluster:\n\t\t- Build the Lighthouse Server GKE cluster."
@@ -45,9 +47,16 @@ lighthouse.build.up: lighthouse.build.image lighthouse.up
 lighthouse.up:
 	@docker-compose up lighthouse-server
 
-# Stop the isolated Lighthouse Server Docker image with docker-compose down.
-lighthouse.down:
-	@docker-compose down
+# Take the isolated Lighthouse Server Docker image down.
+lighthouse.down: lighthouse.stop lighthouse.rm
+
+# Stop the isolated Lighthouse Server Docker image with docker-compose stop.
+lighthouse.stop:
+	@docker-compose stop lighthouse-server
+
+# Remove the isolated Lighthouse Server Docker image with docker-compose rm.
+lighthouse.rm:
+	@docker-compose rm -f lighthouse-server
 
 # Push the Lighthouse Server Docker image to GCR.
 lighthouse.push.image:
