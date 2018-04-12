@@ -22,9 +22,9 @@ api.setup:
 
 # Generate the API templates.
 api.tpl:
-	@./bin/tpl -t=service/api/tpl/app.tpl -d=service/api/app.yaml -e=.env.gke
-	@./bin/tpl -t=service/api/tpl/cron.tpl -d=service/api/cron.yaml -e=.env.gke
-	@./bin/tpl -t=service/api/tpl/wp-config.tpl -d=service/api/wp-config.php -e=.env.gke
+	@./bin/tpl -t=service/api/tpl/app.tpl -d=service/api/app.yaml -e=.env.gcp
+	@./bin/tpl -t=service/api/tpl/cron.tpl -d=service/api/cron.yaml -e=.env.gcp
+	@./bin/tpl -t=service/api/tpl/wp-config.tpl -d=service/api/wp-config.php -e=.env.gcp
 
 # Deploy the Cloud SQL database & setup the users.
 api.deploy.sql:
@@ -32,13 +32,13 @@ api.deploy.sql:
 	--region ${GCP_REGION} \
 	--tier ${API_GAE_SQL_MACHINE_TYPE} \
 	--storage-size ${API_GAE_SQL_STORAGE_SIZE} \
-	--database-version MYSQL_5_7 \
-	--backup-start-time 11:00 \
+	--database-version ${API_GAE_SQL_DB_VERSION} \
+	--backup-start-time ${API_GAE_SQL_BACKUP_START_TIME} \
 	--enable-bin-log \
 	--failover-replica-name ${API_GAE_SQL_INSTANCE_FAILOVER_NAME} \
-	--maintenance-release-channel production \
-	--maintenance-window-day SUN \
-	--maintenance-window-hour 1
+	--maintenance-release-channel ${API_GAE_SQL_MAINTENANCE_RELEASE_CHANNEL} \
+	--maintenance-window-day ${API_GAE_SQL_MAINTENANCE_WINDOW_DAY} \
+	--maintenance-window-hour ${API_GAE_SQL_MAINTENANCE_WINDOW_HOUR}
 	@gcloud sql users set-password root % --instance ${API_GAE_SQL_INSTANCE_NAME} --password "${API_GAE_SQL_ROOT_PASSWORD}"
 	@gcloud sql databases create ${API_GAE_SQL_DB} --instance ${API_GAE_SQL_INSTANCE_NAME} --charset utf8 --collation utf8_general_ci
 	@gcloud sql users create ${API_GAE_SQL_USER} % --instance ${API_GAE_SQL_INSTANCE_NAME} --password "${API_GAE_SQL_PASSWORD}"
