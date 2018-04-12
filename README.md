@@ -69,7 +69,7 @@ Then configure the App Engine default GCS bucket for later use. The default App 
 $ gsutil defacl ch -u AllUsers:R gs://YOUR_PROJECT_ID.appspot.com
 ```
 
-Go to the [the Credentials section][credentials-section] of your project in the Console. For the Service account, select 'App Engine app default service account.' Then click 'Create key' to create and download the JSON service account key to your local machine. Save it as `service-account.json` in the `service/api` directory for use with connecting to both Cloud Storage and Cloud SQL.
+Go to the [the Credentials section][credentials-section] of your project in the Console. Click 'Create credentials' and then click 'Service account key.' For the Service account, select 'App Engine app default service account.' Then click 'Create' to create and download the JSON service account key to your local machine. Save it as `service-account.json` in the `service/api` directory for use with connecting to both Cloud Storage and Cloud SQL.
 
 ### API
 
