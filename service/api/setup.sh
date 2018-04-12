@@ -91,13 +91,6 @@ vendor/bin/wp user create wporg wporg@${API_LOCAL_DOMAIN} --role=api_client --pa
 echo
 echo "Setup Complete!"
 
-if [ -n "$(grep -i "$API_LOCAL_DOMAIN" /etc/hosts)" ]
-    then
-        echo "Found host"
-    else
-        echo "No host"
-fi
-
 echo
 echo "Be sure to add '${BOLD}127.0.0.1 ${API_LOCAL_DOMAIN}${RESET}' to your hosts file."
 echo "Use the following command (${RED}with caution${RESET}):"
