@@ -12,6 +12,7 @@ We believe the web can be better. With Tide, the code which underpins every webs
 ## [Table of Contents](#table-of-contents)
    + [Introduction](#introduction)
    + [Dependencies](#dependencies)
+   + [Cloning](#cloning)
    + [Setup]($setup)
    + [API](#api)
    + [Lighthouse Server](#lighthouse-server)
@@ -39,6 +40,26 @@ Tide services are responsible for the following:
 * Enable Billing on that project
 * [Enable Cloud SQL API][cloud-sql-api-enable]
 * Install [Google Cloud SDK][gcloud-sdk]
+
+### Cloning
+
+Ensure you're in the directory where you would like to install Tide:
+
+```
+git clone -b develop --recursive https://github.com/xwp/go-tide.git tide
+```
+
+Change to Tide working directory:  
+
+```
+cd tide
+```
+
+Update submodules:
+
+```
+git submodule update --init --recursive
+```
 
 ### Setup
 
@@ -129,8 +150,6 @@ Take the isolated Lighthouse Server down:
 $ make lighthouse.down
 ```
 
-@todo additional notes...
-
 ### PHPCS Server
 
 First build the PHPCS Server Docker image:
@@ -157,8 +176,6 @@ Take the isolated PHPCS Server down:
 $ make phpcs.down
 ```
 
-@todo additional notes...
-
 ### Sync Server
 
 First build the Sync Server Docker image:
@@ -184,8 +201,6 @@ Take the isolated Sync Server down:
 ```
 $ make sync.down
 ```
-
-@todo additional notes...
 
 ### Deployment
 
