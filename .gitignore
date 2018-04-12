@@ -3,7 +3,7 @@ vendor
 
 # Variables
 .env
-.env.prod
+.env.gke
 
 # MacOS
 .DS_Store
@@ -19,3 +19,6 @@ report.json
 
 # Server data
 data
+
+# GKE YAML Configurations
+**/*.yaml

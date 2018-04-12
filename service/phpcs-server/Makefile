@@ -1,5 +1,5 @@
 # PHPCS Server Docker settings.
-PHPCS_TAG=${PHPCS_GKE_IMAGE}:${VERSION}
+export PHPCS_GCR_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${PHPCS_GKE_IMAGE}:${VERSION}
 
 # PHPCS Server GO settings.
 PHPCS_BIN_PATH=bin/phpcs-server
@@ -17,6 +17,7 @@ phpcs.usage:
 	@echo "\tphpcs.clean.image:\n\t\t- Clean the PHPCS Server Docker image from the host machine."
 	@echo "\tphpcs.build.cluster:\n\t\t- Build the PHPCS Server GKE cluster."
 	@echo "\tphpcs.creds:\n\t\t- Get the PHPCS Server GKE cluster credentials."
+	@echo "\tphpcs.tpl:\n\t\t- Generate the PHPCS Server GKE YAML template."
 	@echo "\tphpcs.deploy.cluster:\n\t\t- Deploy the PHPCS Server GKE cluster."
 	@echo "\tphpcs.get.cluster:\n\t\t- Get the PHPCS Server GKE cluster status."
 	@echo "\tphpcs.clean.cluster:\n\t\t- Clean the PHPCS Server GKE cluster."
@@ -33,9 +34,9 @@ phpcs.clean.bin:
 
 # Build the PHPCS Server Docker image.
 phpcs.build.image: deps phpcs.clean.bin phpcs.build.bin
-	@echo "Building Docker image [${REPO}/${PHPCS_TAG}] ..."
-	@docker build -f docker/phpcs-server/Dockerfile -t ${REPO}/${PHPCS_TAG} --no-cache .
-	@docker tag ${REPO}/${PHPCS_TAG} ${PHPCS_GKE_IMAGE}:latest
+	@echo "Building Docker image [${PHPCS_GCR_IMAGE_TAG}] ..."
+	@docker build -f service/phpcs-server/docker/Dockerfile -t ${PHPCS_GCR_IMAGE_TAG} --no-cache .
+	@docker tag ${PHPCS_GCR_IMAGE_TAG} ${PHPCS_GKE_IMAGE}:latest
 
 # Rebuild & run the PHPCS Server Docker image in isolation with docker-compose up.
 phpcs.build.up: phpcs.build.image phpcs.up
@@ -50,16 +51,16 @@ phpcs.down:
 
 # Push the PHPCS Server Docker image to GCR.
 phpcs.push.image:
-	@gcloud docker -- push ${REPO}/${PHPCS_TAG}
+	@gcloud docker -- push ${PHPCS_GCR_IMAGE_TAG}
 
 # Clean the PHPCS Server Docker image from the host machine.
 phpcs.clean.image:
-	@docker rmi ${REPO}/${PHPCS_TAG}
+	@docker rmi ${PHPCS_GCR_IMAGE_TAG}
 	@docker rmi ${PHPCS_GKE_IMAGE}:latest
 
 # Build the PHPCS Server GKE cluster.
 phpcs.build.cluster: config
-	@gcloud beta container --project ${GCP_PROJECT} clusters create ${PHPCS_GKE_CLUSTER} \
+	@gcloud container --project ${GCP_PROJECT} clusters create ${PHPCS_GKE_CLUSTER} \
 	--zone ${GCP_ZONE} \
 	--cluster-version ${PHPCS_GKE_CLUSTER_VERSION} \
 	--machine-type ${PHPCS_GKE_MACHINE_TYPE} \
@@ -72,41 +73,25 @@ phpcs.build.cluster: config
 	--enable-cloud-monitoring \
 	--enable-autoscaling \
 	--min-nodes ${PHPCS_GKE_MIN_NODES} \
-	--max-nodes ${PHPCS_GKE_MAX_NODES} \
-	--enable-legacy-authorization \
-	--disable-addons HttpLoadBalancing
+	--max-nodes ${PHPCS_GKE_MAX_NODES}
 
 # Get the PHPCS Server GKE cluster credentials.
 phpcs.creds:
 	@gcloud container clusters get-credentials ${PHPCS_GKE_CLUSTER}
 
+# Generate the PHPCS Server GKE YAML template.
+phpcs.tpl:
+	@./bin/tpl -p=service/phpcs-server/kubernetes/ -f=deployment -e=.env.gke
+
 # Deploy the PHPCS Server GKE cluster.
-phpcs.deploy.cluster: config phpcs.creds
-	@kubectl run ${PHPCS_GKE_CLUSTER} --image=${REPO}/${PHPCS_TAG} --replicas=${PHPCS_GKE_REPLICAS} \
-	--env="TIDE_API_AUTH_URL=${TIDE_API_AUTH_URL}" \
-	--env="TIDE_API_HOST=${TIDE_API_HOST}" \
-	--env="TIDE_API_PROTOCOL=${TIDE_API_PROTOCOL}" \
-	--env="TIDE_API_KEY=${TIDE_API_KEY}" \
-	--env="TIDE_API_SECRET=${TIDE_API_SECRET}" \
-	--env="TIDE_API_VERSION=${TIDE_API_VERSION}" \
- 	--env="PHPCS_SQS_VERSION=${PHPCS_SQS_VERSION}" \
-	--env="PHPCS_SQS_REGION=${PHPCS_SQS_REGION}" \
-	--env="PHPCS_SQS_KEY=${PHPCS_SQS_KEY}" \
-	--env="PHPCS_SQS_SECRET=${PHPCS_SQS_SECRET}" \
-	--env="PHPCS_SQS_QUEUE_NAME=${PHPCS_SQS_QUEUE_NAME}" \
-	--env="PHPCS_S3_REGION=${PHPCS_S3_REGION}" \
-	--env="PHPCS_S3_KEY=${PHPCS_S3_KEY}" \
-	--env="PHPCS_S3_SECRET=${PHPCS_S3_SECRET}" \
-	--env="PHPCS_S3_BUCKET_NAME=${PHPCS_S3_BUCKET_NAME}"
-	@kubectl autoscale deployment ${PHPCS_GKE_CLUSTER} \
-	--cpu-percent=${PHPCS_GKE_CPU_PERCENT} \
-	--min=${PHPCS_GKE_MIN_PODS} \
-	--max=${PHPCS_GKE_MAX_PODS}
+phpcs.deploy.cluster: config phpcs.creds phpcs.tpl
+	@kubectl apply -f service/phpcs-server/kubernetes/deployment.yaml
 
 # Get the PHPCS Server GKE cluster status.
-phpcs.get.cluster:
+phpcs.get.cluster: config phpcs.creds
 	@kubectl get deployment ${PHPCS_GKE_CLUSTER} -o yaml
 
 # Clean the PHPCS Server GKE cluster.
-phpcs.clean.cluster: config
+phpcs.clean.cluster: config phpcs.creds phpcs.tpl
+	@kubectl delete -f service/phpcs-server/kubernetes/deployment.yaml
 	@gcloud container clusters delete ${PHPCS_GKE_CLUSTER} -q
