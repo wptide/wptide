@@ -189,7 +189,10 @@ $ make sync.down
 
 ### Deployment
 
-@todo
+To make deploying services easier you can create an `.env.gcp` file in the 
+project root that will override values in `.env`. However, this only effects 
+the `.tpl` files that get converted, which are used to deploy to your project 
+on GCP.
 
 #### Google App Engine
 
@@ -210,8 +213,8 @@ readiness_check:
 ```
 
 _Once you've deployed and installed WordPress add the `readiness_check` 
-section back to `app.yaml` and re-deploy. The health check should be working and ensuring 
-the health of your containers on App Engine._
+section back to `app.yaml` and re-deploy. The health check should be working 
+and ensuring the health of your containers on App Engine._
 
 First create the Cloud SQL database:
 
@@ -219,18 +222,51 @@ First create the Cloud SQL database:
 make api.deploy.sql
 ```
 
-_This command will create a database instance and failover instance, set the root password, create a database for WordPress, and create a user for that database._
+_This command will create a database instance and failover instance, set the 
+root password, create a database for WordPress, and create a user for that 
+database._
 
 Then deploy the API:
 
 ```
 make api.deploy.app
 ```
-_You will need to activate the plugins, create the necessary API user accounts, and setup permalinks manually._
+
+_You will need to activate the plugins, create the necessary API user accounts, 
+and setup permalinks manually._
 
 #### Google Kubernetes Engine
 
-@todo
+All the Go routines are deployed with the same basic steps. Push the image to 
+Google Container Registry (GCR), create the Kubernetes cluster, and then create 
+a Kubernetes deployment.
+
+I'll demonstrate with the PHPCS Server. Other than specific `make` commands for 
+each service, these step are all the same.
+
+Push the image to GCR:
+
+```
+make phpcs.push.image
+```
+
+Create the GKE cluster:
+
+```
+make phpcs.build.cluster
+```
+
+Deploy the GKE cluster:
+
+```
+make phpcs.deploy.cluster
+```
+
+Delete the GKE cluster:
+
+```
+make phpcs.clean.cluster
+```
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
