@@ -268,6 +268,19 @@ func Test_main(t *testing.T) {
 				flagVisibility: &[]string{"public"}[0],
 			},
 		},
+		{
+			"Run Main - Process Error",
+			args{
+				timeOut: 0,
+				version: true,
+				// Invalid config. Will cause a process.Run() error.
+				altConfig: &processConfig{
+					igTempFolder:      "./testdata/tmp",
+					phpcsTempFolder:      "./testdata/tmp",
+					phpcsStorageProvider: &mockStorage{},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -41,7 +41,9 @@ var (
 		"tide": payload.TidePayload{
 			Client: TideClient,
 		},
-		"local-file": filePayload{},
+		"local-file": filePayload{
+			terminateChan: terminateChannel,
+		},
 	}
 
 	// messageProvider is the primary source of messages to process.
@@ -183,7 +185,13 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 	// Not chaining response, so no need for Out channel.
 	response := &process.Response{
 		In:         phpcs.Out,
+		Out:        make(chan process.Processor),
 		Payloaders: config.resPayloaders,
+	}
+
+	sink := &Sink{
+		In: response.Out,
+		MessageProvider: messageProvider,
 	}
 
 	return []process.Processor{
@@ -191,10 +199,13 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 		info,
 		phpcs,
 		response,
+		sink,
 	}, nil
 }
 
 func main() {
+
+	log.Println("Starting PHPCS audit server.")
 
 	if bParseFlags {
 		// Is the -version flag being used?
@@ -224,39 +235,18 @@ func main() {
 		log.SetFlags(oldFlags)
 	}
 
-	// If -url is set then send a message using the URL.
-	if *flagUrl != "" {
-
-		singleMessageType := "tide"
-		singleMessageEndpoint := fmt.Sprintf("%s://%s/api/tide/%s/audit", tideConfig.protocol, tideConfig.host, tideConfig.version)
-
-		// If -output is set add it to Tide process OutputFile.
-		if *flagOutput != "" {
-			singleMessageType = "local-file"
-			singleMessageEndpoint = *flagOutput
+	// Prepare the Tide Client if we're not writing to file.
+	if *flagOutput == "" {
+		log.Println("Authenticating with Tide API.")
+		err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
+		if err != nil {
+			log.Println("Tide API Error:", err)
+			terminateChannel <- struct{}{}
 		}
-
-		cMessage <- message.Message{
-			ResponseAPIEndpoint: singleMessageEndpoint,
-			Title:               "Single Project",
-			Content:             "Single project URL provided.",
-			PayloadType:         singleMessageType,
-			SourceURL:           *flagUrl,
-			SourceType:          source.GetKind(*flagUrl),
-			Force:               true,
-			Visibility:          *flagVisibility,
-			RequestClient:       *flagClient,
-		}
-	}
-
-	// Prepare the Tide Client.
-	err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
-	if err != nil {
-		log.Println("Tide API Error:", err)
-		terminateChannel <- struct{}{}
 	}
 
 	/** Processes **/
+	log.Println("Initializing processes.")
 	processes, err := initProcesses(
 		cMessage,
 		procCfg,
@@ -270,21 +260,70 @@ func main() {
 	// Create and run the pipe.
 	go func() {
 		// Create New Pipe with processes.
+		log.Println("Starting processing pipeline.")
 		pipeline := pipe.WithProcesses(processes...)
 
-		pipeline.Run()
+		err := pipeline.Run()
+		if err != nil {
+			fmt.Println(err)
+		}
 	}()
 
-	// Start polling the messageProvider.
+	// If -url is set then send a message using the URL.
+	if *flagUrl != "" {
+
+		singleMessageType := "tide"
+		singleMessageEndpoint := fmt.Sprintf("%s://%s/api/tide/%s/audit", tideConfig.protocol, tideConfig.host, tideConfig.version)
+
+		// If -output is set add it to Tide process OutputFile.
+		if *flagOutput != "" {
+			singleMessageType = "local-file"
+			singleMessageEndpoint = *flagOutput
+		}
+
+		go func() {
+			cMessage <- message.Message{
+				ResponseAPIEndpoint: singleMessageEndpoint,
+				Title:               "Single Project",
+				Content:             "Single project URL provided.",
+				PayloadType:         singleMessageType,
+				SourceURL:           *flagUrl,
+				SourceType:          source.GetKind(*flagUrl),
+				Force:               true,
+				Visibility:          *flagVisibility,
+				RequestClient:       *flagClient,
+				Audits: &[]message.Audit{
+					{
+						Type: "phpcs",
+						Options: &message.AuditOption{
+							Standard: "wordpress",
+						},
+					},
+					{
+						Type: "phpcs",
+						Options: &message.AuditOption{
+							Standard: "phpcompatibility",
+						},
+					},
+				},
+			}
+		}()
+	}
+
+	// Start polling the messageProvider if we didn't provide a url.
 	// Other processes can also queue the channel.
-	pollProvider(cMessage, messageProvider, buffer)
+	if *flagUrl == "" {
+		log.Println("Polling message provider.")
+		pollProvider(cMessage, messageProvider, buffer)
+	}
 
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
 		// Terminate signal received.
 		case <-terminateChannel:
-			break;
+			fmt.Println("Terminating server.")
+			return
 		}
 	}
 }
@@ -321,6 +360,9 @@ func pollProvider(c chan message.Message, provider message.MessageProvider, buff
 
 			// If message has been retrieved add it to the channel.
 			if msg != nil {
+
+				log.Println("Dispatching '" + msg.Title + "'")
+
 				// Block if the buffer is full.
 				b <- struct{}{}
 
