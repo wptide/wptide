@@ -49,7 +49,7 @@ cp .env.dist .env
 
 ```
 
-Update placeholder values in `.env` to reflect your environment. For example, Tide API specific details; AWS key pairs; SQS queues and S3 buckets.
+_Update placeholder values in `.env` to reflect your environment. For example, Tide API specific details; AWS key pairs; SQS queues and S3 buckets._
 
 Configure Google Cloud SDK with your account and the appropriate project ID:
 
@@ -69,7 +69,7 @@ Then configure the App Engine default GCS bucket for later use. The default App 
 $ gsutil defacl ch -u AllUsers:R gs://YOUR_PROJECT_ID.appspot.com
 ```
 
-Go to the [the Credentials section][credentials-section] of your project in the Console. Click 'Create credentials' and then click 'Service account key.' For the Service account, select 'App Engine app default service account.' Then click 'Create' to create and download the JSON service account key to your local machine. Save it as `service-account.json` in the `service/api` directory for use with connecting to both Cloud Storage and Cloud SQL.
+Finally, go to the [the Credentials section][credentials-section] of your project in the Console. Click 'Create credentials' and then click 'Service account key.' For the Service account, select 'App Engine app default service account.' Then click 'Create' to create and download the JSON service account key to your local machine. Save it as `service-account.json` in the `service/api` directory for use with connecting to both Cloud Storage and Cloud SQL.
 
 ### API
 
@@ -193,7 +193,40 @@ $ make sync.down
 
 #### Google App Engine
 
-@todo
+Deploying the API to App Engine is fairly straight forward. You'll need to 
+provision a database and then deploy the app. With one caveat. The first time 
+you deploy the API you **must** remove the `readiness_check` section from your 
+`service/api/app.yaml` or your app will never become healthy. The section looks 
+like this:
+
+```yaml
+readiness_check:
+  path: "/health-check.php"
+  timeout_sec: 4
+  check_interval_sec: 5
+  failure_threshold: 2
+  success_threshold: 2
+  app_start_timeout_sec: 60
+```
+
+_Once you've deployed and installed WordPress add the `readiness_check` 
+section back to `app.yaml` and re-deploy. The health check should be working and ensuring 
+the health of your containers on App Engine._
+
+First create the Cloud SQL database:
+
+```
+make api.deploy.sql
+```
+
+_This command will create a database instance and failover instance, set the root password, create a database for WordPress, and create a user for that database._
+
+Then deploy the API:
+
+```
+make api.deploy.app
+```
+_You will need to activate the plugins, create the necessary API user accounts, and setup permalinks manually._
 
 #### Google Kubernetes Engine
 
