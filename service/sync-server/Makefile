@@ -90,7 +90,7 @@ sync.tpl:
 	@./bin/tpl \
 	-t=service/sync-server/kubernetes/deployment.tpl \
 	-d=service/sync-server/kubernetes/deployment.yaml \
-	-e=.env.gke
+	-e=.env.gcp
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds sync.tpl

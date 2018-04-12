@@ -3,7 +3,7 @@ vendor
 
 # Variables
 .env
-.env.gke
+.env.gcp
 
 # MacOS
 .DS_Store

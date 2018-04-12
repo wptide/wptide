@@ -84,7 +84,7 @@ phpcs.tpl:
 	@./bin/tpl \
 	-t=service/phpcs-server/kubernetes/deployment.tpl \
 	-d=service/phpcs-server/kubernetes/deployment.yaml \
-	-e=.env.gke
+	-e=.env.gcp
 
 # Deploy the PHPCS Server GKE cluster.
 phpcs.deploy.cluster: config phpcs.creds phpcs.tpl
