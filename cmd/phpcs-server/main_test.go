@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -10,6 +8,8 @@ import (
 	"github.com/wptide/pkg/env"
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/payload"
+	"bytes"
+	"log"
 )
 
 var (
@@ -43,7 +43,7 @@ func Test_initProcesses(t *testing.T) {
 
 	type args struct {
 		source <-chan message.Message
-		config processConfig
+		config *processConfig
 	}
 
 	tests := []struct {
@@ -55,7 +55,7 @@ func Test_initProcesses(t *testing.T) {
 			"Valid Processes",
 			args{
 				make(chan message.Message),
-				processConfig{
+				&processConfig{
 					igTempFolder:      "./testdata/tmp",
 					phpcsTempFolder:      "./testdata/tmp",
 					phpcsStorageProvider: &mockStorage{},
@@ -70,13 +70,14 @@ func Test_initProcesses(t *testing.T) {
 			"No Config",
 			args{
 				source: make(chan message.Message),
+				config: nil,
 			},
 			true,
 		},
 		{
 			"No Source",
 			args{
-				config: processConfig{
+				config: &processConfig{
 					igTempFolder:      "./testdata/tmp",
 					phpcsTempFolder:      "./testdata/tmp",
 					phpcsStorageProvider: &mockStorage{},
@@ -91,7 +92,7 @@ func Test_initProcesses(t *testing.T) {
 			"Ingest temp folder missing",
 			args{
 				make(chan message.Message),
-				processConfig{
+				&processConfig{
 					phpcsTempFolder:      "./testdata/tmp",
 					phpcsStorageProvider: &mockStorage{},
 					resPayloaders: map[string]payload.Payloader{
@@ -105,7 +106,7 @@ func Test_initProcesses(t *testing.T) {
 			"Lighthouse temp folder missing",
 			args{
 				make(chan message.Message),
-				processConfig{
+				&processConfig{
 					igTempFolder:      "./testdata/tmp",
 					phpcsStorageProvider: &mockStorage{},
 					resPayloaders: map[string]payload.Payloader{
@@ -119,7 +120,7 @@ func Test_initProcesses(t *testing.T) {
 			"Lighthouse storage provider missing",
 			args{
 				make(chan message.Message),
-				processConfig{
+				&processConfig{
 					igTempFolder: "./testdata/tmp",
 					phpcsTempFolder: "./testdata/tmp",
 					resPayloaders: map[string]payload.Payloader{
@@ -133,7 +134,7 @@ func Test_initProcesses(t *testing.T) {
 			"Response payloaders missing",
 			args{
 				make(chan message.Message),
-				processConfig{
+				&processConfig{
 					igTempFolder:      "./testdata/tmp",
 					phpcsTempFolder:      "./testdata/tmp",
 					phpcsStorageProvider: &mockStorage{},
@@ -145,7 +146,7 @@ func Test_initProcesses(t *testing.T) {
 			"Valid Processes with messages",
 			args{
 				make(chan message.Message),
-				processConfig{
+				&processConfig{
 					igTempFolder:      "./testdata/tmp",
 					phpcsTempFolder:      "./testdata/tmp",
 					phpcsStorageProvider: &mockStorage{},
@@ -216,17 +217,17 @@ func Test_main(t *testing.T) {
 		args     args
 	}{
 		{
-			"Run Main - Process Config Error (missing)",
+			"Run Main - Auth Error",
 			args{
 				messageChannel: make(chan message.Message, 1),
-				timeOut:        1,
-				msg:            message.Message{},
-				altConfig:      &processConfig{},
+				timeOut:   1,
+				authError: true,
 			},
 		},
 		{
 			"Run Main",
 			args{
+				messageChannel: make(chan message.Message, 1),
 				timeOut: 1,
 				version: true,
 			},
@@ -242,20 +243,15 @@ func Test_main(t *testing.T) {
 		{
 			"Run Main - Version flag set",
 			args{
+				messageChannel: make(chan message.Message, 1),
 				timeOut:    1,
 				parseFlags: true,
 			},
 		},
 		{
-			"Run Main - Auth Error",
-			args{
-				timeOut:   1,
-				authError: true,
-			},
-		},
-		{
 			"Run Main - Output Flag set",
 			args{
+				messageChannel: make(chan message.Message, 1),
 				timeOut:    1,
 				flagOutput: &[]string{"./testdata/report.json"}[0],
 			},
@@ -263,6 +259,7 @@ func Test_main(t *testing.T) {
 		{
 			"Run Main - URL and Visibility Flag set",
 			args{
+				messageChannel: make(chan message.Message, 1),
 				timeOut:        1,
 				flagUrl:        &[]string{testFileServer.URL + "/test.zip"}[0],
 				flagVisibility: &[]string{"public"}[0],
@@ -271,6 +268,7 @@ func Test_main(t *testing.T) {
 		{
 			"Run Main - Process Error",
 			args{
+				messageChannel: make(chan message.Message, 1),
 				timeOut: 0,
 				version: true,
 				// Invalid config. Will cause a process.Run() error.
@@ -291,9 +289,20 @@ func Test_main(t *testing.T) {
 			// Alternate config.
 			if tt.args.altConfig != nil {
 				oldConf := procCfg
-				procCfg = *tt.args.altConfig
+				procCfg.igTempFolder = tt.args.altConfig.igTempFolder
+				procCfg.phpcsTempFolder = tt.args.altConfig.phpcsTempFolder
+				procCfg.phpcsStorageProvider = tt.args.altConfig.phpcsStorageProvider
+
+				if tt.args.altConfig.igTempFolder == "no-proc" {
+					procCfg = nil
+				}
+
 				defer func() {
-					procCfg = oldConf
+					procCfg = &processConfig{}
+					procCfg.igTempFolder = oldConf.igTempFolder
+					procCfg.phpcsTempFolder = oldConf.phpcsTempFolder
+					procCfg.phpcsStorageProvider = oldConf.phpcsStorageProvider
+					procCfg.resPayloaders = oldConf.resPayloaders
 				}()
 			}
 
@@ -305,11 +314,17 @@ func Test_main(t *testing.T) {
 			// -url
 			if tt.args.flagUrl != nil && *tt.args.flagUrl != "" {
 				flagUrl = tt.args.flagUrl
+				defer func() {
+					flagUrl = &[]string{""}[0]
+				}()
 			}
 
 			// -visibility
 			if tt.args.flagVisibility != nil && *tt.args.flagVisibility != "" {
 				flagVisibility = tt.args.flagVisibility
+				defer func() {
+					flagVisibility = &[]string{""}[0]
+				}()
 			}
 
 			if tt.args.version {
@@ -338,8 +353,8 @@ func Test_main(t *testing.T) {
 				}()
 			}
 
-			// Sleep for one second. Allows for one poll action.
-			time.Sleep(time.Millisecond * 100 * tt.args.timeOut)
+			// Sleep before terminating.
+			time.Sleep(time.Millisecond * 300 * tt.args.timeOut)
 			terminateChannel <- struct{}{}
 		})
 	}

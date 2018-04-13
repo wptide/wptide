@@ -1,32 +1,32 @@
-package main
+package payload
 
 import (
 	"github.com/wptide/pkg/message"
 	"io/ioutil"
 	"github.com/wptide/pkg/payload"
-	"fmt"
+	"log"
 )
 
-type filePayload struct{
-	terminateChan chan struct{}
+type FilePayload struct{
+	TerminateChannel chan struct{}
 }
 
 // SendPayload sends the results to a file.
-func (fp filePayload) SendPayload(destination string, payload []byte) ([]byte, error) {
+func (fp FilePayload) SendPayload(destination string, payload []byte) ([]byte, error) {
 	err := ioutil.WriteFile(destination, payload, 0664)
 	if err != nil {
 		return nil, err
 	}
-	if fp.terminateChan != nil {
-		fmt.Println("Payload sent to: " + destination)
+	if fp.TerminateChannel != nil {
+		log.Println("Payload sent to: " + destination)
 		// Terminate the server.
-		fp.terminateChan <- struct{}{}
+		fp.TerminateChannel <- struct{}{}
 	}
 	return []byte("ok"), nil
 }
 
 // BuildPayload uses the default TidePayload.
-func (fp filePayload) BuildPayload(msg message.Message, data map[string]interface{}) ([]byte, error) {
+func (fp FilePayload) BuildPayload(msg message.Message, data map[string]interface{}) ([]byte, error) {
 	pl := payload.TidePayload{}
 	return pl.BuildPayload(msg, data)
 }

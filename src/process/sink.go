@@ -1,4 +1,4 @@
-package main
+package process
 
 import (
 	"github.com/wptide/pkg/process"
@@ -7,9 +7,9 @@ import (
 )
 
 // Sink is the last process in our Pipeline and responsible for cleanup.
-type Sink struct{
+type Sink struct {
 	process.Process
-	In         <-chan process.Processor
+	In              <-chan process.Processor
 	MessageProvider message.MessageProvider
 }
 

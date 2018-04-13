@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"github.com/wptide/pkg/source"
 	"github.com/wptide/pkg/pipe"
+	commonProcess "github.com/xwp/go-tide/src/process"
+	commonPayload "github.com/xwp/go-tide/src/payload"
 )
 
 type processConfig struct {
@@ -41,8 +43,8 @@ var (
 		"tide": payload.TidePayload{
 			Client: TideClient,
 		},
-		"local-file": filePayload{
-			terminateChan: terminateChannel,
+		"local-file": commonPayload.FilePayload{
+			TerminateChannel: terminateChannel,
 		},
 	}
 
@@ -56,7 +58,7 @@ var (
 	tempFolder = env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp")
 
 	/** Processes Configuration **/
-	procCfg = processConfig{
+	procCfg = &processConfig{
 		tempFolder,
 		tempFolder,
 		storageProvider,
@@ -139,7 +141,7 @@ var (
 
 // initProcesses creates a number of processes for the pipeline.
 // With each process we connect the "In" and "Out" channels to subsequent processes.
-func initProcesses(source <-chan message.Message, config processConfig) ([]process.Processor, error) {
+func initProcesses(source <-chan message.Message, config *processConfig) ([]process.Processor, error) {
 
 	// Make sure we have a valid channel.
 	if source == nil {
@@ -147,14 +149,17 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 	}
 
 	// Make sure we have our config.
+	if config == nil {
+		return nil, errors.New("no config provided")
+	}
 	if config.igTempFolder == "" {
 		return nil, errors.New("no temp folder for ingest process")
 	}
 	if config.phpcsTempFolder == "" {
-		return nil, errors.New("no temp folder for lighthouse process")
+		return nil, errors.New("no temp folder for phpcs process")
 	}
 	if config.phpcsStorageProvider == nil {
-		return nil, errors.New("no storage provider for lighthouse process")
+		return nil, errors.New("no storage provider for phpcs process")
 	}
 	if config.resPayloaders == nil {
 		return nil, errors.New("no response payloaders to send to")
@@ -189,7 +194,7 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 		Payloaders: config.resPayloaders,
 	}
 
-	sink := &Sink{
+	sink := &commonProcess.Sink{
 		In: response.Out,
 		MessageProvider: messageProvider,
 	}
@@ -247,15 +252,10 @@ func main() {
 
 	/** Processes **/
 	log.Println("Initializing processes.")
-	processes, err := initProcesses(
+	processes, _ := initProcesses(
 		cMessage,
 		procCfg,
 	)
-
-	if err != nil {
-		log.Println("could not initiate processes")
-		terminateChannel <- struct{}{}
-	}
 
 	// Create and run the pipe.
 	go func() {
