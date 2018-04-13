@@ -55,15 +55,15 @@ define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/../wp-content' );
 
 // ** MySQL settings ** //
 if ( $is_gae ) {
-    define( 'DB_HOST',     ':/cloudsql/${GCP_PROJECT}:${GCP_REGION}:${API_GAE_SQL_INSTANCE_NAME}' );
-    define( 'DB_NAME',     '${API_GAE_SQL_DB}' );
-    define( 'DB_USER',     '${API_GAE_SQL_USER}' );
-    define( 'DB_PASSWORD', '${API_GAE_SQL_PASSWORD}' );
+    define( 'DB_HOST',     ':/cloudsql/${GCP_PROJECT}:${GCP_REGION}:${GCSQL_API_INSTANCE}' );
+    define( 'DB_NAME',     '${GCSQL_API_DB_NAME}' );
+    define( 'DB_USER',     '${GCSQL_API_DB_USER}' );
+    define( 'DB_PASSWORD', '${GCSQL_API_DB_PASSWORD}' );
 } else {
-    define( 'DB_HOST',     '${API_LOCAL_SQL_HOST}' );
-    define( 'DB_NAME',     '${API_LOCAL_SQL_DB}' );
-    define( 'DB_USER',     '${API_LOCAL_SQL_USER}' );
-    define( 'DB_PASSWORD', '${API_LOCAL_SQL_PASSWORD}' );
+    define( 'DB_HOST',     '${API_DB_HOST}' );
+    define( 'DB_NAME',     '${API_DB_NAME}' );
+    define( 'DB_USER',     '${API_DB_USER}' );
+    define( 'DB_PASSWORD', '${API_DB_PASSWORD}' );
 }
 
 /** Database Charset to use in creating database tables. */
@@ -115,19 +115,21 @@ $table_prefix  = 'wp_';
  */
 define( 'WP_DEBUG', ! $is_gae );
 
+// AWS API settings.
+define( 'AWS_API_KEY',         getenv( 'AWS_API_KEY' ) );
+define( 'AWS_API_SECRET',      getenv( 'AWS_API_SECRET' ) );
+
 // AWS S3 settings.
-define( 'AWS_S3_VERSION',     getenv( 'AWS_S3_VERSION' ) );
-define( 'AWS_S3_REGION',      getenv( 'AWS_S3_REGION' ) );
-define( 'AWS_S3_KEY',         getenv( 'AWS_S3_KEY' ) );
-define( 'AWS_S3_SECRET',      getenv( 'AWS_S3_SECRET' ) );
-define( 'AWS_S3_BUCKET_NAME', getenv( 'AWS_S3_BUCKET_NAME' ) );
+define( 'AWS_S3_BUCKET_NAME',  getenv( 'AWS_S3_BUCKET_NAME' ) );
+define( 'AWS_S3_REGION',       getenv( 'AWS_S3_REGION' ) );
+define( 'AWS_S3_VERSION',      getenv( 'AWS_S3_VERSION' ) );
 
 // AWS SQS settings.
-define( 'AWS_SQS_VERSION',    getenv( 'AWS_SQS_VERSION' ) );
-define( 'AWS_SQS_REGION',     getenv( 'AWS_SQS_REGION' ) );
-define( 'AWS_SQS_KEY',        getenv( 'AWS_SQS_KEY' ) );
-define( 'AWS_SQS_SECRET',     getenv( 'AWS_SQS_SECRET' ) );
-define( 'AWS_SQS_QUEUE_NAME', getenv( 'AWS_SQS_QUEUE_NAME' ) );
+define( 'AWS_SQS_QUEUE_LH',    getenv( 'AWS_SQS_QUEUE_LH' ) );
+define( 'AWS_SQS_QUEUE_PHPCS', getenv( 'AWS_SQS_QUEUE_PHPCS' ) );
+define( 'AWS_SQS_REGION',      getenv( 'AWS_SQS_REGION' ) );
+define( 'AWS_SQS_VERSION',     getenv( 'AWS_SQS_VERSION' ) );
+
 
 /* That's all, stop editing! Happy blogging. */
 

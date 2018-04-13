@@ -6,7 +6,7 @@
     }
   ],
   "require": {
-    "google/cloud": "~0.59",
+    "google/cloud": "~0.60",
     "johnpbloch/wordpress-core-installer": "^1",
     "johnpbloch/wordpress-core": "4.9.5",
     "slowprog/composer-copy-file": "~0.2",

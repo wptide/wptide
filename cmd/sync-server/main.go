@@ -49,21 +49,21 @@ var (
 			Accepts  string // "all" or "themes" or "plugins"
 		}{
 			"phpcs": {
-				env.GetEnv("PHPCS_SQS_REGION", ""),
-				env.GetEnv("PHPCS_SQS_KEY", ""),
-				env.GetEnv("PHPCS_SQS_SECRET", ""),
-				env.GetEnv("PHPCS_SQS_QUEUE_NAME", ""),
+				env.GetEnv("AWS_SQS_REGION", ""),
+				env.GetEnv("AWS_API_KEY", ""),
+				env.GetEnv("AWS_API_SECRET", ""),
+				env.GetEnv("AWS_SQS_QUEUE_PHPCS", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("PHPCS_SQS_QUEUE", "on")) == "on",
+				strings.ToLower(env.GetEnv("SYNC_PHPCS_ACTIVE", "on")) == "on",
 				"all",
 			},
 			"lighthouse": {
-				env.GetEnv("LH_SQS_REGION", ""),
-				env.GetEnv("LH_SQS_KEY", ""),
-				env.GetEnv("LH_SQS_SECRET", ""),
-				env.GetEnv("LH_SQS_QUEUE_NAME", ""),
+				env.GetEnv("AWS_SQS_REGION", ""),
+				env.GetEnv("AWS_API_KEY", ""),
+				env.GetEnv("AWS_API_SECRET", ""),
+				env.GetEnv("AWS_SQS_QUEUE_LH", ""),
 				apiEndpoint,
-				strings.ToLower(env.GetEnv("LH_SQS_QUEUE", "off")) == "on",
+				strings.ToLower(env.GetEnv("SYNC_LH_ACTIVE", "off")) == "on",
 				"themes",
 			},
 		},
@@ -71,9 +71,9 @@ var (
 	}
 
 	// Tide API settings.
-	apiVersion  = env.GetEnv("TIDE_API_VERSION", "v1")
-	apiProtocol = env.GetEnv("TIDE_API_PROTOCOL", "https")
-	apiHost     = env.GetEnv("TIDE_API_HOST", "wptide.org")
+	apiVersion  = env.GetEnv("API_VERSION", "v1")
+	apiProtocol = env.GetEnv("API_PROTOCOL", "https")
+	apiHost     = env.GetEnv("API_HTTP_HOST", "wptide.org")
 	apiEndpoint = fmt.Sprintf("%s://%s/api/tide/%s/audit", apiProtocol, apiHost, apiVersion)
 )
 

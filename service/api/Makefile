@@ -42,20 +42,20 @@ api.tpl:
 
 # Deploy the Cloud SQL database & setup the users.
 api.deploy.sql:
-	@gcloud sql instances create ${API_GAE_SQL_INSTANCE_NAME} \
+	@gcloud sql instances create ${GCSQL_API_INSTANCE} \
 	--region ${GCP_REGION} \
-	--tier ${API_GAE_SQL_MACHINE_TYPE} \
-	--storage-size ${API_GAE_SQL_STORAGE_SIZE} \
-	--database-version ${API_GAE_SQL_DB_VERSION} \
-	--backup-start-time ${API_GAE_SQL_BACKUP_START_TIME} \
+	--tier ${GCSQL_API_TIER} \
+	--storage-size ${GCSQL_API_STORAGE_SIZE} \
+	--database-version ${GCSQL_API_DATABASE_VERSION} \
+	--backup-start-time ${GAE_API_SQL_BACKUP_START_TIME} \
 	--enable-bin-log \
-	--failover-replica-name ${API_GAE_SQL_INSTANCE_FAILOVER_NAME} \
-	--maintenance-release-channel ${API_GAE_SQL_MAINTENANCE_RELEASE_CHANNEL} \
-	--maintenance-window-day ${API_GAE_SQL_MAINTENANCE_WINDOW_DAY} \
-	--maintenance-window-hour ${API_GAE_SQL_MAINTENANCE_WINDOW_HOUR}
-	@gcloud sql users set-password root % --instance ${API_GAE_SQL_INSTANCE_NAME} --password "${API_GAE_SQL_ROOT_PASSWORD}"
-	@gcloud sql databases create ${API_GAE_SQL_DB} --instance ${API_GAE_SQL_INSTANCE_NAME} --charset utf8 --collation utf8_general_ci
-	@gcloud sql users create ${API_GAE_SQL_USER} % --instance ${API_GAE_SQL_INSTANCE_NAME} --password "${API_GAE_SQL_PASSWORD}"
+	--failover-replica-name ${GCSQL_API_FAILOVER_REPLICA_NAME} \
+	--maintenance-release-channel ${GCSQL_API_MAINTENANCE_RELEASE_CHANNEL} \
+	--maintenance-window-day ${GCSQL_API_MAINTENANCE_WINDOW_DAY} \
+	--maintenance-window-hour ${GCSQL_API_MAINTENANCE_WINDOW_HOUR}
+	@gcloud sql users set-password root % --instance ${GCSQL_API_INSTANCE} --password "${GCSQL_API_DB_ROOT_PASSWORD}"
+	@gcloud sql databases create ${GCSQL_API_DB_NAME} --instance ${GCSQL_API_INSTANCE} --charset utf8 --collation utf8_general_ci
+	@gcloud sql users create ${GCSQL_API_DB_USER} % --instance ${GCSQL_API_INSTANCE} --password "${GCSQL_API_DB_PASSWORD}"
 
 # Deploy the API to Google App Engine.
 api.deploy.app:

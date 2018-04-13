@@ -14,32 +14,29 @@ services:
         ports:
             - 80:8080
         environment:
-            API_LOCAL_ADMIN_EMAIL: ${API_LOCAL_ADMIN_EMAIL}
-            API_LOCAL_ADMIN_PASSWORD: ${API_LOCAL_ADMIN_PASSWORD}
-            API_LOCAL_ADMIN_USER: ${API_LOCAL_ADMIN_USER}
-            API_LOCAL_DESCRIPTION: ${API_LOCAL_DESCRIPTION}
-            API_LOCAL_DOMAIN: ${API_LOCAL_DOMAIN}
-            API_LOCAL_THEME_NAME: ${API_LOCAL_THEME_NAME}
-            API_LOCAL_TITLE: ${API_LOCAL_TITLE}
-            API_LOCAL_SQL_HOST: ${API_LOCAL_SQL_HOST}
-            API_LOCAL_SQL_HOST_PORT: ${API_LOCAL_SQL_HOST_PORT}
-            API_LOCAL_SQL_DB: ${API_LOCAL_SQL_DB}
-            API_LOCAL_SQL_PASSWORD: ${API_LOCAL_SQL_PASSWORD}
-            API_LOCAL_SQL_ROOT_PASSWORD: ${API_LOCAL_SQL_ROOT_PASSWORD}
-            API_LOCAL_SQL_USER: ${API_LOCAL_SQL_USER}
+            API_ADMIN_EMAIL: ${API_ADMIN_EMAIL}
+            API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD}
+            API_ADMIN_USER: ${API_ADMIN_USER}
+            API_BLOG_DESCRIPTION: ${API_BLOG_DESCRIPTION}
+            API_BLOG_NAME: ${API_BLOG_NAME}
+            API_DB_HOST: ${API_DB_HOST}
+            API_DB_NAME: ${API_DB_NAME}
+            API_DB_PASSWORD: ${API_DB_PASSWORD}
+            API_DB_ROOT_PASSWORD: ${API_DB_ROOT_PASSWORD}
+            API_DB_USER: ${API_DB_USER}
+            API_HTTP_HOST: ${API_HTTP_HOST}
+            API_KEY: ${API_KEY}
+            API_SECRET: ${API_SECRET}
+            API_THEME: ${API_THEME}
+            AWS_API_KEY: ${AWS_API_KEY}
+            AWS_API_SECRET: ${AWS_API_SECRET}
             AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
-            AWS_S3_KEY: ${AWS_S3_KEY}
             AWS_S3_REGION: ${AWS_S3_REGION}
-            AWS_S3_SECRET: ${AWS_S3_SECRET}
             AWS_S3_VERSION: ${AWS_S3_VERSION}
-            AWS_SQS_KEY: ${AWS_SQS_KEY}
-            AWS_SQS_QUEUE_NAME: ${AWS_SQS_QUEUE_NAME}
+            AWS_SQS_QUEUE_LH: ${AWS_SQS_QUEUE_LH}
+            AWS_SQS_QUEUE_PHPCS: ${AWS_SQS_QUEUE_PHPCS}
             AWS_SQS_REGION: ${AWS_SQS_REGION}
-            AWS_SQS_SECRET: ${AWS_SQS_SECRET}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
-            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
-            TIDE_API_KEY: ${TIDE_API_KEY}
-            TIDE_API_SECRET: ${TIDE_API_SECRET}
             DOCUMENT_ROOT: /app/wordpress
             GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
 
@@ -51,69 +48,73 @@ services:
             - ./data/api/mysql:/var/lib/mysql
             - ./service/api/wptests.sql:/docker-entrypoint-initdb.d/wptests.sql
         environment:
-            MYSQL_DATABASE: ${API_LOCAL_SQL_DB}
-            MYSQL_PASSWORD: ${API_LOCAL_SQL_PASSWORD}
-            MYSQL_ROOT_PASSWORD: ${API_LOCAL_SQL_ROOT_PASSWORD}
-            MYSQL_USER: ${API_LOCAL_SQL_USER}
+            MYSQL_DATABASE: ${API_DB_NAME}
+            MYSQL_PASSWORD: ${API_DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${API_DB_ROOT_PASSWORD}
+            MYSQL_USER: ${API_DB_USER}
 
 ### Lighthouse Server ###########################################
     lighthouse-server:
-        image: ${LH_GKE_IMAGE}:latest
+        image: ${GKE_LH_IMAGE}:latest
         volumes:
             - ./data/lighthouse-server:/srv/data
         environment:
-            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
-            TIDE_API_HOST: ${TIDE_API_HOST}
-            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
-            TIDE_API_KEY: ${TIDE_API_KEY}
-            TIDE_API_SECRET: ${TIDE_API_SECRET}
-            TIDE_API_VERSION: ${TIDE_API_VERSION}
-            LH_SQS_VERSION: ${LH_SQS_VERSION}
-            LH_SQS_REGION: ${LH_SQS_REGION}
-            LH_SQS_KEY: ${LH_SQS_KEY}
-            LH_SQS_SECRET: ${LH_SQS_SECRET}
-            LH_SQS_QUEUE_NAME: ${LH_SQS_QUEUE_NAME}
-            LH_S3_REGION: ${LH_S3_REGION}
-            LH_S3_KEY: ${LH_S3_KEY}
-            LH_S3_SECRET: ${LH_S3_SECRET}
-            LH_S3_BUCKET_NAME: ${LH_S3_BUCKET_NAME}
+            API_AUTH_URL: ${API_AUTH_URL}
+            API_HTTP_HOST: ${API_HTTP_HOST}
+            API_KEY: ${API_KEY}
+            API_PROTOCOL: ${API_PROTOCOL}
+            API_SECRET: ${API_SECRET}
+            API_VERSION: ${API_VERSION}
+            AWS_API_KEY: ${AWS_API_KEY}
+            AWS_API_SECRET: ${AWS_API_SECRET}
+            AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+            AWS_S3_REGION: ${AWS_S3_REGION}
+            AWS_S3_VERSION: ${AWS_S3_VERSION}
+            AWS_SQS_QUEUE_LH: ${AWS_SQS_QUEUE_LH}
+            AWS_SQS_REGION: ${AWS_SQS_REGION}
+            AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
         network_mode: host
 
 ### PHPCS Server ################################################
     phpcs-server:
-        image: ${PHPCS_GKE_IMAGE}:latest
+        image: ${GKE_PHPCS_IMAGE}:latest
         volumes:
             - ./data/phpcs-server:/srv/data
         environment:
-            TIDE_API_AUTH_URL: ${TIDE_API_AUTH_URL}
-            TIDE_API_HOST: ${TIDE_API_HOST}
-            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
-            TIDE_API_KEY: ${TIDE_API_KEY}
-            TIDE_API_SECRET: ${TIDE_API_SECRET}
-            TIDE_API_VERSION: ${TIDE_API_VERSION}
-            PHPCS_SQS_VERSION: ${PHPCS_SQS_VERSION}
-            PHPCS_SQS_REGION: ${PHPCS_SQS_REGION}
-            PHPCS_SQS_KEY: ${PHPCS_SQS_KEY}
-            PHPCS_SQS_SECRET: ${PHPCS_SQS_SECRET}
-            PHPCS_SQS_QUEUE_NAME: ${PHPCS_SQS_QUEUE_NAME}
-            PHPCS_S3_REGION: ${PHPCS_S3_REGION}
-            PHPCS_S3_KEY: ${PHPCS_S3_KEY}
-            PHPCS_S3_SECRET: ${PHPCS_S3_SECRET}
-            PHPCS_S3_BUCKET_NAME: ${PHPCS_S3_BUCKET_NAME}
+            API_AUTH_URL: ${API_AUTH_URL}
+            API_HTTP_HOST: ${API_HTTP_HOST}
+            API_KEY: ${API_KEY}
+            API_PROTOCOL: ${API_PROTOCOL}
+            API_SECRET: ${API_SECRET}
+            API_VERSION: ${API_VERSION}
+            AWS_API_KEY: ${AWS_API_KEY}
+            AWS_API_SECRET: ${AWS_API_SECRET}
+            AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+            AWS_S3_REGION: ${AWS_S3_REGION}
+            AWS_S3_VERSION: ${AWS_S3_VERSION}
+            AWS_SQS_QUEUE_PHPCS: ${AWS_SQS_QUEUE_PHPCS}
+            AWS_SQS_REGION: ${AWS_SQS_REGION}
+            AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
             PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
         network_mode: host
 
 ### Sync Server #################################################
     sync-server:
-        image: ${SYNC_GKE_IMAGE}:latest
+        image: ${GKE_SYNC_IMAGE}:latest
         volumes:
             - ./data/sync-server:/srv/data
         environment:
-            TIDE_API_HOST: ${TIDE_API_HOST}
-            TIDE_API_PROTOCOL: ${TIDE_API_PROTOCOL}
-            TIDE_API_VERSION: ${TIDE_API_VERSION}
+            API_HTTP_HOST: ${API_HTTP_HOST}
+            API_PROTOCOL: ${API_PROTOCOL}
+            API_VERSION: ${API_VERSION}
+            AWS_API_KEY: ${AWS_API_KEY}
+            AWS_API_SECRET: ${AWS_API_SECRET}
+            AWS_SQS_QUEUE_LH: ${AWS_SQS_QUEUE_LH}
+            AWS_SQS_QUEUE_PHPCS: ${AWS_SQS_QUEUE_PHPCS}
+            AWS_SQS_REGION: ${AWS_SQS_REGION}
+            AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             SYNC_ACTIVE: ${SYNC_ACTIVE}
             SYNC_API_BROWSE_CATEGORY: ${SYNC_API_BROWSE_CATEGORY}
             SYNC_DATA: ${SYNC_DATA}
@@ -121,16 +122,8 @@ services:
             SYNC_DEFAULT_VISIBILITY: ${SYNC_DEFAULT_VISIBILITY}
             SYNC_FORCE_AUDITS: ${SYNC_FORCE_AUDITS}
             SYNC_ITEMS_PER_PAGE: ${SYNC_ITEMS_PER_PAGE}
+            SYNC_LH_ACTIVE: ${SYNC_LH_ACTIVE}
+            SYNC_PHPCS_ACTIVE: ${SYNC_PHPCS_ACTIVE}
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
-            PHPCS_SQS_KEY: ${PHPCS_SQS_KEY}
-            PHPCS_SQS_QUEUE: ${PHPCS_SQS_QUEUE}
-            PHPCS_SQS_QUEUE_NAME: ${PHPCS_SQS_QUEUE_NAME}
-            PHPCS_SQS_REGION: ${PHPCS_SQS_REGION}
-            PHPCS_SQS_SECRET: ${PHPCS_SQS_SECRET}
-            LH_SQS_KEY: ${LH_SQS_KEY}
-            LH_SQS_QUEUE: ${LH_SQS_QUEUE}
-            LH_SQS_QUEUE_NAME: ${LH_SQS_QUEUE_NAME}
-            LH_SQS_REGION: ${LH_SQS_REGION}
-            LH_SQS_SECRET: ${LH_SQS_SECRET}
         network_mode: host

@@ -20,27 +20,28 @@ import (
 var (
 	envTest = map[string]string{
 		// Tide API config
-		"TIDE_API_AUTH_URL": "http://tide.local/api/tide/v1/auth",
-		"TIDE_API_HOST":     "tide.local",
-		"TIDE_API_PROTOCOL": "http",
-		"TIDE_API_KEY":      "tideapikey",
-		"TIDE_API_SECRET":   "tideapisecret",
-		"TIDE_API_VERSION":  "v1",
-		// AWS SQS settings
-		"LH_SQS_VERSION":    "2012-11-05",
-		"LH_SQS_REGION":     "us-west-2",
-		"LH_SQS_KEY":        "sqskey",
-		"LH_SQS_SECRET":     "sqssecret",
-		"LH_SQS_QUEUE_NAME": "test-queue",
+		"API_AUTH_URL":        "http://tide.local/api/tide/v1/auth",
+		"API_HTTP_HOST":       "tide.local",
+		"API_PROTOCOL":        "http",
+		"API_KEY":             "tideapikey",
+		"API_SECRET":          "tideapisecret",
+		"API_VERSION":         "v1",
+		//
+		// AWS API settings
+		"AWS_API_KEY":         "sqskey",
+		"AWS_API_SECRET":      "sqssecret",
 		//
 		// AWS S3 settings
-		"LH_S3_REGION":      "us-west-2",
-		"LH_S3_KEY":         "s3key",
-		"LH_S3_SECRET":      "s3secret",
-		"LH_S3_BUCKET_NAME": "test-bucket",
+		"AWS_S3_BUCKET_NAME":   "test-bucket",
+		"AWS_S3_REGION":        "us-west-2",
+		//
+		// AWS SQS settings
+		"AWS_SQS_QUEUE_LH":     "test-queue",
+		"AWS_SQS_REGION":       "us-west-2",
+		"AWS_SQS_VERSION":      "2012-11-05",
 		//
 		// LH Server settings
-		"LH_CONCURRENT_AUDITS":      "1",
+		"LH_CONCURRENT_AUDITS": "1",
 	}
 )
 
@@ -256,10 +257,10 @@ func setupConfig() {
 		secret string
 		queue  string
 	}{
-		env.GetEnv("LH_SQS_REGION", ""),
-		env.GetEnv("LH_SQS_KEY", ""),
-		env.GetEnv("LH_SQS_SECRET", ""),
-		env.GetEnv("LH_SQS_QUEUE_NAME", ""),
+		env.GetEnv("AWS_SQS_REGION", ""),
+		env.GetEnv("AWS_API_KEY", ""),
+		env.GetEnv("AWS_API_SECRET", ""),
+		env.GetEnv("AWS_SQS_QUEUE_LH", ""),
 	}
 }
 

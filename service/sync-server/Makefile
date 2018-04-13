@@ -1,5 +1,5 @@
 # Sync Server Docker settings.
-export SYNC_GCR_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${SYNC_GKE_IMAGE}:${VERSION}
+export GCR_SYNC_IMAGE_TAG=gcr.io/${GCP_PROJECT}/${GKE_SYNC_IMAGE}:${VERSION}
 
 # Sync Server GO settings.
 SYNC_BIN_PATH=bin/sync-server
@@ -36,9 +36,9 @@ sync.clean.bin:
 
 # Build the Sync Server Docker image.
 sync.build.image: deps sync.clean.bin sync.build.bin
-	@echo "Building Docker image [${SYNC_GCR_IMAGE_TAG}] ..."
-	@docker build -f service/sync-server/docker/Dockerfile -t ${SYNC_GCR_IMAGE_TAG} --no-cache .
-	@docker tag ${SYNC_GCR_IMAGE_TAG} ${SYNC_GKE_IMAGE}:latest
+	@echo "Building Docker image [${GCR_SYNC_IMAGE_TAG}] ..."
+	@docker build -f service/sync-server/docker/Dockerfile -t ${GCR_SYNC_IMAGE_TAG} --no-cache .
+	@docker tag ${GCR_SYNC_IMAGE_TAG} ${GKE_SYNC_IMAGE}:latest
 
 # Rebuild & run the Sync Server Docker image in isolation with docker-compose up.
 sync.build.up: sync.build.image sync.up
@@ -60,21 +60,21 @@ sync.rm:
 
 # Push the Sync Server Docker image to GCR.
 sync.push.image:
-	@gcloud docker -- push ${SYNC_GCR_IMAGE_TAG}
+	@gcloud docker -- push ${GCR_SYNC_IMAGE_TAG}
 
 # Clean the Sync Server Docker image from the host machine.
 sync.clean.image:
-	@docker rmi ${SYNC_GCR_IMAGE_TAG}
-	@docker rmi ${SYNC_GKE_IMAGE}:latest
+	@docker rmi ${GCR_SYNC_IMAGE_TAG}
+	@docker rmi ${GKE_SYNC_IMAGE}:latest
 
 # Build the Sync Server GKE cluster.
 sync.build.cluster: config
-	@gcloud container --project ${GCP_PROJECT} clusters create ${SYNC_GKE_CLUSTER} \
+	@gcloud container --project ${GCP_PROJECT} clusters create ${GKE_SYNC_CLUSTER} \
 	--zone ${GCP_ZONE} \
-	--cluster-version ${SYNC_GKE_CLUSTER_VERSION} \
-	--machine-type ${SYNC_GKE_MACHINE_TYPE} \
+	--cluster-version ${GKE_SYNC_CLUSTER_VERSION} \
+	--machine-type ${GKE_SYNC_MACHINE_TYPE} \
 	--image-type "COS" \
-	--disk-size ${SYNC_GKE_DISK_SIZE} \
+	--disk-size ${GKE_SYNC_DISK_SIZE} \
 	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
 	--preemptible \
 	--num-nodes 1 \
@@ -83,7 +83,7 @@ sync.build.cluster: config
 
 # Get the Sync Server GKE cluster credentials.
 sync.creds:
-	@gcloud container clusters get-credentials ${SYNC_GKE_CLUSTER}
+	@gcloud container clusters get-credentials ${GKE_SYNC_CLUSTER}
 
 # Generate the Sync Server GKE YAML template.
 sync.tpl:
@@ -98,9 +98,9 @@ sync.deploy.cluster: config sync.creds sync.tpl
 
 # Get the Sync Server GKE cluster status.
 sync.get.cluster: config sync.creds
-	@kubectl get deployment ${SYNC_GKE_CLUSTER} -o yaml
+	@kubectl get deployment ${GKE_SYNC_CLUSTER} -o yaml
 
 # Clean the Sync Server GKE cluster.
 sync.clean.cluster: config sync.creds sync.tpl
 	@kubectl delete -f service/sync-server/kubernetes/deployment.yaml
-	@gcloud container clusters delete ${SYNC_GKE_CLUSTER} -q
+	@gcloud container clusters delete ${GKE_SYNC_CLUSTER} -q
