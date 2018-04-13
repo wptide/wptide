@@ -15,12 +15,25 @@ We believe the web can be better. With Tide, the code which underpins every webs
    + [Cloning](#cloning)
    + [Setup]($setup)
    + [API](#api)
+       - [API Settings](#api-settings)
    + [Lighthouse Server](#lighthouse-server)
+       - [Lighthouse Server Settings](#lighthouse-server-settings)
    + [PHPCS Server](#phpcs-server)
+       - [PHPCS Server Settings](#phpcs-server-settings)
    + [Sync Server](#sync-server)
-   + [Deployment](#deployment)
-       - [Google App Engine](#google-app-engine)
-       - [Google Kubernetes Engine](#google-kubernetes-engine)
+       - [Sync Server Settings](#sync-server-settings)
+   + [Deployments to Google Cloud Platform (GCP)](#deployments-to-google-cloud-platform-(gcp))
+       - [GCP Settings](#gcp-settings)
+       - [Google Cloud SQL (GCSQL)](#google-cloud-sql-(gcsql))
+           * [GCSQL API Settings](#gcsql-api-settings)
+       - [Google App Engine (GAE)](#google-app-engine-(gae))
+           * [GAE API Settings](#gae-api-settings)
+       - [Google Kubernetes Engine (GKE)](#google-kubernetes-engine-(gke))
+           * [GKE Lighthouse Server Settings](#gke-lighthouse-server-settings)
+           * [GKE PHPCS Server Settings](#gke-phpcs-server-settings)
+           * [GKE Sync Server Settings](#gke-sync-server-settings)
+   + [AWS](#aws)
+       - [AWS Settings](#aws-settings)
    + [Contributing](#contributing)
    + [Contact Us](#contact-us)
    + [Credits](#credits)
@@ -70,7 +83,7 @@ cp .env.dist .env
 
 ```
 
-_Update placeholder values in `.env` to reflect your environment. For example, Tide API specific details; AWS key pairs; SQS queues and S3 buckets._
+_Update the value for each [environment variable](#environment-variables) in your custom `.env` file._
 
 Configure Google Cloud SDK with your account and the appropriate project ID:
 
@@ -124,6 +137,28 @@ The local database is stored in the `data/api/mysql` directory. If you ever need
 
 Note: Running `make down` will stop all Docker services.
 
+#### API Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `API_ADMIN_EMAIL` | @todo |
+| `API_ADMIN_PASSWORD` | @todo |
+| `API_ADMIN_USER` | @todo |
+| `API_AUTH_URL` | @todo Default is `http://tide.local/api/tide/v1/auth` |
+| `API_BLOG_DESCRIPTION` | @todo Default is `Automated insight into your WordPress code`. |
+| `API_BLOG_NAME` | @todo Default is `Tide`. |
+| `API_DB_HOST` | @todo Default is `api-mysql`. |
+| `API_DB_NAME` | @todo Default is `wordpress`. |
+| `API_DB_PASSWORD` | @todo Default is `wordpress`. |
+| `API_DB_ROOT_PASSWORD` | @todo Default is `wordpress`. |
+| `API_DB_USER` | @todo Default is `wordpress`. |
+| `API_HTTP_HOST` | @todo Default is `tide.local`. |
+| `API_KEY` | @todo |
+| `API_PROTOCOL` | @todo Default is `http`. |
+| `API_SECRET` | @todo |
+| `API_THEME` | @todo Default is `twentyseventeen`. |
+| `API_VERSION` | @todo Default is `v1`. |
+
 ### Lighthouse Server
 
 First build the Lighthouse Server Docker image:
@@ -149,6 +184,12 @@ Take the isolated Lighthouse Server down:
 ```
 $ make lighthouse.down
 ```
+
+#### Lighthouse Server Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `LH_CONCURRENT_AUDITS` | @todo Default is `5` |
 
 ### PHPCS Server
 
@@ -176,6 +217,13 @@ Take the isolated PHPCS Server down:
 $ make phpcs.down
 ```
 
+#### PHPCS Server Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `PHPCS_CONCURRENT_AUDITS` | @todo Default is `5` |
+| `PHPCS_TEMP_FOLDER` | @todo Default is `/tmp` |
+
 ### Sync Server
 
 First build the Sync Server Docker image:
@@ -202,14 +250,60 @@ Take the isolated Sync Server down:
 $ make sync.down
 ```
 
-### Deployment
+#### Sync Server Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `SYNC_ACTIVE` | @todo Default is `off` |
+| `SYNC_API_BROWSE_CATEGORY` | @todo Default is `updated` |
+| `SYNC_DATA` | @todo Default is `/srv/data` |
+| `SYNC_DEFAULT_CLIENT` | @todo Default is `wporg` |
+| `SYNC_DEFAULT_VISIBILITY` | @todo Default is `public` |
+| `SYNC_FORCE_AUDITS` | @todo Default is `no` |
+| `SYNC_ITEMS_PER_PAGE` | @todo Default is `250` |
+| `SYNC_LH_ACTIVE` | @todo Default is `off` |
+| `SYNC_PHPCS_ACTIVE` | @todo Default is `on` |
+| `SYNC_POOL_DELAY` | @todo Default is `600` |
+| `SYNC_POOL_WORKERS` | @todo Default is `125` |
+
+### Deployments to Google Cloud Platform (GCP)
 
 To make deploying services easier you can create an `.env.gcp` file in the 
 project root that will override values in `.env`. However, this only effects 
 the `.tpl` files that get converted, which are used to deploy to your project 
 on GCP.
 
-#### Google App Engine
+#### GCP Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCP_PROJECT` | @todo |
+| `GCP_REGION` | @todo |
+| `GCP_ZONE` | @todo |
+
+#### Google Cloud SQL (GCSQL)
+
+@todo
+
+##### GCSQL API Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCSQL_API_BACKUP_START_TIME` | @todo |
+| `GCSQL_API_DATABASE_VERSION` | @todo |
+| `GCSQL_API_DB_NAME` | @todo |
+| `GCSQL_API_DB_PASSWORD` | @todo |
+| `GCSQL_API_DB_ROOT_PASSWORD` | @todo |
+| `GCSQL_API_DB_USER` | @todo |
+| `GCSQL_API_INSTANCE` | @todo |
+| `GCSQL_API_FAILOVER_REPLICA_NAME` | @todo |
+| `GCSQL_API_TIER` | @todo |
+| `GCSQL_API_MAINTENANCE_RELEASE_CHANNEL` | @todo |
+| `GCSQL_API_MAINTENANCE_WINDOW_DAY` | @todo |
+| `GCSQL_API_MAINTENANCE_WINDOW_HOUR` | @todo |
+| `GCSQL_API_STORAGE_SIZE` | @todo |
+
+#### Google App Engine (GAE)
 
 Deploying the API to App Engine is fairly straight forward. You'll need to 
 provision a database and then deploy the app. With one caveat. The first time 
@@ -250,7 +344,22 @@ make api.deploy.app
 _You will need to activate the plugins, create the necessary API user accounts, 
 and setup permalinks manually._
 
-#### Google Kubernetes Engine
+##### GAE API Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GAE_API_AS_COOL_DOWN_PERIOD_SEC` | @todo |
+| `GAE_API_AS_CPU_TARGET_UTILIZATION` | @todo |
+| `GAE_API_AS_MAX_NUM_INSTANCES` | @todo |
+| `GAE_API_AS_MIN_NUM_INSTANCES` | @todo |
+| `GAE_API_CRON_SCHEDULE_MINS` | @todo |
+| `GAE_API_RC_APP_START_TIMEOUT_SEC` | @todo |
+| `GAE_API_RC_CHECK_INTERVAL_SEC` | @todo |
+| `GAE_API_RC_FAILURE_THRESHOLD` | @todo |
+| `GAE_API_RC_SUCCESS_THRESHOLD` | @todo |
+| `GAE_API_RC_TIMEOUT_SEC` | @todo |
+
+#### Google Kubernetes Engine (GKE)
 
 All the Go routines are deployed with the same basic steps. Push the image to 
 Google Container Registry (GCR), create the Kubernetes cluster, and then create 
@@ -282,6 +391,68 @@ Delete the GKE cluster:
 ```
 make phpcs.clean.cluster
 ```
+
+##### GKE Lighthouse Server Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GKE_LH_CLUSTER` | @todo |
+| `GKE_LH_CLUSTER_VERSION` | @todo |
+| `GKE_LH_CPU_PERCENT` | @todo |
+| `GKE_LH_DISK_SIZE` | @todo |
+| `GKE_LH_IMAGE` | Default is`lighthouse-server`. |
+| `GKE_LH_MACHINE_TYPE` | @todo |
+| `GKE_LH_MAX_NODES` | @todo |
+| `GKE_LH_MAX_PODS` | @todo |
+| `GKE_LH_MIN_NODES` | @todo |
+| `GKE_LH_MIN_PODS` | @todo |
+| `GKE_LH_NUM_NODES` | @todo |
+| `GKE_LH_REPLICAS` | @todo |
+
+##### GKE PHPCS Server Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GKE_PHPCS_CLUSTER` | @todo |
+| `GKE_PHPCS_CLUSTER_VERSION` | @todo |
+| `GKE_PHPCS_CPU_PERCENT` | @todo |
+| `GKE_PHPCS_DISK_SIZE` | @todo |
+| `GKE_PHPCS_IMAGE` | Default is `phpcs-server`. |
+| `GKE_PHPCS_MACHINE_TYPE` | @todo |
+| `GKE_PHPCS_MAX_NODES` | @todo |
+| `GKE_PHPCS_MAX_PODS` | @todo |
+| `GKE_PHPCS_MIN_NODES` | @todo |
+| `GKE_PHPCS_MIN_PODS` | @todo |
+| `GKE_PHPCS_NUM_NODES` | @todo |
+| `GKE_PHPCS_REPLICAS` | @todo |
+
+##### GKE Sync Server Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GKE_SYNC_CLUSTER` | @todo |
+| `GKE_SYNC_CLUSTER_VERSION` | @todo |
+| `GKE_SYNC_DISK_SIZE` | @todo |
+| `GKE_SYNC_IMAGE` | Default is `sync-server`. |
+| `GKE_SYNC_MACHINE_TYPE` | @todo |
+
+### AWS
+
+@todo
+
+#### AWS Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `AWS_API_KEY` | The AWS API key. |
+| `AWS_API_SECRET` | The AWS API secret. |
+| `AWS_S3_BUCKET_NAME` | The name of the S3 bucket.  |
+| `AWS_S3_REGION` | The region of the S3 bucket. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region).  |
+| `AWS_S3_VERSION` | The S3 API version. Default is `2006-03-01` |
+| `AWS_SQS_QUEUE_LH` | The name of the SQS queue for the Lighthouse Server. |
+| `AWS_SQS_QUEUE_PHPCS` | The name of the SQS queue for the PHPCS Server. |
+| `AWS_SQS_REGION` | The region of the SQS queue. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region).  |
+| `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05` |
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.

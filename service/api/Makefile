@@ -47,7 +47,7 @@ api.deploy.sql:
 	--tier ${GCSQL_API_TIER} \
 	--storage-size ${GCSQL_API_STORAGE_SIZE} \
 	--database-version ${GCSQL_API_DATABASE_VERSION} \
-	--backup-start-time ${GAE_API_SQL_BACKUP_START_TIME} \
+	--backup-start-time ${GCSQL_API_BACKUP_START_TIME} \
 	--enable-bin-log \
 	--failover-replica-name ${GCSQL_API_FAILOVER_REPLICA_NAME} \
 	--maintenance-release-channel ${GCSQL_API_MAINTENANCE_RELEASE_CHANNEL} \
