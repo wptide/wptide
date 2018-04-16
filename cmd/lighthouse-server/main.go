@@ -14,10 +14,12 @@ import (
 	"flag"
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
-	"github.com/pkg/errors"
+	"errors"
 	"fmt"
 	"github.com/wptide/pkg/source"
 	"github.com/wptide/pkg/pipe"
+	commonProcess "github.com/xwp/go-tide/src/process"
+	commonPayload "github.com/xwp/go-tide/src/payload"
 )
 
 type processConfig struct {
@@ -41,7 +43,7 @@ var (
 		"tide": payload.TidePayload{
 			Client: TideClient,
 		},
-		"local-file": filePayload{},
+		"local-file": commonPayload.FilePayload{},
 	}
 
 	// messageProvider is the primary source of messages to process.
@@ -183,11 +185,17 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 		Payloaders: config.resPayloaders,
 	}
 
+	sink := &commonProcess.Sink{
+		In: response.Out,
+		MessageProvider: messageProvider,
+	}
+
 	return []process.Processor{
 		ingest,
 		info,
 		lh,
 		response,
+		sink,
 	}, nil
 }
 

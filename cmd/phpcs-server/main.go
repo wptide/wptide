@@ -14,7 +14,7 @@ import (
 	"flag"
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
-	"github.com/pkg/errors"
+	"errors"
 	"fmt"
 	"github.com/wptide/pkg/source"
 	"github.com/wptide/pkg/pipe"
