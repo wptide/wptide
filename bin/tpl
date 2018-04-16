@@ -69,7 +69,7 @@ if [ ! -z ${ENV_FILE} ]; then
     if [ -e ${ENV_FILE} ]; then
         export $(cat ${ENV_FILE} | grep -v ^# | xargs)
     else
-        echo "${RED}error${RESET}: The environment file [${CYAN}${ENV_FILE}${RESET}] does not exist at the location provided."
+        echo "${YELLOW}warning${RESET}: The custom environment file [${CYAN}${ENV_FILE}${RESET}] does not exist at the location provided."
     fi
 fi
 
