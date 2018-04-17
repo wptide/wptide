@@ -43,7 +43,9 @@ var (
 		"tide": payload.TidePayload{
 			Client: TideClient,
 		},
-		"local-file": commonPayload.FilePayload{},
+		"local-file": commonPayload.FilePayload{
+			TerminateChannel: terminateChannel,
+		},
 	}
 
 	// messageProvider is the primary source of messages to process.
@@ -182,6 +184,7 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 	// Not chaining response, so no need for Out channel.
 	response := &process.Response{
 		In:         lh.Out,
+		Out:        make(chan process.Processor),
 		Payloaders: config.resPayloaders,
 	}
 
@@ -200,6 +203,8 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 }
 
 func main() {
+
+	log.Println("Starting Lighthouse audit server.")
 
 	if bParseFlags {
 		// Is the -version flag being used?
@@ -229,6 +234,35 @@ func main() {
 		log.SetFlags(oldFlags)
 	}
 
+	// Prepare the Tide Client if we're not writing to file.
+	if *flagOutput == "" {
+		log.Println("Authenticating with Tide API.")
+		err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
+		if err != nil {
+			log.Println("Tide API Error:", err)
+			terminateChannel <- struct{}{}
+		}
+	}
+
+	/** Processes **/
+	log.Println("Initializing processes.")
+	processes, _ := initProcesses(
+		cMessage,
+		procCfg,
+	)
+
+	// Create and run the pipe.
+	go func() {
+		// Create New Pipe with processes.
+		log.Println("Starting processing pipeline.")
+		pipeline := pipe.WithProcesses(processes...)
+
+		err := pipeline.Run()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	// If -url is set then send a message using the URL.
 	if *flagUrl != "" {
 
@@ -241,54 +275,40 @@ func main() {
 			singleMessageEndpoint = *flagOutput
 		}
 
-		cMessage <- message.Message{
-			ResponseAPIEndpoint: singleMessageEndpoint,
-			Title:               "Single Project",
-			Content:             "Single project URL provided.",
-			PayloadType:         singleMessageType,
-			SourceURL:           *flagUrl,
-			SourceType:          source.GetKind(*flagUrl),
-			Force:               true,
-			Visibility:          *flagVisibility,
-			RequestClient:       *flagClient,
-		}
+		go func() {
+			cMessage <- message.Message{
+				ResponseAPIEndpoint: singleMessageEndpoint,
+				Title:               "Single Project",
+				Content:             "Single project URL provided.",
+				PayloadType:         singleMessageType,
+				SourceURL:           *flagUrl,
+				SourceType:          source.GetKind(*flagUrl),
+				Force:               true,
+				Visibility:          *flagVisibility,
+				RequestClient:       *flagClient,
+				Audits: &[]message.Audit{
+					{
+						Type: "lighthouse",
+						Options: &message.AuditOption{},
+					},
+				},
+			}
+		}()
 	}
 
-	// Prepare the Tide Client.
-	err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
-	if err != nil {
-		log.Println("Tide API Error:", err)
-		terminateChannel <- struct{}{}
-	}
-
-	/** Processes **/
-	processes, err := initProcesses(
-		cMessage,
-		procCfg,
-	)
-
-	if err != nil {
-		log.Println("could not initiate processes")
-		terminateChannel <- struct{}{}
-	}
-
-	// Create and run the pipe.
-	go func() {
-		// Create New Pipe with processes.
-		pipeline := pipe.WithProcesses(processes...)
-
-		pipeline.Run()
-	}()
-
-	// Start polling the messageProvider.
+	// Start polling the messageProvider if we didn't provide a url.
 	// Other processes can also queue the channel.
-	pollProvider(cMessage, messageProvider, buffer)
+	if *flagUrl == "" {
+		log.Println("Polling message provider.")
+		pollProvider(cMessage, messageProvider, buffer)
+	}
 
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
 		// Terminate signal received.
 		case <-terminateChannel:
+			fmt.Println("Terminating server.")
 			break;
 		}
 	}
@@ -326,6 +346,9 @@ func pollProvider(c chan message.Message, provider message.MessageProvider, buff
 
 			// If message has been retrieved add it to the channel.
 			if msg != nil {
+
+				log.Println("Dispatching '" + msg.Title + "'")
+
 				// Block if the buffer is full.
 				b <- struct{}{}
 
