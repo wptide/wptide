@@ -91,6 +91,8 @@ Configure Google Cloud SDK with your account and the appropriate project ID:
 $ gcloud init
 ```
 
+**Note**: The next two commands are optional and can be skipped if you are setting up Tide for local development only. However, you will need create the `service-account.json` for your GCP credentials or the services will not function and fail to initialize.
+
 Create an App Engine application within your new project:
 
 ```
