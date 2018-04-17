@@ -164,10 +164,10 @@ ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: 
 | `API_DB_USER` | Username used to access the local database. Default is `wordpress`. |
 | `API_HTTP_HOST` | The API domain name, used both locally and on GCP. Default is `tide.local`. |
 | `API_KEY` | The API key used locally to authenticate the `audit-server` user. |
-| `API_PROTOCOL` | @todo Default is `http`. |
+| `API_PROTOCOL` | The API protocol, used both locally and on GCP Default is `http`. |
 | `API_SECRET` | The API secret used locally to authenticate the `audit-server` user. |
-| `API_THEME` | The theme slug. Default is `twentyseventeen`. |
-| `API_VERSION` | The API version used in the Tide API url. Default is `v1`. |
+| `API_THEME` | The slug of the local WordPress theme. Default is `twentyseventeen`. |
+| `API_VERSION` | The API version found in the Tide API REST url, used both locally and on GCP. Default is `v1`. |
 
 ### Lighthouse Server
 
