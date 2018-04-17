@@ -111,6 +111,8 @@ $ gsutil defacl ch -u AllUsers:R gs://YOUR_PROJECT_ID.appspot.com
 
 Finally, go to the [the Credentials section][credentials-section] of your project in the Console. Click 'Create credentials' and then click 'Service account key.' For the Service account, select 'App Engine app default service account.' Then click 'Create' to create and download the JSON service account key to your local machine. Save it as `service-account.json` in the `service/api` directory for use with connecting to both Cloud Storage and Cloud SQL.
 
+---
+
 ### API
 
 First generate the API templates:
@@ -173,6 +175,8 @@ ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: 
 | `API_THEME` | The slug of the local WordPress theme. Default is `twentyseventeen`. |
 | `API_VERSION` | The API version found in the Tide API REST url, used both locally and on GCP. Default is `v1`. |
 
+---
+
 ### Lighthouse Server
 
 First build the Lighthouse Server Docker image:
@@ -210,6 +214,8 @@ $ make lighthouse.down
 | `LH_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 
+---
+
 ### PHPCS Server
 
 First build the PHPCS Server Docker image:
@@ -246,6 +252,8 @@ $ make phpcs.down
 | :--- | :--- |
 | `PHPCS_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
 | `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+
+---
 
 ### Sync Server
 
@@ -292,6 +300,8 @@ $ make sync.down
 | `SYNC_PHPCS_ACTIVE` | @todo Default is `on` |
 | `SYNC_POOL_DELAY` | @todo Default is `600` |
 | `SYNC_POOL_WORKERS` | @todo Default is `125` |
+
+---
 
 ### Deployments to Google Cloud Platform (GCP)
 
@@ -463,6 +473,8 @@ make phpcs.clean.cluster
 | `GKE_SYNC_IMAGE` | Default is `sync-server`. |
 | `GKE_SYNC_MACHINE_TYPE` | @todo |
 
+---
+
 ### AWS
 
 @todo
@@ -480,6 +492,8 @@ make phpcs.clean.cluster
 | `AWS_SQS_QUEUE_PHPCS` | The name of the SQS queue for the PHPCS Server. |
 | `AWS_SQS_REGION` | The region of the SQS queue. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][sqs-region].  |
 | `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05` |
+
+---
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
