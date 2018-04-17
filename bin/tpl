@@ -40,8 +40,25 @@ done
 
 ## Check for envsubst command.
 if ! command -v envsubst >/dev/null 2>&1; then
-    echo "${RED}error${RESET}: Variable Interpolation failure. The ${CYAN}envsubst${RESET} command is not installed on your OS."
-    exit 1
+    echo "${YELLOW}warning${RESET}: Variable Interpolation failure. The ${CYAN}envsubst${RESET} command is not installed on your OS. Using a less safe fallback method with the eval command."
+
+    envsubst(){
+        local line lineEscaped
+
+        while IFS= read -r line || [[ -n $line ]]; do
+
+            # Escape ALL chars. that could trigger an expansion.
+            IFS= read -r -d '' lineEscaped < <(printf %s "$line" | tr '`([$' '\1\2\3\4')
+
+            # ... then selectively re-enable ${ references
+            lineEscaped=${lineEscaped//$'\4'{/\${}
+
+            # Finally, escape embedded double quotes to preserve them.
+            lineEscaped=${lineEscaped//\"/\\\"}
+
+            eval "printf '%s\n' \"$lineEscaped\"" | tr '\1\2\3\4' '`([$'
+        done
+    }
 fi
 
 ## Validate cli arguments.
