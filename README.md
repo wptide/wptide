@@ -296,7 +296,7 @@ $ make sync.down
 | `SYNC_DEFAULT_VISIBILITY` | @todo Default is `public` |
 | `SYNC_FORCE_AUDITS` | @todo Default is `no` |
 | `SYNC_ITEMS_PER_PAGE` | @todo Default is `250` |
-| `SYNC_LH_ACTIVE` | @todo Default is `off` |
+| `SYNC_LH_ACTIVE` | @todo Default is `on` |
 | `SYNC_PHPCS_ACTIVE` | @todo Default is `on` |
 | `SYNC_POOL_DELAY` | @todo Default is `600` |
 | `SYNC_POOL_WORKERS` | @todo Default is `125` |
