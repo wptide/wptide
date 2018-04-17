@@ -195,11 +195,16 @@ Take the isolated Lighthouse Server down:
 $ make lighthouse.down
 ```
 
+#### Lighthouse Server Notes
+
+@todo
+
 #### Lighthouse Server Settings
 
 | Variable | Description |
 | :--- | :--- |
-| `LH_CONCURRENT_AUDITS` | @todo Default is `5` |
+| `LH_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
+| `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 
 ### PHPCS Server
 
@@ -227,12 +232,16 @@ Take the isolated PHPCS Server down:
 $ make phpcs.down
 ```
 
+#### PHPCS Server Notes
+
+@todo
+
 #### PHPCS Server Settings
 
 | Variable | Description |
 | :--- | :--- |
-| `PHPCS_CONCURRENT_AUDITS` | @todo Default is `5` |
-| `PHPCS_TEMP_FOLDER` | @todo Default is `/tmp` |
+| `PHPCS_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
+| `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 
 ### Sync Server
 
@@ -259,6 +268,10 @@ Take the isolated Sync Server down:
 ```
 $ make sync.down
 ```
+
+#### Sync Server Notes
+
+@todo
 
 #### Sync Server Settings
 
