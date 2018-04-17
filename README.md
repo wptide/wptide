@@ -141,23 +141,23 @@ Note: Running `make down` will stop all Docker services.
 
 | Variable | Description |
 | :--- | :--- |
-| `API_ADMIN_EMAIL` | @todo |
-| `API_ADMIN_PASSWORD` | @todo |
-| `API_ADMIN_USER` | @todo |
-| `API_AUTH_URL` | @todo Default is `http://tide.local/api/tide/v1/auth` |
-| `API_BLOG_DESCRIPTION` | @todo Default is `Automated insight into your WordPress code`. |
-| `API_BLOG_NAME` | @todo Default is `Tide`. |
-| `API_DB_HOST` | @todo Default is `api-mysql`. |
-| `API_DB_NAME` | @todo Default is `wordpress`. |
-| `API_DB_PASSWORD` | @todo Default is `wordpress`. |
-| `API_DB_ROOT_PASSWORD` | @todo Default is `wordpress`. |
-| `API_DB_USER` | @todo Default is `wordpress`. |
-| `API_HTTP_HOST` | @todo Default is `tide.local`. |
-| `API_KEY` | @todo |
+| `API_ADMIN_EMAIL` | The email associated with the local admin account |
+| `API_ADMIN_PASSWORD` | The password associated with the local admin account |
+| `API_ADMIN_USER` | The username associated with the local admin account |
+| `API_AUTH_URL` | The [`wp-tide-api`](https://github.com/wptide/wp-tide-api) authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth` |
+| `API_BLOG_DESCRIPTION` | Site tagline (set in Settings > General). Default is `Automated insight into your WordPress code`. |
+| `API_BLOG_NAME` | Site title (set in Settings > General). Default is `Tide`. |
+| `API_DB_HOST` | The host of the local database, which connects to a Docker container. Default is `api-mysql`. |
+| `API_DB_NAME` | Name of the local database. Default is `wordpress`. |
+| `API_DB_PASSWORD` | Password used to access the local database. Default is `wordpress`. |
+| `API_DB_ROOT_PASSWORD` | The local database root password. Default is `wordpress`. |
+| `API_DB_USER` | Username used to access the local database. Default is `wordpress`. |
+| `API_HTTP_HOST` | The API domain name, used both locally and on GCP. Default is `tide.local`. |
+| `API_KEY` | The API key used locally to authenticate the `audit-server` user. |
 | `API_PROTOCOL` | @todo Default is `http`. |
-| `API_SECRET` | @todo |
-| `API_THEME` | @todo Default is `twentyseventeen`. |
-| `API_VERSION` | @todo Default is `v1`. |
+| `API_SECRET` | The API secret used locally to authenticate the `audit-server` user. |
+| `API_THEME` | The theme slug. Default is `twentyseventeen`. |
+| `API_VERSION` | The API version used in the Tide API url. Default is `v1`. |
 
 ### Lighthouse Server
 
