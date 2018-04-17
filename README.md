@@ -52,7 +52,7 @@ Tide services are responsible for the following:
 * Create a new Cloud Project using the [Cloud Console][cloud-console]
 * Enable Billing on that project
 * [Enable Cloud SQL API][cloud-sql-api-enable]
-* Install [Google Cloud SDK][gcloud-sdk]
+* Install [Google Cloud SDK][gcloud-sdk] & [gsutil][gsutil]
 
 ### Cloning
 
@@ -154,7 +154,7 @@ ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: 
 | `API_ADMIN_EMAIL` | The email associated with the local admin account |
 | `API_ADMIN_PASSWORD` | The password associated with the local admin account |
 | `API_ADMIN_USER` | The username associated with the local admin account |
-| `API_AUTH_URL` | The [`wp-tide-api`](https://github.com/wptide/wp-tide-api) authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth` |
+| `API_AUTH_URL` | The [`wp-tide-api`][wp-tide-api] authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth` |
 | `API_BLOG_DESCRIPTION` | Site tagline (set in Settings > General). Default is `Automated insight into your WordPress code`. |
 | `API_BLOG_NAME` | Site title (set in Settings > General). Default is `Tide`. |
 | `API_DB_HOST` | The host of the local database, which connects to a Docker container. Default is `api-mysql`. |
@@ -470,27 +470,34 @@ make phpcs.clean.cluster
 | `AWS_API_KEY` | The AWS API key. |
 | `AWS_API_SECRET` | The AWS API secret. |
 | `AWS_S3_BUCKET_NAME` | The name of the S3 bucket.  |
-| `AWS_S3_REGION` | The region of the S3 bucket. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region).  |
+| `AWS_S3_REGION` | The region of the S3 bucket. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][s3-region].  |
 | `AWS_S3_VERSION` | The S3 API version. Default is `2006-03-01` |
 | `AWS_SQS_QUEUE_LH` | The name of the SQS queue for the Lighthouse Server. |
 | `AWS_SQS_QUEUE_PHPCS` | The name of the SQS queue for the PHPCS Server. |
-| `AWS_SQS_REGION` | The region of the SQS queue. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints](https://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region).  |
+| `AWS_SQS_REGION` | The region of the SQS queue. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][sqs-region].  |
 | `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05` |
 
 ### Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Contact Us
-Have questions? Don't open an Issue, come join us in the [`#tide` channel](https://wordpress.slack.com/messages/C7TK8FBUJ/) in [WordPress Slack](https://make.wordpress.org/chat/). Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
+Have questions? Don't open an Issue, come join us in the [`#tide` channel][tide-slack] in [WordPress Slack][wp-slack]. Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
 
 ### Credits
 Props: [@danlouw](https://github.com/danlouw), [@jeffpaul](https://github.com/jeffpaul), [@rheinardkorf](https://github.com/rheinardkorf), [@valendesigns](https://github.com/valendesigns)
 
 ### License
-Tide utilizes an [MIT license](https://github.com/xwp/go-tide/blob/master/LICENSE).
+Tide utilizes an [MIT license][mit-license].
 
 [composer]: https://getcomposer.org/
 [cloud-console]: https://console.cloud.google.com/
 [cloud-sql-api-enable]: https://console.cloud.google.com/flows/enableapi?apiid=sqladmin
 [gcloud-sdk]: https://cloud.google.com/sdk/
+[gsutil]: https://cloud.google.com/storage/docs/gsutil_install
 [credentials-section]: https://console.cloud.google.com/apis/credentials/
+[wp-tide-api]: https://github.com/wptide/wp-tide-api
+[s3-region]: https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+[sqs-region]: https://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region
+[tide-slack]: https://wordpress.slack.com/messages/C7TK8FBUJ/
+[wp-slack]: https://make.wordpress.org/chat/
+[mit-license]: https://github.com/xwp/go-tide/blob/master/LICENSE
