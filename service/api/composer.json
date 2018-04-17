@@ -6,7 +6,7 @@
     }
   ],
   "require": {
-    "google/cloud": "~0.60",
+    "google/cloud": "~0.61",
     "johnpbloch/wordpress-core-installer": "^1",
     "johnpbloch/wordpress-core": "4.9.5",
     "slowprog/composer-copy-file": "~0.2",
@@ -34,6 +34,11 @@
     "copy-file": {
       "wp-config.php": "wordpress/wp-config.php",
       "health-check.php": "wordpress/health-check.php"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "7.2.4"
     }
   }
 }
