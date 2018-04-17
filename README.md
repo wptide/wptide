@@ -83,7 +83,7 @@ cp .env.dist .env
 
 ```
 
-_Update the value for each [environment variable](#environment-variables) in your custom `.env` file._
+_Update the value for each environment variable in your custom `.env` file. The variables and their descriptions can be found at the end of each relevant section._
 
 Configure Google Cloud SDK with your account and the appropriate project ID:
 
