@@ -135,9 +135,17 @@ make api.setup
 
 Run the setup script to initialize WordPress for the first time or if you would like a convenient way to update the default values when you change certain environment variables.
 
+#### API Notes
+
 The local database is stored in the `data/api/mysql` directory. If you ever need to start from scratch delete that directory and run `make api.setup` again. Be sure to stop the API with `make api.down` or `make down` and then start it again with `make api.up`.
 
-Note: Running `make down` will stop all Docker services.
+Running `make down` will stop all Docker services.
+
+If you see an error like this on OS X when bringing up the API you need to add the directory to the `Preferences -> File Sharing` section of the Docker for Mac app.
+
+```
+ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: ...'
+```
 
 #### API Settings
 
