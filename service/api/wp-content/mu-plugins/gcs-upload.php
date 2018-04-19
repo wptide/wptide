@@ -36,6 +36,11 @@ class Upload {
 			return;
 		}
 
+		// Use the local file system on the host machine.
+		if ( ( 'gcs' !== getenv( 'API_UPLOAD_HANDLER' ) ) && ( false === getenv( 'GAE_VERSION' ) ) ) {
+			return;
+		}
+
 		// Add plugin hooks.
 		add_action( 'admin_menu', array( $this, 'options_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
