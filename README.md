@@ -55,7 +55,11 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
 
 ### Introduction
 
-@todo
+The main focus of this documentation is to setup a local development environment. 
+Cloud deployments will be covered, though many assumptions will be made about your 
+level of understanding not only with GCP but also the Tide project and it's manual 
+setup process in relation to WordPress on App Engine. We will not be going into 
+great detail when it comes to deploying Tide on CGP.
 
 ### Dependencies
 
@@ -384,7 +388,8 @@ plugins to process and writes them to a queue.
 
 ### Deployments to Google Cloud Platform (GCP)
 
-@todo
+Deploying to GCP is optional and not required for local development. In this 
+section we've included some of the basic steps required to get setup on GCP.
 
 #### GCP Settings
 
@@ -400,7 +405,18 @@ GCP. Be sure to use the same region you chose during the earlier
 
 #### Google Cloud SQL (GCSQL)
 
-@todo
+Deploying a database to Cloud SQL for the WordPress API only requires a bit of 
+configuration to the environment variable and then to run a single `make` command.
+
+Create the Cloud SQL database:
+
+```
+make api.deploy.sql
+```
+
+_This command will create a database instance and failover instance, set the 
+root password, create a database for WordPress, and create a user for that 
+database._
 
 ##### GCSQL API Settings
 
@@ -442,17 +458,7 @@ _Once you've deployed and installed WordPress add the `readiness_check`
 section back to `app.yaml` and re-deploy. The health check should be working 
 and ensuring the health of your containers on App Engine._
 
-First create the Cloud SQL database:
-
-```
-make api.deploy.sql
-```
-
-_This command will create a database instance and failover instance, set the 
-root password, create a database for WordPress, and create a user for that 
-database._
-
-Then deploy the API:
+Deploy the API to App Engine:
 
 ```
 make api.deploy.app
@@ -463,16 +469,15 @@ and setup permalinks manually._
 
 ##### GAE API Settings
 
-
 | Variable | Description |
 | :--- | :--- |
 | Auto Scaling: |
-| `GAE_API_AS_COOL_DOWN_PERIOD_SEC` | The number of seconds that the autoscaler should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable. The cool-down period must be greater than or equal to 60 seconds. Default is 120. |
+| `GAE_API_AS_COOL_DOWN_PERIOD_SEC` | The number of seconds that the autoscaler should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable. The cool-down period must be greater than or equal to 60 seconds. An example value is `120`. |
 | `GAE_API_AS_CPU_TARGET_UTILIZATION` | Target CPU utilization. CPU use is averaged across all running instances and is used to decide when to reduce or increase the number of instances. Note that instances are downscaled irrespective of in-flight requests 25 seconds after an instance receives the shutdown signal. An example value is `0.5`. |
 | `GAE_API_AS_MAX_NUM_INSTANCES` | The maximum number of instances that your service can scale up to. The maximum number of instances in your project is limited by your project's [resource quota](https://cloud.google.com/compute/docs/resource-quotas). |
-| `GAE_API_AS_MIN_NUM_INSTANCES` | The minimum number of instances given to your service. When a service is deployed, it is given this many instances and scales according to traffic. Must be 1 or greater, use a minimum of 2 to reduce latency. |
+| `GAE_API_AS_MIN_NUM_INSTANCES` | The minimum number of instances given to your service. When a service is deployed, it is given this many instances and scales according to traffic. Must be `1` or greater, use a minimum of `2` to reduce latency. |
 | Cron Schedule: |
-| `GAE_API_CRON_SCHEDULE_MINS` | The number of minutes between cron intervals. |
+| `GAE_API_CRON_SCHEDULE_MINS` | The number of minutes between cron intervals. An example value is `1`. |
 | Readiness Check: |
 | `GAE_API_RC_APP_START_TIMEOUT_SEC` | The maximum time, in seconds, an instance has to become ready after the VM and other infrastructure are provisioned. After this period, the deployment fails and is rolled back. You might want to increase this setting if your application requires significant initialization tasks, such as downloading a large file, before it is ready to serve. Must be within range of: `1-3600`. |
 | `GAE_API_RC_CHECK_INTERVAL_SEC` | Time interval between checks, in seconds. Must be within range of: `1-300`. |
@@ -564,7 +569,7 @@ make phpcs.clean.cluster
 
 ### AWS
 
-@todo
+@todo Remove the dependency on AWS.
 
 #### AWS Settings
 
