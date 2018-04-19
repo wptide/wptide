@@ -39,6 +39,11 @@ func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
 		msg.SourceURL = "https://downloads.wordpress.org/theme/" + project.Slug + "." + project.Version + ".zip"
 		msg.ProjectType = "theme"
 		msg.Content = project.Description
+		msg.Standards = append(msg.Standards, "lighthouse")
+		*msg.Audits = append(*msg.Audits,message.Audit{
+			Type: "lighthouse",
+			Options: &message.AuditOption{},
+		})
 	case "plugins":
 		msg.SourceURL = project.DownloadLink
 		msg.ProjectType = "plugin"
