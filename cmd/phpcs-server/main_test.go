@@ -31,7 +31,7 @@ var (
 		"AWS_S3_REGION":           "us-west-2",
 		//
 		// AWS SQS settings
-		"AWS_SQS_QUEUE_LH":        "test-queue",
+		"AWS_SQS_QUEUE_PHPCS":     "test-queue",
 		"AWS_SQS_REGION":          "us-west-2",
 		"AWS_SQS_VERSION":         "2012-11-05",
 		//
@@ -383,12 +383,12 @@ func setupConfig() {
 		protocol     string
 		version      string
 	}{
-		env.GetEnv("TIDE_API_KEY", ""),
-		env.GetEnv("TIDE_API_SECRET", ""),
-		env.GetEnv("TIDE_API_AUTH_URL", ""),
-		env.GetEnv("TIDE_API_HOST", ""),
-		env.GetEnv("TIDE_API_PROTOCOL", ""),
-		env.GetEnv("TIDE_API_VERSION", ""),
+		env.GetEnv("API_KEY", ""),
+		env.GetEnv("API_SECRET", ""),
+		env.GetEnv("API_AUTH_URL", ""),
+		env.GetEnv("API_HTTP_HOST", ""),
+		env.GetEnv("API_PROTOCOL", ""),
+		env.GetEnv("API_VERSION", ""),
 	}
 
 	s3Config = struct {
@@ -397,10 +397,10 @@ func setupConfig() {
 		secret string
 		bucket string
 	}{
-		env.GetEnv("PHPCS_S3_REGION", ""),
-		env.GetEnv("PHPCS_S3_KEY", ""),
-		env.GetEnv("PHPCS_S3_SECRET", ""),
-		env.GetEnv("PHPCS_S3_BUCKET_NAME", ""),
+		env.GetEnv("AWS_S3_REGION", ""),
+		env.GetEnv("AWS_API_KEY", ""),
+		env.GetEnv("AWS_API_SECRET", ""),
+		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 	}
 }
 
