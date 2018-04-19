@@ -1,18 +1,16 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${SYNC_GKE_CLUSTER}-secret
+  name: ${GKE_SYNC_CLUSTER}-secret
 type: Opaque
 stringData:
-  LH_SQS_KEY: $LH_SQS_KEY
-  LH_SQS_SECRET: $LH_SQS_SECRET
-  PHPCS_SQS_KEY: $PHPCS_SQS_KEY
-  PHPCS_SQS_SECRET: $PHPCS_SQS_SECRET
+  AWS_API_KEY: $AWS_API_KEY
+  AWS_API_SECRET: $AWS_API_SECRET
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ${SYNC_GKE_CLUSTER}-pv-claim
+  name: ${GKE_SYNC_CLUSTER}-pv-claim
 spec:
   accessModes:
     - ReadWriteOnce
@@ -23,31 +21,47 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${SYNC_GKE_CLUSTER}-deployment
+  name: ${GKE_SYNC_CLUSTER}-deployment
   labels:
-    app: ${SYNC_GKE_CLUSTER}
+    app: ${GKE_SYNC_CLUSTER}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ${SYNC_GKE_CLUSTER}
+      app: ${GKE_SYNC_CLUSTER}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: ${SYNC_GKE_CLUSTER}
+        app: ${GKE_SYNC_CLUSTER}
     spec:
       containers:
-      - image: ${SYNC_GCR_IMAGE_TAG}
-        name: ${SYNC_GKE_CLUSTER}
+      - image: ${GCR_SYNC_IMAGE_TAG}
+        name: ${GKE_SYNC_CLUSTER}
         env:
-        - name: TIDE_API_HOST
-          value: "${TIDE_API_HOST}"
-        - name: TIDE_API_PROTOCOL
-          value: "${TIDE_API_PROTOCOL}"
-        - name: TIDE_API_VERSION
-          value: "${TIDE_API_VERSION}"
+        - name: API_HTTP_HOST
+          value: "${API_HTTP_HOST}"
+        - name: API_PROTOCOL
+          value: "${API_PROTOCOL}"
+        - name: API_VERSION
+          value: "${API_VERSION}"
+        - name: AWS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ${GKE_SYNC_CLUSTER}-secret
+              key: AWS_API_KEY
+        - name: AWS_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: ${GKE_SYNC_CLUSTER}-secret
+              key: AWS_API_SECRET
+        - name: AWS_SQS_QUEUE_LH
+          value: "${AWS_SQS_QUEUE_LH}"
+        - name: AWS_SQS_QUEUE_PHPCS
+          value: "${AWS_SQS_QUEUE_PHPCS}"
+        - name: AWS_SQS_REGION
+          value: "${AWS_SQS_REGION}"
         - name: SYNC_ACTIVE
           value: "${SYNC_ACTIVE}"
         - name: SYNC_API_BROWSE_CATEGORY
@@ -62,46 +76,18 @@ spec:
           value: "${SYNC_FORCE_AUDITS}"
         - name: SYNC_ITEMS_PER_PAGE
           value: "${SYNC_ITEMS_PER_PAGE}"
+        - name: SYNC_LH_ACTIVE
+          value: "${SYNC_LH_ACTIVE}"
+        - name: SYNC_PHPCS_ACTIVE
+          value: "${SYNC_PHPCS_ACTIVE}"
         - name: SYNC_POOL_DELAY
           value: "${SYNC_POOL_DELAY}"
         - name: SYNC_POOL_WORKERS
           value: "${SYNC_POOL_WORKERS}"
-        - name: PHPCS_SQS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ${SYNC_GKE_CLUSTER}-secret
-              key: PHPCS_SQS_KEY
-        - name: PHPCS_SQS_QUEUE
-          value: "${PHPCS_SQS_QUEUE}"
-        - name: PHPCS_SQS_QUEUE_NAME
-          value: "${PHPCS_SQS_QUEUE_NAME}"
-        - name: PHPCS_SQS_REGION
-          value: "${PHPCS_SQS_REGION}"
-        - name: PHPCS_SQS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: ${SYNC_GKE_CLUSTER}-secret
-              key: PHPCS_SQS_SECRET
-        - name: LH_SQS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ${SYNC_GKE_CLUSTER}-secret
-              key: LH_SQS_KEY
-        - name: LH_SQS_QUEUE
-          value: "${LH_SQS_QUEUE}"
-        - name: LH_SQS_QUEUE_NAME
-          value: "${LH_SQS_QUEUE_NAME}"
-        - name: LH_SQS_REGION
-          value: "${LH_SQS_REGION}"
-        - name: LH_SQS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: ${SYNC_GKE_CLUSTER}-secret
-              key: LH_SQS_SECRET
         volumeMounts:
-        - name: ${SYNC_GKE_CLUSTER}-persistent-storage
+        - name: ${GKE_SYNC_CLUSTER}-persistent-storage
           mountPath: $SYNC_DATA
       volumes:
-      - name: ${SYNC_GKE_CLUSTER}-persistent-storage
+      - name: ${GKE_SYNC_CLUSTER}-persistent-storage
         persistentVolumeClaim:
-          claimName: ${SYNC_GKE_CLUSTER}-pv-claim
+          claimName: ${GKE_SYNC_CLUSTER}-pv-claim

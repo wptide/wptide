@@ -1,96 +1,90 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${PHPCS_GKE_CLUSTER}-secret
+  name: ${GKE_PHPCS_CLUSTER}-secret
 type: Opaque
 stringData:
-  TIDE_API_KEY: ${TIDE_API_KEY}
-  TIDE_API_SECRET: ${TIDE_API_SECRET}
-  PHPCS_SQS_KEY: ${PHPCS_SQS_KEY}
-  PHPCS_SQS_SECRET: ${PHPCS_SQS_SECRET}
-  PHPCS_S3_KEY: ${PHPCS_S3_KEY}
-  PHPCS_S3_SECRET: ${PHPCS_S3_SECRET}
+  API_KEY: ${API_KEY}
+  API_SECRET: ${API_SECRET}
+  AWS_API_KEY: ${AWS_API_KEY}
+  AWS_API_SECRET: ${AWS_API_SECRET}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${PHPCS_GKE_CLUSTER}-deployment
+  name: ${GKE_PHPCS_CLUSTER}-deployment
   labels:
-    app: ${PHPCS_GKE_CLUSTER}
+    app: ${GKE_PHPCS_CLUSTER}
 spec:
-  replicas: ${PHPCS_GKE_REPLICAS}
+  replicas: ${GKE_PHPCS_REPLICAS}
   selector:
     matchLabels:
-      app: ${PHPCS_GKE_CLUSTER}
+      app: ${GKE_PHPCS_CLUSTER}
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: ${PHPCS_GKE_CLUSTER}
+        app: ${GKE_PHPCS_CLUSTER}
     spec:
       containers:
-      - image: ${PHPCS_GCR_IMAGE_TAG}
-        name: ${PHPCS_GKE_CLUSTER}
+      - image: ${GCR_PHPCS_IMAGE_TAG}
+        name: ${GKE_PHPCS_CLUSTER}
         env:
-        - name: TIDE_API_AUTH_URL
-          value: "${TIDE_API_AUTH_URL}"
-        - name: TIDE_API_HOST
-          value: "${TIDE_API_HOST}"
-        - name: TIDE_API_PROTOCOL
-          value: "${TIDE_API_PROTOCOL}"
-        - name: TIDE_API_KEY
+        - name: API_AUTH_URL
+          value: "${API_AUTH_URL}"
+        - name: API_HTTP_HOST
+          value: "${API_HTTP_HOST}"
+        - name: API_KEY
           valueFrom:
             secretKeyRef:
-              name: ${PHPCS_GKE_CLUSTER}-secret
-              key: TIDE_API_KEY
-        - name: TIDE_API_SECRET
+              name: ${GKE_PHPCS_CLUSTER}-secret
+              key: API_KEY
+        - name: API_PROTOCOL
+          value: "${API_PROTOCOL}"
+        - name: API_SECRET
           valueFrom:
             secretKeyRef:
-              name: ${PHPCS_GKE_CLUSTER}-secret
-              key: TIDE_API_SECRET
-        - name: TIDE_API_VERSION
-          value: "${TIDE_API_VERSION}"
-        - name: PHPCS_SQS_VERSION
-          value: "${PHPCS_SQS_VERSION}"
-        - name: PHPCS_SQS_REGION
-          value: "${PHPCS_SQS_REGION}"
-        - name: PHPCS_SQS_KEY
+              name: ${GKE_PHPCS_CLUSTER}-secret
+              key: API_SECRET
+        - name: API_VERSION
+          value: "${API_VERSION}"
+        - name: AWS_API_KEY
           valueFrom:
             secretKeyRef:
-              name: ${PHPCS_GKE_CLUSTER}-secret
-              key: PHPCS_SQS_KEY
-        - name: PHPCS_SQS_SECRET
+              name: ${GKE_PHPCS_CLUSTER}-secret
+              key: AWS_API_KEY
+        - name: AWS_API_SECRET
           valueFrom:
             secretKeyRef:
-              name: ${PHPCS_GKE_CLUSTER}-secret
-              key: PHPCS_SQS_SECRET
-        - name: PHPCS_SQS_QUEUE_NAME
-          value: "${PHPCS_SQS_QUEUE_NAME}"
-        - name: PHPCS_S3_REGION
-          value: "${PHPCS_S3_REGION}"
-        - name: PHPCS_S3_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ${PHPCS_GKE_CLUSTER}-secret
-              key: PHPCS_S3_KEY
-        - name: PHPCS_S3_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: ${PHPCS_GKE_CLUSTER}-secret
-              key: PHPCS_S3_SECRET
-        - name: PHPCS_S3_BUCKET_NAME
-          value: "${PHPCS_S3_BUCKET_NAME}"
+              name: ${GKE_PHPCS_CLUSTER}-secret
+              key: AWS_API_SECRET
+        - name: AWS_S3_BUCKET_NAME
+          value: "${AWS_S3_BUCKET_NAME}"
+        - name: AWS_S3_REGION
+          value: "${AWS_S3_REGION}"
+        - name: AWS_S3_VERSION
+          value: "${AWS_S3_VERSION}"
+        - name: AWS_SQS_QUEUE_PHPCS
+          value: "${AWS_SQS_QUEUE_PHPCS}"
+        - name: AWS_SQS_REGION
+          value: "${AWS_SQS_REGION}"
+        - name: AWS_SQS_VERSION
+          value: "${AWS_SQS_VERSION}"
+        - name: PHPCS_CONCURRENT_AUDITS
+          value: "${PHPCS_CONCURRENT_AUDITS}"
+        - name: PHPCS_TEMP_FOLDER
+          value: "${PHPCS_TEMP_FOLDER}"
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ${PHPCS_GKE_CLUSTER}-hpa
+  name: ${GKE_PHPCS_CLUSTER}-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ${PHPCS_GKE_CLUSTER}-deployment
-  minReplicas: ${PHPCS_GKE_MIN_PODS}
-  maxReplicas: ${PHPCS_GKE_MAX_PODS}
-  targetCPUUtilizationPercentage: ${PHPCS_GKE_CPU_PERCENT}
+    name: ${GKE_PHPCS_CLUSTER}-deployment
+  minReplicas: ${GKE_PHPCS_MIN_PODS}
+  maxReplicas: ${GKE_PHPCS_MAX_PODS}
+  targetCPUUtilizationPercentage: ${GKE_PHPCS_CPU_PERCENT}
