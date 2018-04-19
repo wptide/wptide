@@ -27,11 +27,13 @@ usage:
 	@echo "\tup:\n\t\t- Run the Docker images with docker-compose up."
 	@echo "\tdown:\n\t\t- Stop the Docker images with docker-compose down."
 	@echo "\ttest:\n\t\t- Run the GO test suite."
+	@make api.usage
 	@make lighthouse.usage
 	@make phpcs.usage
 	@make sync.usage
 
 # Include Makefiles.
+include service/api/Makefile
 include service/lighthouse-server/Makefile
 include service/phpcs-server/Makefile
 include service/sync-server/Makefile

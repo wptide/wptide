@@ -75,12 +75,12 @@ var (
 		protocol     string
 		version      string
 	}{
-		env.GetEnv("TIDE_API_KEY", ""),
-		env.GetEnv("TIDE_API_SECRET", ""),
-		env.GetEnv("TIDE_API_AUTH_URL", ""),
-		env.GetEnv("TIDE_API_HOST", ""),
-		env.GetEnv("TIDE_API_PROTOCOL", ""),
-		env.GetEnv("TIDE_API_VERSION", ""),
+		env.GetEnv("API_KEY", ""),
+		env.GetEnv("API_SECRET", ""),
+		env.GetEnv("API_AUTH_URL", ""),
+		env.GetEnv("API_HTTP_HOST", ""),
+		env.GetEnv("API_PROTOCOL", ""),
+		env.GetEnv("API_VERSION", ""),
 	}
 
 	// SQS configuration.
@@ -90,10 +90,10 @@ var (
 		secret string
 		queue  string
 	}{
-		env.GetEnv("PHPCS_SQS_REGION", ""),
-		env.GetEnv("PHPCS_SQS_KEY", ""),
-		env.GetEnv("PHPCS_SQS_SECRET", ""),
-		env.GetEnv("PHPCS_SQS_QUEUE_NAME", ""),
+		env.GetEnv("AWS_SQS_REGION", ""),
+		env.GetEnv("AWS_API_KEY", ""),
+		env.GetEnv("AWS_API_SECRET", ""),
+		env.GetEnv("AWS_SQS_QUEUE_PHPCS", ""),
 	}
 
 	// Lighthouse SQS configuration.
@@ -103,10 +103,10 @@ var (
 		secret string
 		bucket string
 	}{
-		env.GetEnv("PHPCS_S3_REGION", ""),
-		env.GetEnv("PHPCS_S3_KEY", ""),
-		env.GetEnv("PHPCS_S3_SECRET", ""),
-		env.GetEnv("PHPCS_S3_BUCKET_NAME", ""),
+		env.GetEnv("AWS_S3_REGION", ""),
+		env.GetEnv("AWS_API_KEY", ""),
+		env.GetEnv("AWS_API_SECRET", ""),
+		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 	}
 
 	/** Channels **/
