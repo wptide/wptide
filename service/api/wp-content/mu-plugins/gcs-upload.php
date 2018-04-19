@@ -37,7 +37,7 @@ class Upload {
 		}
 
 		// Use the local file system on the host machine.
-		if ( ( 'gcs' !== getenv( 'API_UPLOAD_HANDLER' ) ) && ( false === getenv( 'GAE_VERSION' ) ) ) {
+		if ( 'gcs' !== getenv( 'API_UPLOAD_HANDLER' ) && false === getenv( 'GAE_VERSION' ) ) {
 			return;
 		}
 
