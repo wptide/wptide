@@ -65,7 +65,7 @@ services:
         ports:
             - 6379:6379
         volumes:
-            - ./data/api/redis:/databases
+            - ./data/api/redis:/data
 
 ### Lighthouse Server ###########################################
     lighthouse-server:

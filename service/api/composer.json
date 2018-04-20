@@ -3,16 +3,28 @@
     {
       "type": "composer",
       "url": "https://wpackagist.org"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "pressjitsu/pj-page-cache-red",
+        "type": "wordpress-plugin",
+        "version": "dev-master",
+        "dist": {
+          "type": "zip",
+          "url": "https://github.com/pressjitsu/pj-page-cache-red/archive/master.zip"
+        }
+      }
     }
   ],
   "require": {
     "google/cloud": "~0.61",
     "johnpbloch/wordpress-core-installer": "^1",
     "johnpbloch/wordpress-core": "4.9.5",
+    "pressjitsu/pj-page-cache-red": "dev-master",
     "slowprog/composer-copy-file": "~0.2",
     "wpackagist-theme/twentyseventeen": "1.5",
     "wpackagist-plugin/flush-opcache": "2.4",
-    "wpackagist-plugin/pj-page-cache-red": "0.8.2",
     "wpackagist-plugin/wp-redis": "0.7.0"
   },
   "require-dev": {
