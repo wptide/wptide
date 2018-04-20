@@ -51,7 +51,7 @@ define( 'DISALLOW_FILE_MODS', true );
 define( 'AUTOMATIC_UPDATER_DISABLED', true );
 
 // Set the content directory.
-define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/../wp-content' );
+define( 'WP_CONTENT_DIR', dirname( dirname( __FILE__ ) ) . '/wp-content' );
 
 // ** MySQL settings ** //
 if ( $is_gae ) {
