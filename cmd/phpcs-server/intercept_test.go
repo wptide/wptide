@@ -53,7 +53,7 @@ func TestIntercept_Run(t *testing.T) {
 			0,
 			false,
 			false,
-			"phpcompatibility",
+			"",
 		},
 		{
 			"PHPCompatibility Theme",
@@ -72,7 +72,7 @@ func TestIntercept_Run(t *testing.T) {
 							},
 						},
 						Result: map[string]interface{}{
-							"info": &tide.CodeInfo{
+							"info": tide.CodeInfo{
 								Type: "theme",
 							},
 						},
@@ -106,7 +106,7 @@ func TestIntercept_Run(t *testing.T) {
 							},
 						},
 						Result: map[string]interface{}{
-							"info": &tide.CodeInfo{
+							"info": tide.CodeInfo{
 								Type: "plugin",
 							},
 						},
@@ -135,7 +135,7 @@ func TestIntercept_Run(t *testing.T) {
 							},
 						},
 						Result: map[string]interface{}{
-							"info": &tide.CodeInfo{
+							"info": tide.CodeInfo{
 								Type: "other",
 							},
 						},
@@ -145,7 +145,7 @@ func TestIntercept_Run(t *testing.T) {
 			0,
 			false,
 			false,
-			"phpcompatibility",
+			"",
 		},
 	}
 	for _, tt := range tests {
@@ -170,7 +170,7 @@ func TestIntercept_Run(t *testing.T) {
 			if ix.Message.Audits != nil {
 				audits := *ix.Message.Audits
 				if audits != nil && len(audits) > 0 {
-					gotValue := audits[tt.index].Options.Standard
+					gotValue := audits[tt.index].Options.StandardOverride
 					if gotValue != tt.wantValue {
 						t.Errorf("Intercept.Run() gotValue = %v, wantValue %v", gotValue, tt.wantValue)
 						return

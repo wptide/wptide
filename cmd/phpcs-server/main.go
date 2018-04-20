@@ -178,7 +178,7 @@ func initProcesses(source <-chan message.Message, config *processConfig) ([]proc
 	}
 
 	intercept := &Intercept{
-		In:  ingest.Out,
+		In:  info.Out,
 		Out: make(chan process.Processor),
 	}
 

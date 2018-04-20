@@ -13,9 +13,9 @@ var (
 
 // Intercept intercepts the message in the pipe and makes required alterations.
 type Intercept struct {
-	process.Process                         // Assume all functions of Process.
-	In             <-chan process.Processor // The Processor to intercept.
-	Out            chan process.Processor   // The outbound Processor.
+	process.Process              // Assume all functions of Process.
+	In  <-chan process.Processor // The Processor to intercept.
+	Out chan process.Processor   // The outbound Processor.
 }
 
 func (ix *Intercept) Run() (<-chan error, error) {
@@ -29,21 +29,16 @@ func (ix *Intercept) Run() (<-chan error, error) {
 			case in := <-ix.In:
 				ix.CopyFields(in)
 
-				codeInfo, ok := ix.Result["info"].(*tide.CodeInfo)
-
-				if ! ok {
-					ix.Out <- ix
-					continue
-				}
+				codeInfo, ok := ix.Result["info"].(tide.CodeInfo)
 
 				// If this is a theme or plugin then we need to tweak the incoming message
 				// to use the WordPress PHPCompatibility standards file.
-				if codeInfo.Type == "theme" || codeInfo.Type == "plugin" {
+				if ok && (codeInfo.Type == "theme" || codeInfo.Type == "plugin") {
 					var newAuditsArray []message.Audit
 					for _, audit := range *ix.Message.Audits {
 						newAudit := audit
 						if audit.Type == "phpcs" && audit.Options.Standard == "phpcompatibility" {
-							newAudit.Options.Standard = PHPCompatibilityWPPath
+							newAudit.Options.StandardOverride = PHPCompatibilityWPPath
 						}
 						newAuditsArray = append(newAuditsArray, newAudit)
 					}
