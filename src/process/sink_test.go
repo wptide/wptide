@@ -122,13 +122,13 @@ func TestSink_Run(t *testing.T) {
 			time.Sleep(time.Millisecond * 100)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Response.Run() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Sink.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			if (len(errc) != 0) != tt.wantErrc {
 				e := <-errc
-				t.Errorf("Response.Run() error = %v, wantErrc %v", e, tt.wantErrc)
+				t.Errorf("Sink.Run() error = %v, wantErrc %v", e, tt.wantErrc)
 				return
 			}
 		})
