@@ -14,14 +14,15 @@ RUN set -x \
         ca-certificates \
     && apk add --no-cache -t .build-deps \
         curl \
+        git \
         php7-json \
         php7-openssl \
         php7-phar \
     && curl -Lo /usr/local/bin/composer https://getcomposer.org/composer.phar \
     && chmod +x /usr/local/bin/composer \
-    && composer global require "squizlabs/php_codesniffer=*" \
-    && composer global require "wp-coding-standards/wpcs=*" \
-    && composer global require "wimg/php-compatibility=*" \
+    && composer global require squizlabs/php_codesniffer:3.2.3 \
+    && composer global require wp-coding-standards/wpcs:0.14.1 \
+    && composer global require wimg/php-compatibility:dev-master \
     && $VENDOR/bin/phpcs --config-set show_progress 1 \
     && $VENDOR/bin/phpcs --config-set colors 1 \
     && $VENDOR/bin/phpcs --config-set installed_paths $VENDOR/wp-coding-standards/wpcs,$VENDOR/wimg/php-compatibility \
