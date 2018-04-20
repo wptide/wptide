@@ -177,8 +177,13 @@ func initProcesses(source <-chan message.Message, config *processConfig) ([]proc
 		Out: make(chan process.Processor),
 	}
 
+	intercept := &Intercept{
+		In:  ingest.Out,
+		Out: make(chan process.Processor),
+	}
+
 	phpcs := &process.Phpcs{
-		In:         info.Out,
+		In:         intercept.Out,
 		Out:        make(chan process.Processor),
 		TempFolder: config.phpcsTempFolder,
 		Config: map[string]interface{}{
@@ -202,6 +207,7 @@ func initProcesses(source <-chan message.Message, config *processConfig) ([]proc
 	return []process.Processor{
 		ingest,
 		info,
+		intercept,
 		phpcs,
 		response,
 		sink,
