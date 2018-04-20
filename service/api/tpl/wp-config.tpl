@@ -106,7 +106,8 @@ $table_prefix  = 'wp_';
  *
  * Page and Object caching are both backed by Redis.
  */
-define( 'WP_CACHE', ${API_CACHE} );
+define( 'WP_CACHE',          ${API_CACHE} );
+define( 'WP_CACHE_KEY_SALT', '${CACHE_KEY_SALT}' );
 
 // Redis settings.
 if ( true === WP_CACHE ) {
