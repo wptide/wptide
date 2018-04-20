@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d63a74a564c9dd1c79c0a93ea2f122a",
+    "content-hash": "e8aaaf3641ee92dfda006c4416786ead",
     "packages": [
         {
             "name": "composer/installers",
@@ -948,17 +948,6 @@
             "time": "2018-04-04T21:24:14+00:00"
         },
         {
-            "name": "pressjitsu/pj-page-cache-red",
-            "version": "dev-master",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/pressjitsu/pj-page-cache-red/archive/master.zip",
-                "reference": null,
-                "shasum": null
-            },
-            "type": "wordpress-plugin"
-        },
-        {
             "name": "psr/cache",
             "version": "1.0.1",
             "source": {
@@ -1291,6 +1280,26 @@
             },
             "type": "wordpress-plugin",
             "homepage": "https://wordpress.org/plugins/flush-opcache/"
+        },
+        {
+            "name": "wpackagist-plugin/pj-page-cache-red",
+            "version": "0.8.3",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/pj-page-cache-red/",
+                "reference": "tags/0.8.3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/pj-page-cache-red.0.8.3.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/pj-page-cache-red/"
         },
         {
             "name": "wpackagist-plugin/wp-redis",
@@ -5718,9 +5727,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "pressjitsu/pj-page-cache-red": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
