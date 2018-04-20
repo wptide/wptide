@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b62487168f82c650aed6c278e58bbcd5",
+    "content-hash": "df34edd1b376846ee02300fb9669f3a9",
     "packages": [
         {
             "name": "composer/installers",
@@ -380,16 +380,16 @@
         },
         {
             "name": "google/gax",
-            "version": "0.31.2",
+            "version": "0.31.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/gax-php.git",
-                "reference": "9043b2ae9ad3d1dfdc5d7f492496d2d3149e9caa"
+                "reference": "cae100c34c518e150db4adb6a1cfa6d5335d63f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/gax-php/zipball/9043b2ae9ad3d1dfdc5d7f492496d2d3149e9caa",
-                "reference": "9043b2ae9ad3d1dfdc5d7f492496d2d3149e9caa",
+                "url": "https://api.github.com/repos/googleapis/gax-php/zipball/cae100c34c518e150db4adb6a1cfa6d5335d63f9",
+                "reference": "cae100c34c518e150db4adb6a1cfa6d5335d63f9",
                 "shasum": ""
             },
             "require": {
@@ -427,7 +427,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2018-04-16T23:39:56+00:00"
+            "time": "2018-04-17T15:26:29+00:00"
         },
         {
             "name": "google/proto-client",
@@ -1282,6 +1282,46 @@
             "homepage": "https://wordpress.org/plugins/flush-opcache/"
         },
         {
+            "name": "wpackagist-plugin/pj-page-cache-red",
+            "version": "0.8.2",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/pj-page-cache-red/",
+                "reference": "tags/0.8.2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/pj-page-cache-red.0.8.2.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/pj-page-cache-red/"
+        },
+        {
+            "name": "wpackagist-plugin/wp-redis",
+            "version": "0.7.0",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/wp-redis/",
+                "reference": "tags/0.7.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/wp-redis.0.7.0.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/wp-redis/"
+        },
+        {
             "name": "wpackagist-theme/twentyseventeen",
             "version": "1.5",
             "source": {
@@ -1965,23 +2005,23 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.7.5",
+            "version": "1.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "dfd6be44111a7c41c2e884a336cc4f461b3b2401"
+                "reference": "33a7e3c4fda54e912ff6338c48823bd5c0f0b712"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/dfd6be44111a7c41c2e884a336cc4f461b3b2401",
-                "reference": "dfd6be44111a7c41c2e884a336cc4f461b3b2401",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/33a7e3c4fda54e912ff6338c48823bd5c0f0b712",
+                "reference": "33a7e3c4fda54e912ff6338c48823bd5c0f0b712",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.0.2",
                 "php": "^5.3|^7.0",
                 "phpdocumentor/reflection-docblock": "^2.0|^3.0.2|^4.0",
-                "sebastian/comparator": "^1.1|^2.0",
+                "sebastian/comparator": "^1.1|^2.0|^3.0",
                 "sebastian/recursion-context": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
@@ -2024,7 +2064,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2018-02-19T10:16:54+00:00"
+            "time": "2018-04-18T13:57:24+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
