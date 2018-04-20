@@ -65,6 +65,7 @@ echo "Activating plugins ..."
 
 vendor/bin/wp plugin activate \
     flush-opcache \
+    pj-page-cache-red \
     wp-redis \
     wp-tide-api \
     --path=wordpress \
