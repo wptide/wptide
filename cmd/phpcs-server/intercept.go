@@ -29,7 +29,12 @@ func (ix *Intercept) Run() (<-chan error, error) {
 			case in := <-ix.In:
 				ix.CopyFields(in)
 
-				codeInfo := ix.Result["info"].(*tide.CodeInfo)
+				codeInfo, ok := ix.Result["info"].(*tide.CodeInfo)
+
+				if ! ok {
+					ix.Out <- ix
+					continue
+				}
 
 				// If this is a theme or plugin then we need to tweak the incoming message
 				// to use the WordPress PHPCompatibility standards file.

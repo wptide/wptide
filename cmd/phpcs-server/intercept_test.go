@@ -31,7 +31,29 @@ func TestIntercept_Run(t *testing.T) {
 		wantValue string
 	}{
 		{
-			name: "Invalid process",
+			"No Code Info",
+			[]process.Processor{
+				&process.Response{
+					Process: process.Process{
+						Message: message.Message{
+							Title:       "Test Theme",
+							PayloadType: "mock",
+							Audits: &[]message.Audit{
+								{"phpcs",
+									&message.AuditOption{
+										Standard: "phpcompatibility",
+									},
+								},
+							},
+						},
+						Result: map[string]interface{}{},
+					},
+				},
+			},
+			0,
+			false,
+			false,
+			"phpcompatibility",
 		},
 		{
 			"PHPCompatibility Theme",
