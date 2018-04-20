@@ -9,6 +9,7 @@ services:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
             - ./service/api/php.ini:/opt/php72/lib/php.ini
+            - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads:ro
         depends_on:
             - api-mysql
         ports:
@@ -28,6 +29,7 @@ services:
             API_KEY: ${API_KEY}
             API_SECRET: ${API_SECRET}
             API_THEME: ${API_THEME}
+            API_UPLOAD_HANDLER: ${API_UPLOAD_HANDLER}
             AWS_API_KEY: ${AWS_API_KEY}
             AWS_API_SECRET: ${AWS_API_SECRET}
             AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}

@@ -157,8 +157,8 @@ _**Note**: The previous step is optional if you are setting up Tide for local
 development only._
 
 If you want to upload images to WordPress then you'll need to create a bucket for 
-those images to live. Open the [Cloud Storage Browser][cloud-storage-browser] and 
-click **Create Bucket**.
+those images to live (unless you opt to use the local file system). Open the 
+[Cloud Storage Browser][cloud-storage-browser] and click **Create Bucket**.
 
 Run the following command to change the ACL's of your new bucket:
 
@@ -253,6 +253,7 @@ ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: 
 | `API_PROTOCOL` | The API protocol, used both locally and on GCP Default is `http`. |
 | `API_SECRET` | The API secret used locally to authenticate the `audit-server` user. |
 | `API_THEME` | The slug of the local WordPress theme. Default is `twentyseventeen`. |
+| `API_UPLOAD_HANDLER` | Tells WordPress how media upload is handled. Uses either the local file system or Google Cloud Storage. Must be one of: `local`, `gcs`. Default is `local`. |
 | `API_VERSION` | The API version found in the Tide API REST url, used both locally and on GCP. Default is `v1`. |
 
 ---
