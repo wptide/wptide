@@ -111,23 +111,26 @@ define( 'WP_CACHE_KEY_SALT', '${CACHE_KEY_SALT}' );
 
 // Redis settings.
 if ( true === WP_CACHE ) {
-  global $redis_server, $redis_page_cache_config;
+    global $redis_server, $redis_page_cache_config;
 
-  $redis_server = array(
-      'host'     => getenv( 'API_REDIS_HOST' ),
-      'port'     => (int) getenv( 'API_REDIS_PORT' ),
-      'auth'     => getenv( 'API_REDIS_AUTH' ),
-      'database' => (int) getenv( 'API_REDIS_DATABASE' ),
-  );
+    $redis_server = array(
+        'host'     => getenv( 'API_REDIS_HOST' ),
+        'port'     => (int) getenv( 'API_REDIS_PORT' ),
+        'auth'     => getenv( 'API_REDIS_AUTH' ),
+        'database' => (int) getenv( 'API_REDIS_DATABASE' ),
+    );
 
-  $redis_page_cache_config = array(
-      'redis_host'          => getenv( 'API_REDIS_HOST' ),
-      'redis_port'          => (int) getenv( 'API_REDIS_PORT' ),
-      'redis_auth'          => getenv( 'API_REDIS_AUTH' ),
-      'redis_db'            => (int) getenv( 'API_REDIS_DATABASE' ),
-      'ignore_cookies'      => array( 'wordpress_test_cookie', 'openstat_ref' ),
-      'ignore_request_keys' => array( 'utm_source', 'utm_medium' ),
-  );
+    $redis_page_cache_config = array(
+        'redis_host'          => getenv( 'API_REDIS_HOST' ),
+        'redis_port'          => (int) getenv( 'API_REDIS_PORT' ),
+        'redis_auth'          => getenv( 'API_REDIS_AUTH' ),
+        'redis_db'            => (int) getenv( 'API_REDIS_DATABASE' ),
+        'ttl'                 => 600,
+        'ignore_cookies'      => array( 'wordpress_test_cookie', '__utmt', '__utma', '__utmb', '__utmc', '__utmz', '__gads', '__qca', '_ga' ),
+        'ignore_request_keys' => array( 'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign' ),
+        'debug'               => getenv( 'API_REDIS_DEBUG_HEADERS' ),
+        'gzip'                => true,
+    );
 }
 
 /**

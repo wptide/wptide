@@ -30,6 +30,7 @@ services:
             API_KEY: ${API_KEY}
             API_REDIS_AUTH: ${API_REDIS_AUTH}
             API_REDIS_DATABASE: ${API_REDIS_DATABASE}
+            API_REDIS_DEBUG_HEADERS: ${API_REDIS_DEBUG_HEADERS}
             API_REDIS_HOST: ${API_REDIS_HOST}
             API_REDIS_PORT: ${API_REDIS_PORT}
             API_SECRET: ${API_SECRET}
