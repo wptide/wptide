@@ -125,10 +125,10 @@ if ( true === WP_CACHE ) {
         'redis_port'          => (int) getenv( 'API_REDIS_PORT' ),
         'redis_auth'          => getenv( 'API_REDIS_AUTH' ),
         'redis_db'            => (int) getenv( 'API_REDIS_DATABASE' ),
-        'ttl'                 => 600,
+        'ttl'                 => getenv( 'API_CACHE_TTL' ),
         'ignore_cookies'      => array( 'wordpress_test_cookie', '__utmt', '__utma', '__utmb', '__utmc', '__utmz', '__gads', '__qca', '_ga' ),
         'ignore_request_keys' => array( 'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign' ),
-        'debug'               => getenv( 'API_REDIS_DEBUG_HEADERS' ),
+        'debug'               => getenv( 'API_CACHE_DEBUG' ),
         'gzip'                => true,
     );
 }

@@ -24,9 +24,10 @@ automatic_scaling:
 
 env_variables:
   WHITELIST_FUNCTIONS: escapeshellarg,escapeshellcmd,exec,pclose,popen,shell_exec,phpversion,php_uname
+  API_CACHE_DEBUG: ${API_CACHE_DEBUG}
+  API_CACHE_TTL: ${API_CACHE_TTL}
   API_REDIS_AUTH: ${API_REDIS_AUTH}
   API_REDIS_DATABASE: ${API_REDIS_DATABASE}
-  API_REDIS_DEBUG_HEADERS: ${API_REDIS_DEBUG_HEADERS}
   API_REDIS_HOST: ${API_REDIS_HOST}
   API_REDIS_PORT: ${API_REDIS_PORT}
   AWS_API_KEY: ${AWS_API_KEY}

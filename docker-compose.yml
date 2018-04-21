@@ -21,6 +21,8 @@ services:
             API_ADMIN_USER: ${API_ADMIN_USER}
             API_BLOG_DESCRIPTION: ${API_BLOG_DESCRIPTION}
             API_BLOG_NAME: ${API_BLOG_NAME}
+            API_CACHE_DEBUG: ${API_CACHE_DEBUG}
+            API_CACHE_TTL: ${API_CACHE_TTL}
             API_DB_HOST: ${API_DB_HOST}
             API_DB_NAME: ${API_DB_NAME}
             API_DB_PASSWORD: ${API_DB_PASSWORD}
@@ -30,7 +32,6 @@ services:
             API_KEY: ${API_KEY}
             API_REDIS_AUTH: ${API_REDIS_AUTH}
             API_REDIS_DATABASE: ${API_REDIS_DATABASE}
-            API_REDIS_DEBUG_HEADERS: ${API_REDIS_DEBUG_HEADERS}
             API_REDIS_HOST: ${API_REDIS_HOST}
             API_REDIS_PORT: ${API_REDIS_PORT}
             API_SECRET: ${API_SECRET}
