@@ -19,7 +19,8 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
         nodejs \
         ttf-freefont \
         udev \
-    && npm i lighthouse -g \
+    && npm i -g npm \
+    && npm i -g lighthouse \
     && runDeps="$( \
         scanelf --needed --nobanner --recursive /usr/local \
             | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
