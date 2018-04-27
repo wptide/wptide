@@ -189,7 +189,7 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 	}
 
 	sink := &commonProcess.Sink{
-		In: response.Out,
+		In:              response.Out,
 		MessageProvider: messageProvider,
 	}
 
@@ -288,7 +288,7 @@ func main() {
 				RequestClient:       *flagClient,
 				Audits: &[]message.Audit{
 					{
-						Type: "lighthouse",
+						Type:    "lighthouse",
 						Options: &message.AuditOption{},
 					},
 				},
@@ -308,10 +308,12 @@ func main() {
 		select {
 		// Terminate signal received.
 		case <-terminateChannel:
-			fmt.Println("Terminating server.")
-			break;
+			goto terminated
 		}
 	}
+
+terminated:
+	fmt.Println("Server terminated.")
 }
 
 // pollProvider polls the message provider for

@@ -328,10 +328,12 @@ func main() {
 		select {
 		// Terminate signal received.
 		case <-terminateChannel:
-			fmt.Println("Terminating server.")
-			return
+			goto terminated
 		}
 	}
+
+terminated:
+	fmt.Println("Server terminated.")
 }
 
 // pollProvider polls the message provider for
