@@ -11,7 +11,9 @@
     "johnpbloch/wordpress-core": "4.9.5",
     "slowprog/composer-copy-file": "~0.2",
     "wpackagist-theme/twentyseventeen": "1.5",
-    "wpackagist-plugin/flush-opcache": "2.4"
+    "wpackagist-plugin/flush-opcache": "2.4",
+    "wpackagist-plugin/pj-page-cache-red": "0.8.3",
+    "wpackagist-plugin/wp-redis": "0.7.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~5.7",
