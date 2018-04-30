@@ -607,6 +607,7 @@ Props:
 [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul)  
 [Justin Kopepasah (@kopepasah)](https://github.com/kopepasah)  
 [Miina Sikk (@miina)](https://github.com/miina)  
+[Mike Crantea (@mehigh)](https://github.com/mehigh)  
 [Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf)  
 [Rob Stinson (@robstino)](https://github.com/robstino)  
 [Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui)  
