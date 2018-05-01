@@ -12,6 +12,7 @@ services:
             - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads:ro
         depends_on:
             - api-mysql
+            - api-redis
         ports:
             - 80:8080
         environment:
@@ -20,6 +21,8 @@ services:
             API_ADMIN_USER: ${API_ADMIN_USER}
             API_BLOG_DESCRIPTION: ${API_BLOG_DESCRIPTION}
             API_BLOG_NAME: ${API_BLOG_NAME}
+            API_CACHE_DEBUG: ${API_CACHE_DEBUG}
+            API_CACHE_TTL: ${API_CACHE_TTL}
             API_DB_HOST: ${API_DB_HOST}
             API_DB_NAME: ${API_DB_NAME}
             API_DB_PASSWORD: ${API_DB_PASSWORD}
@@ -27,6 +30,10 @@ services:
             API_DB_USER: ${API_DB_USER}
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_KEY: ${API_KEY}
+            API_REDIS_AUTH: ${API_REDIS_AUTH}
+            API_REDIS_DATABASE: ${API_REDIS_DATABASE}
+            API_REDIS_HOST: ${API_REDIS_HOST}
+            API_REDIS_PORT: ${API_REDIS_PORT}
             API_SECRET: ${API_SECRET}
             API_THEME: ${API_THEME}
             API_UPLOAD_HANDLER: ${API_UPLOAD_HANDLER}
@@ -54,6 +61,13 @@ services:
             MYSQL_PASSWORD: ${API_DB_PASSWORD}
             MYSQL_ROOT_PASSWORD: ${API_DB_ROOT_PASSWORD}
             MYSQL_USER: ${API_DB_USER}
+
+    api-redis:
+        image: redis:3.2-alpine
+        ports:
+            - 6379:6379
+        volumes:
+            - ./data/api/redis:/data
 
 ### Lighthouse Server ###########################################
     lighthouse-server:

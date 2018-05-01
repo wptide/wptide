@@ -102,6 +102,38 @@ define( 'NONCE_SALT',       '${NONCE_SALT}' );
 $table_prefix  = 'wp_';
 
 /**
+ * WordPress Cache.
+ *
+ * Page and Object caching are both backed by Redis.
+ */
+define( 'WP_CACHE',          ${API_CACHE} );
+define( 'WP_CACHE_KEY_SALT', '${CACHE_KEY_SALT}' );
+
+// Redis settings.
+if ( true === WP_CACHE ) {
+    global $redis_server, $redis_page_cache_config;
+
+    $redis_server = array(
+        'host'     => getenv( 'API_REDIS_HOST' ),
+        'port'     => (int) getenv( 'API_REDIS_PORT' ),
+        'auth'     => getenv( 'API_REDIS_AUTH' ),
+        'database' => (int) getenv( 'API_REDIS_DATABASE' ),
+    );
+
+    $redis_page_cache_config = array(
+        'redis_host'          => getenv( 'API_REDIS_HOST' ),
+        'redis_port'          => (int) getenv( 'API_REDIS_PORT' ),
+        'redis_auth'          => getenv( 'API_REDIS_AUTH' ),
+        'redis_db'            => (int) getenv( 'API_REDIS_DATABASE' ),
+        'ttl'                 => getenv( 'API_CACHE_TTL' ),
+        'ignore_cookies'      => array( 'wordpress_test_cookie', '__utmt', '__utma', '__utmb', '__utmc', '__utmz', '__gads', '__qca', '_ga' ),
+        'ignore_request_keys' => array( 'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign' ),
+        'debug'               => getenv( 'API_CACHE_DEBUG' ),
+        'gzip'                => true,
+    );
+}
+
+/**
  * For developers: WordPress debugging mode.
  *
  * Change this to true to enable the display of notices during development.
@@ -129,7 +161,6 @@ define( 'AWS_SQS_QUEUE_LH',    getenv( 'AWS_SQS_QUEUE_LH' ) );
 define( 'AWS_SQS_QUEUE_PHPCS', getenv( 'AWS_SQS_QUEUE_PHPCS' ) );
 define( 'AWS_SQS_REGION',      getenv( 'AWS_SQS_REGION' ) );
 define( 'AWS_SQS_VERSION',     getenv( 'AWS_SQS_VERSION' ) );
-
 
 /* That's all, stop editing! Happy blogging. */
 
