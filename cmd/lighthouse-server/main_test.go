@@ -10,30 +10,32 @@ import (
 	"github.com/wptide/pkg/env"
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/payload"
+	"github.com/wptide/pkg/process"
+	"errors"
 )
 
 var (
 	envTest = map[string]string{
 		// Tide API config
-		"API_AUTH_URL":        "http://tide.local/api/tide/v1/auth",
-		"API_HTTP_HOST":       "tide.local",
-		"API_PROTOCOL":        "http",
-		"API_KEY":             "tideapikey",
-		"API_SECRET":          "tideapisecret",
-		"API_VERSION":         "v1",
+		"API_AUTH_URL":  "http://tide.local/api/tide/v1/auth",
+		"API_HTTP_HOST": "tide.local",
+		"API_PROTOCOL":  "http",
+		"API_KEY":       "tideapikey",
+		"API_SECRET":    "tideapisecret",
+		"API_VERSION":   "v1",
 		//
 		// AWS API settings
-		"AWS_API_KEY":         "sqskey",
-		"AWS_API_SECRET":      "sqssecret",
+		"AWS_API_KEY":    "sqskey",
+		"AWS_API_SECRET": "sqssecret",
 		//
 		// AWS S3 settings
-		"AWS_S3_BUCKET_NAME":   "test-bucket",
-		"AWS_S3_REGION":        "us-west-2",
+		"AWS_S3_BUCKET_NAME": "test-bucket",
+		"AWS_S3_REGION":      "us-west-2",
 		//
 		// AWS SQS settings
-		"AWS_SQS_QUEUE_LH":     "test-queue",
-		"AWS_SQS_REGION":       "us-west-2",
-		"AWS_SQS_VERSION":      "2012-11-05",
+		"AWS_SQS_QUEUE_LH": "test-queue",
+		"AWS_SQS_REGION":   "us-west-2",
+		"AWS_SQS_VERSION":  "2012-11-05",
 		//
 		// LH Server settings
 		"LH_CONCURRENT_AUDITS": "1",
@@ -206,6 +208,7 @@ func Test_main(t *testing.T) {
 		parseFlags     bool
 		version        bool
 		authError      bool
+		pipeError      bool
 		flagUrl        *string
 		flagOutput     *string
 		flagVisibility *string
@@ -213,8 +216,8 @@ func Test_main(t *testing.T) {
 	}
 
 	tests := []struct {
-		name     string
-		args     args
+		name string
+		args args
 	}{
 		{
 			"Run Main - Process Config Error (missing)",
@@ -333,6 +336,90 @@ func Test_main(t *testing.T) {
 	}
 }
 
+func Test_pipeError(t *testing.T) {
+
+	b := bytes.Buffer{}
+	log.SetOutput(&b)
+
+	var value string
+	for key, val := range envTest {
+
+		// Key is set, so retain the value when the test is finished.
+		if value = os.Getenv(key); value != "" {
+			os.Unsetenv(key)
+			defer func() { os.Setenv(key, value) }()
+		}
+
+		// Set the test value.
+		os.Setenv(key, val)
+	}
+
+	setupConfig()
+
+	// Use the mockTide for Tide
+	currentClient := TideClient
+	TideClient = &mockTide{}
+	defer func() { TideClient = currentClient }()
+
+	cMessageProvider := messageProvider
+	messageProvider = &mockMessageProvider{}
+	defer func() { messageProvider = cMessageProvider }()
+
+	type args struct {
+		timeOut       time.Duration
+		pipeError     bool
+		pipeErrorChan bool
+	}
+
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			"Run Main - Pipe Error Channel",
+			args{
+				timeOut:   1,
+				pipeErrorChan: true,
+			},
+		},
+		{
+			"Run Main - Pipe Errors",
+			args{
+				timeOut:       1,
+				pipeError:     true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if tt.args.pipeError {
+				oldProcs := processes
+				defer func() {
+					processes = oldProcs
+				}()
+				processes = []process.Processor{
+					mockFailedProcess{
+						shouldErr: true,
+					},
+				}
+			}
+
+			// Run as goroutine and wait for terminate signal.
+			go main()
+
+			if tt.args.pipeErrorChan {
+				go func() {
+					errc <- errors.New("Pipe error occurred.")
+				}()
+			}
+
+			// Sleep for one second. Allows for one poll action.
+			time.Sleep(time.Millisecond * 100 * tt.args.timeOut)
+		})
+	}
+}
+
 func setupConfig() {
 	// Setup lhConfig
 	lhConfig = struct {
@@ -380,7 +467,6 @@ func Test_pollProvider(t *testing.T) {
 	type args struct {
 		c        chan message.Message
 		provider message.MessageProvider
-		buffer   chan struct{}
 	}
 	tests := []struct {
 		name string
@@ -393,7 +479,6 @@ func Test_pollProvider(t *testing.T) {
 				&mockMessageProvider{
 					"message",
 				},
-				make(chan struct{}, 1),
 			},
 		},
 		{
@@ -403,7 +488,6 @@ func Test_pollProvider(t *testing.T) {
 				&mockMessageProvider{
 					"critical",
 				},
-				make(chan struct{}, 1),
 			},
 		},
 		{
@@ -413,7 +497,6 @@ func Test_pollProvider(t *testing.T) {
 				&mockMessageProvider{
 					"quota",
 				},
-				make(chan struct{}, 1),
 			},
 		},
 		{
@@ -423,13 +506,12 @@ func Test_pollProvider(t *testing.T) {
 				&mockMessageProvider{
 					"lenError",
 				},
-				make(chan struct{}, 1),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pollProvider(tt.args.c, tt.args.provider, tt.args.buffer)
+			pollProvider(tt.args.c, tt.args.provider)
 		})
 	}
 }

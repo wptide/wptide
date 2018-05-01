@@ -101,7 +101,11 @@ func (m mockMessageProvider) GetNextMessage() (*message.Message, error) {
 		pErr.Type = message.ErrOverQuota
 		return nil, pErr
 	case "message":
-		return &message.Message{}, nil
+		return &message.Message{
+			Title: "Mock Message",
+			ResponseAPIEndpoint: "localhost",
+
+		}, nil
 	case "lenError":
 		return &message.Message{Title: "lenError"}, nil
 	default:
@@ -152,19 +156,18 @@ type mockFailedProcess struct {
 	shouldErr bool
 }
 
-func (m mockFailedProcess) Run() (<-chan error, error) {
-	errc := make(chan error, 1)
+func (m mockFailedProcess) Run(errc *chan error) error {
 
 	switch m.option {
 	case "error":
-		errc <- errors.New("something went wrong")
+		*errc <- errors.New("something went wrong")
 	}
 
 	if m.shouldErr {
-		return errc, errors.New("something went wrong with setup")
+		return errors.New("something went wrong with setup")
 	}
 
-	return errc, nil
+	return nil
 }
 
 func (m mockFailedProcess) SetContext(ctx context.Context)        {}

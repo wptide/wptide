@@ -13,12 +13,9 @@ type Sink struct {
 	MessageProvider message.MessageProvider
 }
 
-func (s Sink) Run() (<-chan error, error) {
-
-	errc := make(chan error, 1)
+func (s Sink) Run(errc *chan error) error {
 
 	go func() {
-		defer close(errc)
 		for {
 			select {
 			case in := <-s.In:
@@ -30,7 +27,7 @@ func (s Sink) Run() (<-chan error, error) {
 					// Delete message from provider.
 					err := s.MessageProvider.DeleteMessage(s.GetMessage().ExternalRef)
 					if err != nil {
-						errc <- err
+						*errc <- err
 					} else {
 						log.Println("'" + s.GetMessage().Title + "' removed from message queue.")
 					}
@@ -40,5 +37,5 @@ func (s Sink) Run() (<-chan error, error) {
 
 	}()
 
-	return errc, nil
+	return nil
 }

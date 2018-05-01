@@ -157,11 +157,21 @@ func TestIntercept_Run(t *testing.T) {
 				ix.In = generateProcs(ctx, tt.procs)
 			}
 
-			var errc <-chan error
 			var err error
+			var chanError error
+			errc := make(chan error)
 
 			go func() {
-				errc, err = ix.Run()
+				for {
+					select {
+					case e := <-errc:
+						chanError = e
+					}
+				}
+			}()
+
+			go func() {
+				err = ix.Run(&errc)
 			}()
 
 			// Sleep a short time delay to give process time to start.
@@ -183,10 +193,8 @@ func TestIntercept_Run(t *testing.T) {
 				return
 			}
 
-			if (len(errc) != 0) != tt.wantErrc {
-				e := <-errc
-				t.Errorf("Intercept.Run() error = %v, wantErrc %v", e, tt.wantErrc)
-				return
+			if (chanError != nil) != tt.wantErrc {
+				t.Errorf("Intercept.Run() errorChan = %v, wantErrc %v", chanError, tt.wantErrc)
 			}
 		})
 	}

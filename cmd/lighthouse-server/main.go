@@ -8,18 +8,17 @@ import (
 	"time"
 	"log"
 	"github.com/wptide/pkg/env"
-	"strconv"
 	"github.com/wptide/pkg/storage"
 	"github.com/wptide/pkg/storage/s3"
-	"flag"
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
 	"errors"
 	"fmt"
-	"github.com/wptide/pkg/source"
 	"github.com/wptide/pkg/pipe"
 	commonProcess "github.com/xwp/go-tide/src/process"
 	commonPayload "github.com/xwp/go-tide/src/payload"
+	"flag"
+	"github.com/wptide/pkg/source"
 )
 
 type processConfig struct {
@@ -111,14 +110,13 @@ var (
 
 	/** Channels **/
 	// Number of concurrent audits.
-	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
-	buffer        = make(chan struct{}, bufferSize)
-
-	// Create a channel that can terminate the app.
-	terminateChannel = make(chan struct{}, 1)
+	//bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
 
 	// Create a channel that receives messages from a queue.
 	cMessage = make(chan message.Message)
+
+	// Create a channel that can terminate the app.
+	terminateChannel = make(chan struct{}, 1)
 
 	/** Flags **/
 	bParseFlags = true
@@ -137,6 +135,12 @@ var (
 
 	// Send to Stdout rather than API?
 	flagOutput = &[]string{""}[0]
+
+	// Processes to execute.
+	processes []process.Processor
+
+	// Pipeline error channel.
+	errc = make(chan error)
 )
 
 // initProcesses creates a number of processes for the pipeline.
@@ -193,13 +197,45 @@ func initProcesses(source <-chan message.Message, config processConfig) ([]proce
 		MessageProvider: messageProvider,
 	}
 
-	return []process.Processor{
+	processors := []process.Processor{
 		ingest,
 		info,
 		lh,
 		response,
 		sink,
-	}, nil
+	}
+
+	/**
+	 * @todo Make this configurable.
+	 */
+	//doDebug := false
+	//if doDebug {
+	//	debugIngest := &commonProcess.Debug{In: ingest.Out, Out: make(chan process.Processor), N: "Ingest"}
+	//	info.In = debugIngest.Out
+	//
+	//	debugInfo := &commonProcess.Debug{In: info.Out, Out: make(chan process.Processor), N: "Info"}
+	//	lh.In = debugInfo.Out
+	//
+	//	debugLh := &commonProcess.Debug{In: lh.Out, Out: make(chan process.Processor), N: "Lighthouse"}
+	//	response.In = debugLh.Out
+	//
+	//	debugResponse := &commonProcess.Debug{In: ingest.Out, Out: make(chan process.Processor), N: "Response"}
+	//	sink.In = debugResponse.Out
+	//
+	//	processors = []process.Processor{
+	//		ingest,
+	//		debugIngest,
+	//		info,
+	//		debugInfo,
+	//		lh,
+	//		debugLh,
+	//		response,
+	//		debugResponse,
+	//		sink,
+	//	}
+	//}
+
+	return processors, nil
 }
 
 func main() {
@@ -246,10 +282,12 @@ func main() {
 
 	/** Processes **/
 	log.Println("Initializing processes.")
-	processes, _ := initProcesses(
-		cMessage,
-		procCfg,
-	)
+	if processes == nil {
+		processes, _ = initProcesses(
+			cMessage,
+			procCfg,
+		)
+	}
 
 	// Create and run the pipe.
 	go func() {
@@ -257,9 +295,12 @@ func main() {
 		log.Println("Starting processing pipeline.")
 		pipeline := pipe.WithProcesses(processes...)
 
-		err := pipeline.Run()
+		err := pipeline.Run(&errc)
+
+		// Error here is fatal.
 		if err != nil {
 			fmt.Println(err)
+			terminateChannel <- struct{}{}
 		}
 	}()
 
@@ -300,12 +341,15 @@ func main() {
 	// Other processes can also queue the channel.
 	if *flagUrl == "" {
 		log.Println("Polling message provider.")
-		pollProvider(cMessage, messageProvider, buffer)
+		pollProvider(cMessage, messageProvider)
 	}
 
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
+		// Process Pipe Errors
+		case err := <-errc:
+			fmt.Println(err)
 		// Terminate signal received.
 		case <-terminateChannel:
 			goto terminated
@@ -318,10 +362,10 @@ terminated:
 
 // pollProvider polls the message provider for
 // the next message and upon success it gets added to the channel.
-func pollProvider(c chan message.Message, provider message.MessageProvider, buffer chan struct{}) {
+func pollProvider(c chan message.Message, provider message.MessageProvider) {
 
 	// Run this concurrently.
-	go func(b chan struct{}) {
+	go func() {
 		for {
 
 			// Get message from provider.
@@ -351,13 +395,10 @@ func pollProvider(c chan message.Message, provider message.MessageProvider, buff
 
 				log.Println("Dispatching '" + msg.Title + "'")
 
-				// Block if the buffer is full.
-				b <- struct{}{}
-
 				// Send message to channel.
 				c <- *msg
 			}
 			time.Sleep(time.Second * time.Duration(2))
 		}
-	}(buffer)
+	}()
 }

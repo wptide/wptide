@@ -18,12 +18,9 @@ type Intercept struct {
 	Out chan process.Processor   // The outbound Processor.
 }
 
-func (ix *Intercept) Run() (<-chan error, error) {
-
-	errc := make(chan error, 1)
+func (ix *Intercept) Run(errc *chan error) error {
 
 	go func() {
-		defer close(errc)
 		for {
 			select {
 			case in := <-ix.In:
@@ -49,5 +46,5 @@ func (ix *Intercept) Run() (<-chan error, error) {
 		}
 	}()
 
-	return errc, nil
+	return nil
 }
