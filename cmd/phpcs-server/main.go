@@ -13,12 +13,11 @@ import (
 	"flag"
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
-	"errors"
 	"fmt"
 	"github.com/wptide/pkg/source"
-	"github.com/wptide/pkg/pipe"
 	commonProcess "github.com/xwp/go-tide/src/process"
 	commonPayload "github.com/xwp/go-tide/src/payload"
+	"sync"
 )
 
 type processConfig struct {
@@ -137,87 +136,9 @@ var (
 	// Send to Stdout rather than API?
 	flagOutput = &[]string{""}[0]
 
-	// Processes to execute.
-	processes []process.Processor
-
 	// Pipeline error channel.
 	errc = make(chan error)
 )
-
-// initProcesses creates a number of processes for the pipeline.
-// With each process we connect the "In" and "Out" channels to subsequent processes.
-func initProcesses(source <-chan message.Message, config *processConfig) ([]process.Processor, error) {
-
-	// Make sure we have a valid channel.
-	if source == nil {
-		return nil, errors.New("no valid source channel")
-	}
-
-	// Make sure we have our config.
-	if config == nil {
-		return nil, errors.New("no config provided")
-	}
-	if config.igTempFolder == "" {
-		return nil, errors.New("no temp folder for ingest process")
-	}
-	if config.phpcsTempFolder == "" {
-		return nil, errors.New("no temp folder for phpcs process")
-	}
-	if config.phpcsStorageProvider == nil {
-		return nil, errors.New("no storage provider for phpcs process")
-	}
-	if config.resPayloaders == nil {
-		return nil, errors.New("no response payloaders to send to")
-	}
-
-	// Create and connect processes.
-	ingest := &process.Ingest{
-		In:         source,
-		Out:        make(chan process.Processor),
-		TempFolder: config.igTempFolder,
-	}
-
-	info := &process.Info{
-		In:  ingest.Out,
-		Out: make(chan process.Processor),
-	}
-
-	intercept := &Intercept{
-		In:  info.Out,
-		Out: make(chan process.Processor),
-	}
-
-	phpcs := &process.Phpcs{
-		In:         intercept.Out,
-		Out:        make(chan process.Processor),
-		TempFolder: config.phpcsTempFolder,
-		Config: map[string]interface{}{
-			"parallel": 1,
-		},
-		StorageProvider: config.phpcsStorageProvider,
-	}
-
-	// Not chaining response, so no need for Out channel.
-	response := &process.Response{
-		In:         phpcs.Out,
-		Out:        make(chan process.Processor),
-		Payloaders: config.resPayloaders,
-	}
-
-	sink := &commonProcess.Sink{
-		In: response.Out,
-		MessageProvider: messageProvider,
-	}
-
-	return []process.Processor{
-		ingest,
-		info,
-		intercept,
-		phpcs,
-		response,
-		sink,
-	}, nil
-}
 
 func main() {
 
@@ -260,30 +181,6 @@ func main() {
 			terminateChannel <- struct{}{}
 		}
 	}
-
-	/** Processes **/
-	log.Println("Initializing processes.")
-	if processes == nil {
-		processes, _ = initProcesses(
-			cMessage,
-			procCfg,
-		)
-	}
-
-	// Create and run the pipe.
-	go func() {
-		// Create New Pipe with processes.
-		log.Println("Starting processing pipeline.")
-		pipeline := pipe.WithProcesses(processes...)
-
-		err := pipeline.Run(&errc)
-
-		// Error here is fatal.
-		if err != nil {
-			fmt.Println(err)
-			terminateChannel <- struct{}{}
-		}
-	}()
 
 	// If -url is set then send a message using the URL.
 	if *flagUrl != "" {
@@ -336,10 +233,19 @@ func main() {
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
-		// Process Pipe Errors
+		// Process Message
+		case msg := <-cMessage:
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			err := processMessage(msg, &wg)
+			if err != nil {
+				fmt.Println(err)
+			}
+			wg.Wait()
+			// Process Pipe Errors
 		case err := <-errc:
 			fmt.Println(err)
-		// Terminate signal received.
+			// Terminate signal received.
 		case <-terminateChannel:
 			goto terminated
 		}
@@ -347,6 +253,54 @@ func main() {
 
 terminated:
 	fmt.Println("Server terminated.")
+}
+
+// processMessage sends the message through a sequential process.
+func processMessage(msg message.Message, wg *sync.WaitGroup) error {
+	defer wg.Done()
+
+	// Initiate results pointer.
+	results := &process.Result{}
+
+	// Ingest.
+	if err := commonProcess.DoIngest(&msg, results, procCfg.igTempFolder); err != nil {
+		return err
+	}
+
+	// Info.
+	if err := commonProcess.DoInfo(&msg, results); err != nil {
+		return err
+	}
+
+	// Phpcs.
+	config := map[string]interface{}{
+		"parallel": 1,
+	}
+	if err := commonProcess.DoPhpcs(&msg, results, procCfg.phpcsTempFolder, procCfg.phpcsStorageProvider, config); err != nil {
+		return err
+	}
+
+	// Prepare Response.
+	if err := commonProcess.DoResponse(&msg, results, payloaders); err != nil {
+		return err
+	}
+
+	// Clean up.
+	res := *results
+	if res["responseSuccess"] != nil && res["responseSuccess"].(bool) {
+		// Output message.
+		log.Println(res["responseMessage"])
+
+		// Delete message from provider.
+		err := messageProvider.DeleteMessage(msg.ExternalRef)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println("'" + msg.Title + "' removed from message queue.")
+		}
+	}
+
+	return nil
 }
 
 // pollProvider polls the message provider for

@@ -12,13 +12,12 @@ import (
 	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
-	"errors"
 	"fmt"
-	"github.com/wptide/pkg/pipe"
 	commonProcess "github.com/xwp/go-tide/src/process"
 	commonPayload "github.com/xwp/go-tide/src/payload"
 	"flag"
 	"github.com/wptide/pkg/source"
+	"sync"
 )
 
 type processConfig struct {
@@ -143,101 +142,6 @@ var (
 	errc = make(chan error)
 )
 
-// initProcesses creates a number of processes for the pipeline.
-// With each process we connect the "In" and "Out" channels to subsequent processes.
-func initProcesses(source <-chan message.Message, config processConfig) ([]process.Processor, error) {
-
-	// Make sure we have a valid channel.
-	if source == nil {
-		return nil, errors.New("no valid source channel")
-	}
-
-	// Make sure we have our config.
-	if config.igTempFolder == "" {
-		return nil, errors.New("no temp folder for ingest process")
-	}
-	if config.lhTempFolder == "" {
-		return nil, errors.New("no temp folder for lighthouse process")
-	}
-	if config.lhStorageProvider == nil {
-		return nil, errors.New("no storage provider for lighthouse process")
-	}
-	if config.resPayloaders == nil {
-		return nil, errors.New("no response payloaders to send to")
-	}
-
-	// Create and connect processes.
-	ingest := &process.Ingest{
-		In:         source,
-		Out:        make(chan process.Processor),
-		TempFolder: config.igTempFolder,
-	}
-
-	info := &process.Info{
-		In:  ingest.Out,
-		Out: make(chan process.Processor),
-	}
-
-	lh := &process.Lighthouse{
-		In:              info.Out,
-		Out:             make(chan process.Processor),
-		TempFolder:      config.lhTempFolder,
-		StorageProvider: config.lhStorageProvider,
-	}
-
-	// Not chaining response, so no need for Out channel.
-	response := &process.Response{
-		In:         lh.Out,
-		Out:        make(chan process.Processor),
-		Payloaders: config.resPayloaders,
-	}
-
-	sink := &commonProcess.Sink{
-		In:              response.Out,
-		MessageProvider: messageProvider,
-	}
-
-	processors := []process.Processor{
-		ingest,
-		info,
-		lh,
-		response,
-		sink,
-	}
-
-	/**
-	 * @todo Make this configurable.
-	 */
-	//doDebug := false
-	//if doDebug {
-	//	debugIngest := &commonProcess.Debug{In: ingest.Out, Out: make(chan process.Processor), N: "Ingest"}
-	//	info.In = debugIngest.Out
-	//
-	//	debugInfo := &commonProcess.Debug{In: info.Out, Out: make(chan process.Processor), N: "Info"}
-	//	lh.In = debugInfo.Out
-	//
-	//	debugLh := &commonProcess.Debug{In: lh.Out, Out: make(chan process.Processor), N: "Lighthouse"}
-	//	response.In = debugLh.Out
-	//
-	//	debugResponse := &commonProcess.Debug{In: ingest.Out, Out: make(chan process.Processor), N: "Response"}
-	//	sink.In = debugResponse.Out
-	//
-	//	processors = []process.Processor{
-	//		ingest,
-	//		debugIngest,
-	//		info,
-	//		debugInfo,
-	//		lh,
-	//		debugLh,
-	//		response,
-	//		debugResponse,
-	//		sink,
-	//	}
-	//}
-
-	return processors, nil
-}
-
 func main() {
 
 	log.Println("Starting Lighthouse audit server.")
@@ -279,30 +183,6 @@ func main() {
 			terminateChannel <- struct{}{}
 		}
 	}
-
-	/** Processes **/
-	log.Println("Initializing processes.")
-	if processes == nil {
-		processes, _ = initProcesses(
-			cMessage,
-			procCfg,
-		)
-	}
-
-	// Create and run the pipe.
-	go func() {
-		// Create New Pipe with processes.
-		log.Println("Starting processing pipeline.")
-		pipeline := pipe.WithProcesses(processes...)
-
-		err := pipeline.Run(&errc)
-
-		// Error here is fatal.
-		if err != nil {
-			fmt.Println(err)
-			terminateChannel <- struct{}{}
-		}
-	}()
 
 	// If -url is set then send a message using the URL.
 	if *flagUrl != "" {
@@ -347,10 +227,19 @@ func main() {
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
-		// Process Pipe Errors
+		// Process Message
+		case msg := <-cMessage:
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			err := processMessage(msg, &wg)
+			if err != nil {
+				fmt.Println(err)
+			}
+			wg.Wait()
+			// Process Pipe Errors
 		case err := <-errc:
 			fmt.Println(err)
-		// Terminate signal received.
+			// Terminate signal received.
 		case <-terminateChannel:
 			goto terminated
 		}
@@ -358,6 +247,51 @@ func main() {
 
 terminated:
 	fmt.Println("Server terminated.")
+}
+
+// processMessage sends the message through a sequential process.
+func processMessage(msg message.Message, wg *sync.WaitGroup) error {
+	defer wg.Done()
+
+	// Initiate results pointer.
+	results := &process.Result{}
+
+	// Ingest.
+	if err := commonProcess.DoIngest(&msg, results, procCfg.igTempFolder); err != nil {
+		return err
+	}
+
+	// Info.
+	if err := commonProcess.DoInfo(&msg, results); err != nil {
+		return err
+	}
+
+	// Lighthouse.
+	if err := commonProcess.DoLighthouse(&msg, results, procCfg.lhTempFolder, procCfg.lhStorageProvider); err != nil {
+		return err
+	}
+
+	// Prepare Response.
+	if err := commonProcess.DoResponse(&msg, results, payloaders); err != nil {
+		return err
+	}
+
+	// Clean up.
+	res := *results
+	if res["responseSuccess"] != nil && res["responseSuccess"].(bool) {
+		// Output message.
+		log.Println(res["responseMessage"])
+
+		// Delete message from provider.
+		err := messageProvider.DeleteMessage(msg.ExternalRef)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Println("'" + msg.Title + "' removed from message queue.")
+		}
+	}
+
+	return nil
 }
 
 // pollProvider polls the message provider for

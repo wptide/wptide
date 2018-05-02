@@ -2,16 +2,16 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"log"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/wptide/pkg/env"
 	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/payload"
 	"github.com/wptide/pkg/process"
-	"errors"
 )
 
 var (
@@ -41,136 +41,6 @@ var (
 		"LH_CONCURRENT_AUDITS": "1",
 	}
 )
-
-func Test_initProcesses(t *testing.T) {
-
-	type args struct {
-		source <-chan message.Message
-		config processConfig
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			"Valid Processes",
-			args{
-				make(chan message.Message),
-				processConfig{
-					igTempFolder:      "./testdata/tmp",
-					lhTempFolder:      "./testdata/tmp",
-					lhStorageProvider: &mockStorage{},
-					resPayloaders: map[string]payload.Payloader{
-						"tide": &mockPayloader{},
-					},
-				},
-			},
-			false,
-		},
-		{
-			"No Config",
-			args{
-				source: make(chan message.Message),
-			},
-			true,
-		},
-		{
-			"No Source",
-			args{
-				config: processConfig{
-					igTempFolder:      "./testdata/tmp",
-					lhTempFolder:      "./testdata/tmp",
-					lhStorageProvider: &mockStorage{},
-					resPayloaders: map[string]payload.Payloader{
-						"tide": &mockPayloader{},
-					},
-				},
-			},
-			true,
-		},
-		{
-			"Ingest temp folder missing",
-			args{
-				make(chan message.Message),
-				processConfig{
-					lhTempFolder:      "./testdata/tmp",
-					lhStorageProvider: &mockStorage{},
-					resPayloaders: map[string]payload.Payloader{
-						"tide": &mockPayloader{},
-					},
-				},
-			},
-			true,
-		},
-		{
-			"Lighthouse temp folder missing",
-			args{
-				make(chan message.Message),
-				processConfig{
-					igTempFolder:      "./testdata/tmp",
-					lhStorageProvider: &mockStorage{},
-					resPayloaders: map[string]payload.Payloader{
-						"tide": &mockPayloader{},
-					},
-				},
-			},
-			true,
-		},
-		{
-			"Lighthouse storage provider missing",
-			args{
-				make(chan message.Message),
-				processConfig{
-					igTempFolder: "./testdata/tmp",
-					lhTempFolder: "./testdata/tmp",
-					resPayloaders: map[string]payload.Payloader{
-						"tide": &mockPayloader{},
-					},
-				},
-			},
-			true,
-		},
-		{
-			"Response payloaders missing",
-			args{
-				make(chan message.Message),
-				processConfig{
-					igTempFolder:      "./testdata/tmp",
-					lhTempFolder:      "./testdata/tmp",
-					lhStorageProvider: &mockStorage{},
-				},
-			},
-			true,
-		},
-		{
-			"Valid Processes with messages",
-			args{
-				make(chan message.Message),
-				processConfig{
-					igTempFolder:      "./testdata/tmp",
-					lhTempFolder:      "./testdata/tmp",
-					lhStorageProvider: &mockStorage{},
-					resPayloaders: map[string]payload.Payloader{
-						"tide": &mockPayloader{},
-					},
-				},
-			},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			_, err := initProcesses(tt.args.source, tt.args.config)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("initProcesses() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-		})
-	}
-}
 
 func Test_main(t *testing.T) {
 
@@ -378,15 +248,15 @@ func Test_pipeError(t *testing.T) {
 		{
 			"Run Main - Pipe Error Channel",
 			args{
-				timeOut:   1,
+				timeOut:       1,
 				pipeErrorChan: true,
 			},
 		},
 		{
 			"Run Main - Pipe Errors",
 			args{
-				timeOut:       1,
-				pipeError:     true,
+				timeOut:   1,
+				pipeError: true,
 			},
 		},
 	}
@@ -512,6 +382,28 @@ func Test_pollProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pollProvider(tt.args.c, tt.args.provider)
+		})
+	}
+}
+
+func Test_processMessage(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		msg message.Message
+		wantErr bool
+	}{
+		/*
+			@todo Add these tests
+		 */
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			if err := processMessage(tt.msg, &wg); (err != nil) != tt.wantErr {
+				t.Errorf("processMessage() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }

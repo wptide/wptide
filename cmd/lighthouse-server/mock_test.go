@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"errors"
 	"context"
+	"github.com/wptide/pkg/process"
 )
 
 /** ----------------------------------------------
@@ -102,9 +103,8 @@ func (m mockMessageProvider) GetNextMessage() (*message.Message, error) {
 		return nil, pErr
 	case "message":
 		return &message.Message{
-			Title: "Mock Message",
+			Title:               "Mock Message",
 			ResponseAPIEndpoint: "localhost",
-
 		}, nil
 	case "lenError":
 		return &message.Message{Title: "lenError"}, nil
@@ -170,11 +170,10 @@ func (m mockFailedProcess) Run(errc *chan error) error {
 	return nil
 }
 
-func (m mockFailedProcess) SetContext(ctx context.Context)        {}
-func (m mockFailedProcess) SetMessage(msg message.Message)        {}
-func (m mockFailedProcess) GetMessage() message.Message           { return message.Message{} }
-func (m mockFailedProcess) SetResults(res map[string]interface{}) {}
-func (m mockFailedProcess) GetResult() map[string]interface{}     { return nil }
-func (m mockFailedProcess) SetFilesPath(path string)              {}
-func (m mockFailedProcess) GetFilesPath() string                  { return "" }
-
+func (m mockFailedProcess) SetContext(ctx context.Context) {}
+func (m mockFailedProcess) SetMessage(msg message.Message) {}
+func (m mockFailedProcess) GetMessage() message.Message    { return message.Message{} }
+func (m mockFailedProcess) SetResults(res *process.Result) {}
+func (m mockFailedProcess) GetResult() *process.Result     { return nil }
+func (m mockFailedProcess) SetFilesPath(path string)       {}
+func (m mockFailedProcess) GetFilesPath() string           { return "" }
