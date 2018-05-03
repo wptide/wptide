@@ -136,8 +136,11 @@ var (
 	// Send to Stdout rather than API?
 	flagOutput = &[]string{""}[0]
 
-	// Pipeline error channel.
-	errc = make(chan error)
+	// Process Functions
+	doIngest   = commonProcess.DoIngest
+	doInfo     = commonProcess.DoInfo
+	doPhpcs    = commonProcess.DoPhpcs
+	doResponse = commonProcess.DoResponse
 )
 
 func main() {
@@ -233,8 +236,8 @@ func main() {
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
-		// Process Message
 		case msg := <-cMessage:
+			// Process Message
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			err := processMessage(msg, &wg)
@@ -242,11 +245,9 @@ func main() {
 				fmt.Println(err)
 			}
 			wg.Wait()
-			// Process Pipe Errors
-		case err := <-errc:
-			fmt.Println(err)
-			// Terminate signal received.
+
 		case <-terminateChannel:
+			// Terminate signal received.
 			goto terminated
 		}
 	}
@@ -263,12 +264,12 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 	results := &process.Result{}
 
 	// Ingest.
-	if err := commonProcess.DoIngest(&msg, results, procCfg.igTempFolder); err != nil {
+	if err := doIngest(&msg, results, procCfg.igTempFolder); err != nil {
 		return err
 	}
 
 	// Info.
-	if err := commonProcess.DoInfo(&msg, results); err != nil {
+	if err := doInfo(&msg, results); err != nil {
 		return err
 	}
 
@@ -276,12 +277,12 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 	config := map[string]interface{}{
 		"parallel": 1,
 	}
-	if err := commonProcess.DoPhpcs(&msg, results, procCfg.phpcsTempFolder, procCfg.phpcsStorageProvider, config); err != nil {
+	if err := doPhpcs(&msg, results, procCfg.phpcsTempFolder, procCfg.phpcsStorageProvider, config); err != nil {
 		return err
 	}
 
 	// Prepare Response.
-	if err := commonProcess.DoResponse(&msg, results, payloaders); err != nil {
+	if err := doResponse(&msg, results, payloaders); err != nil {
 		return err
 	}
 
@@ -294,7 +295,7 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 		// Delete message from provider.
 		err := messageProvider.DeleteMessage(msg.ExternalRef)
 		if err != nil {
-			log.Println(err)
+			return err
 		} else {
 			log.Println("'" + msg.Title + "' removed from message queue.")
 		}

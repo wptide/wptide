@@ -2,16 +2,14 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"log"
 	"os"
 	"sync"
 	"testing"
 	"time"
-
 	"github.com/wptide/pkg/env"
 	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/process"
+	commonProcess "github.com/xwp/go-tide/src/process"
 )
 
 var (
@@ -78,7 +76,6 @@ func Test_main(t *testing.T) {
 		parseFlags     bool
 		version        bool
 		authError      bool
-		pipeError      bool
 		flagUrl        *string
 		flagOutput     *string
 		flagVisibility *string
@@ -206,90 +203,6 @@ func Test_main(t *testing.T) {
 	}
 }
 
-func Test_pipeError(t *testing.T) {
-
-	b := bytes.Buffer{}
-	log.SetOutput(&b)
-
-	var value string
-	for key, val := range envTest {
-
-		// Key is set, so retain the value when the test is finished.
-		if value = os.Getenv(key); value != "" {
-			os.Unsetenv(key)
-			defer func() { os.Setenv(key, value) }()
-		}
-
-		// Set the test value.
-		os.Setenv(key, val)
-	}
-
-	setupConfig()
-
-	// Use the mockTide for Tide
-	currentClient := TideClient
-	TideClient = &mockTide{}
-	defer func() { TideClient = currentClient }()
-
-	cMessageProvider := messageProvider
-	messageProvider = &mockMessageProvider{}
-	defer func() { messageProvider = cMessageProvider }()
-
-	type args struct {
-		timeOut       time.Duration
-		pipeError     bool
-		pipeErrorChan bool
-	}
-
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			"Run Main - Pipe Error Channel",
-			args{
-				timeOut:       1,
-				pipeErrorChan: true,
-			},
-		},
-		{
-			"Run Main - Pipe Errors",
-			args{
-				timeOut:   1,
-				pipeError: true,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			if tt.args.pipeError {
-				oldProcs := processes
-				defer func() {
-					processes = oldProcs
-				}()
-				processes = []process.Processor{
-					mockFailedProcess{
-						shouldErr: true,
-					},
-				}
-			}
-
-			// Run as goroutine and wait for terminate signal.
-			go main()
-
-			if tt.args.pipeErrorChan {
-				go func() {
-					errc <- errors.New("Pipe error occurred.")
-				}()
-			}
-
-			// Sleep for one second. Allows for one poll action.
-			time.Sleep(time.Millisecond * 100 * tt.args.timeOut)
-		})
-	}
-}
-
 func setupConfig() {
 	// Setup lhConfig
 	lhConfig = struct {
@@ -388,14 +301,97 @@ func Test_pollProvider(t *testing.T) {
 
 func Test_processMessage(t *testing.T) {
 
+	doIngest = MockDoIngest
+	doInfo = MockDoInfo
+	doLighthouse = MockDoLighthouse
+	doResponse = MockDoResponse
+	defer func() {
+		doIngest = commonProcess.DoIngest
+		doInfo = commonProcess.DoInfo
+		doLighthouse = commonProcess.DoLighthouse
+		doResponse = commonProcess.DoResponse
+	}()
+
+	cMessageProvider := messageProvider
+	messageProvider = &mockMessageProvider{}
+	defer func() { messageProvider = cMessageProvider }()
+
 	tests := []struct {
 		name    string
 		msg message.Message
 		wantErr bool
 	}{
-		/*
-			@todo Add these tests
-		 */
+		{
+			"Ingest - Success",
+			message.Message{
+				Slug: "ingestSuccess",
+			},
+			false,
+		},
+		{
+			"Ingest - Fail",
+			message.Message{
+				Slug: "ingestFail",
+			},
+			true,
+		},
+		{
+			"Info - Success",
+			message.Message{
+				Slug: "infoSuccess",
+			},
+			false,
+		},
+		{
+			"Info - Fail",
+			message.Message{
+				Slug: "infoFail",
+			},
+			true,
+		},
+		{
+			"Lighhouse - Success",
+			message.Message{
+				Slug: "lhSuccess",
+			},
+			false,
+		},
+		{
+			"Lighthouse - Fail",
+			message.Message{
+				Slug: "lhFail",
+			},
+			true,
+		},
+		{
+			"Response - Success",
+			message.Message{
+				Slug: "resSuccess",
+			},
+			false,
+		},
+		{
+			"Response - Fail",
+			message.Message{
+				Slug: "resFail",
+			},
+			true,
+		},
+		{
+			"Message Success - Provider Success",
+			message.Message{
+				Slug: "resultSuccess",
+			},
+			false,
+		},
+		{
+			"Message Success - Provider Fail",
+			message.Message{
+				Slug: "resultSuccess",
+				ExternalRef: &[]string{"removeFail"}[0],
+			},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

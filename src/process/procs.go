@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	PHPCompatibilityWPPath = "/root/.composer/vendor/wimg/php-compatibility/framework-rulesets/wordpress.xml"
+	//PHPCompatibilityWPPath = "/root/.composer/vendor/wimg/php-compatibility/framework-rulesets/wordpress.xml"
+	PHPCompatibilityWPPath = "/Users/rheinardkorf/Utilities/phpcs-standards/phpcompatibility/framework-rulesets/wordpress.xml"
 )
 
 func DoIngest(msg *message.Message, result *process.Result, tempFolder string) error {
