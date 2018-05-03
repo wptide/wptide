@@ -79,6 +79,7 @@ func Test_main(t *testing.T) {
 		flagUrl        *string
 		flagOutput     *string
 		flagVisibility *string
+		flagWPRuleset  *string
 		altConfig      *processConfig
 	}
 
@@ -133,6 +134,14 @@ func Test_main(t *testing.T) {
 				timeOut:        1,
 				flagUrl:        &[]string{testFileServer.URL + "/test.zip"}[0],
 				flagVisibility: &[]string{"public"}[0],
+			},
+		},
+		{
+			"Run Main - WP PHPCompatibility Flag set",
+			args{
+				messageChannel: make(chan message.Message, 1),
+				timeOut:        1,
+				flagWPRuleset:  &[]string{"./testdata/wordpress.xml"}[0],
 			},
 		},
 		{
@@ -194,6 +203,15 @@ func Test_main(t *testing.T) {
 				flagVisibility = tt.args.flagVisibility
 				defer func() {
 					flagVisibility = &[]string{""}[0]
+				}()
+			}
+
+			// If -wp-phpcompat-ruleset was provided then override the ruleset path.
+			if tt.args.flagWPRuleset != nil {
+				oldFlag := flagWPRuleset
+				flagWPRuleset = tt.args.flagWPRuleset
+				defer func() {
+					flagWPRuleset = oldFlag
 				}()
 			}
 
@@ -345,7 +363,7 @@ func Test_processMessage(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		msg message.Message
+		msg     message.Message
 		wantErr bool
 	}{
 		{
@@ -414,7 +432,7 @@ func Test_processMessage(t *testing.T) {
 		{
 			"Message Success - Provider Fail",
 			message.Message{
-				Slug: "resultSuccess",
+				Slug:        "resultSuccess",
 				ExternalRef: &[]string{"removeFail"}[0],
 			},
 			true,

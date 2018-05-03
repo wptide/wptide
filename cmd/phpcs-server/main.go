@@ -18,6 +18,7 @@ import (
 	commonProcess "github.com/xwp/go-tide/src/process"
 	commonPayload "github.com/xwp/go-tide/src/payload"
 	"sync"
+	"os"
 )
 
 type processConfig struct {
@@ -136,6 +137,9 @@ var (
 	// Send to Stdout rather than API?
 	flagOutput = &[]string{""}[0]
 
+	// PHPCompatibility ruleset to use for WordPress projects.
+	flagWPRuleset = &[]string{""}[0]
+
 	// Process Functions
 	doIngest   = commonProcess.DoIngest
 	doInfo     = commonProcess.DoInfo
@@ -162,6 +166,9 @@ func main() {
 
 		// The -client login name in Tide API.
 		flagClient = flag.String("client", "wporg", `Tide API client to attribute project to - default "wporg"`)
+
+		// -wp-phpcompat-ruleset sepcifies the WordPress specific ruleset to use for PHPCompatibility.
+		flagWPRuleset = flag.String("wp-phpcompat-ruleset", "", "path to WordPress specific PHPCompatibility ruleset")
 
 		// Parse all flags.
 		flag.Parse()
@@ -231,6 +238,13 @@ func main() {
 	if *flagUrl == "" {
 		log.Println("Polling message provider.")
 		pollProvider(cMessage, messageProvider)
+	}
+
+	// If -wp-phpcompat-ruleset was provided then override the ruleset path.
+	if *flagWPRuleset != ""  {
+		if _, err := os.Stat(*flagWPRuleset); err == nil {
+			commonProcess.PHPCompatibilityWPPath = *flagWPRuleset
+		}
 	}
 
 	// Poll the message channel until the program is forcefully exited.
