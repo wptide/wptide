@@ -32,7 +32,7 @@ func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
 		Visibility:          auditVisibility,
 		Standards:           defaultStandards(),
 		Audits:              defaultAudits(),
-		PayloadType:         "tide-api",
+		PayloadType:         "tide",
 	}
 
 	switch project.Type {
