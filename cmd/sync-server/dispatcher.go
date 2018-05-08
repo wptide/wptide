@@ -32,6 +32,7 @@ func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
 		Visibility:          auditVisibility,
 		Standards:           defaultStandards(),
 		Audits:              defaultAudits(),
+		PayloadType:         "tide-api",
 	}
 
 	switch project.Type {
@@ -40,8 +41,8 @@ func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
 		msg.ProjectType = "theme"
 		msg.Content = project.Description
 		msg.Standards = append(msg.Standards, "lighthouse")
-		*msg.Audits = append(*msg.Audits,message.Audit{
-			Type: "lighthouse",
+		*msg.Audits = append(*msg.Audits, message.Audit{
+			Type:    "lighthouse",
 			Options: &message.AuditOption{},
 		})
 	case "plugins":
