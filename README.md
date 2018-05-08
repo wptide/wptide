@@ -606,7 +606,20 @@ a chat service, sometimes it takes several hours for community members to respon
 — please be patient.
 
 ### Credits
-Props: [@danlouw](https://github.com/danlouw), [@jeffpaul](https://github.com/jeffpaul), [@rheinardkorf](https://github.com/rheinardkorf), [@valendesigns](https://github.com/valendesigns)
+Props: [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp), 
+[Daniel Louw (@danlouw)](https://github.com/danlouw), 
+[David Cramer (@davidcramer)](https://github.com/davidcramer), 
+[David Lonjon (@davidlonjon)](https://github.com/davidlonjon), 
+[Derek Herman (@valendesigns)](https://github.com/valendesigns), 
+[Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul), 
+[Justin Kopepasah (@kopepasah)](https://github.com/kopepasah), 
+[Luke Carbis (@lukecarbis)](https://github.com/lukecarbis), 
+[Miina Sikk (@miina)](https://github.com/miina), 
+[Mike Crantea (@mehigh)](https://github.com/mehigh), 
+[Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf), 
+[Rob Stinson (@robstino)](https://github.com/robstino), 
+[Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui), 
+[Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ### License
 Tide utilizes an [MIT license][mit-license].
