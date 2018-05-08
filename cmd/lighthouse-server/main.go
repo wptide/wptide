@@ -1,27 +1,31 @@
 package main
 
 import (
-	"github.com/wptide/pkg/audit"
 	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/audit/lighthouse"
-	"github.com/wptide/pkg/audit/tide"
 	tideApi "github.com/wptide/pkg/tide"
 	"github.com/wptide/pkg/tide/api"
 	"github.com/wptide/pkg/message/sqs"
 	"time"
 	"log"
-	tidelog "github.com/wptide/pkg/log"
 	"github.com/wptide/pkg/env"
-	"strconv"
-	"github.com/wptide/pkg/audit/ingest"
-	"github.com/wptide/pkg/audit/info"
 	"github.com/wptide/pkg/storage"
 	"github.com/wptide/pkg/storage/s3"
+	"github.com/wptide/pkg/process"
+	"github.com/wptide/pkg/payload"
+	"fmt"
+	commonProcess "github.com/xwp/go-tide/src/process"
+	commonPayload "github.com/xwp/go-tide/src/payload"
 	"flag"
 	"github.com/wptide/pkg/source"
-	"fmt"
-	"os"
+	"sync"
 )
+
+type processConfig struct {
+	igTempFolder      string
+	lhTempFolder      string
+	lhStorageProvider storage.StorageProvider
+	resPayloaders     map[string]payload.Payloader
+}
 
 var (
 	/** Compile time variables. **/
@@ -32,6 +36,16 @@ var (
 	// Use the interface so that we can test.
 	TideClient tideApi.ClientInterface = &api.Client{}
 
+	// Specify the payloads to be used for this service.
+	payloaders = map[string]payload.Payloader{
+		"tide": payload.TidePayload{
+			Client: TideClient,
+		},
+		"local-file": commonPayload.FilePayload{
+			TerminateChannel: terminateChannel,
+		},
+	}
+
 	// messageProvider is the primary source of messages to process.
 	messageProvider message.MessageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
 
@@ -40,6 +54,14 @@ var (
 
 	// Temp folder for downloaded files.
 	tempFolder = env.GetEnv("LH_TEMP_FOLDER", "/tmp")
+
+	/** Processes Configuration **/
+	procCfg = processConfig{
+		tempFolder,
+		tempFolder,
+		storageProvider,
+		payloaders,
+	}
 
 	/** Service Configurations **/
 	// Tide API configuration.
@@ -87,14 +109,13 @@ var (
 
 	/** Channels **/
 	// Number of concurrent audits.
-	bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
-	buffer        = make(chan struct{}, bufferSize)
+	//bufferSize, _ = strconv.Atoi(env.GetEnv("LH_CONCURRENT_AUDITS", "5"))
+
+	// Create a channel that receives messages from a queue.
+	cMessage = make(chan message.Message)
 
 	// Create a channel that can terminate the app.
 	terminateChannel = make(chan struct{}, 1)
-
-	// Create a channel that receives messages from a queue.
-	cMessage chan *message.Message
 
 	/** Flags **/
 	bParseFlags = true
@@ -114,17 +135,16 @@ var (
 	// Send to Stdout rather than API?
 	flagOutput = &[]string{""}[0]
 
-	/** Processes **/
-	// A slice of processes (in order) that need to be performed on a message.
-	processes = []audit.Processor{
-		&ingest.Processor{},
-		&info.Processor{},
-		&lighthouse.Processor{},
-		&tide.Processor{},
-	}
+	// Process Functions
+	doIngest     = commonProcess.DoIngest
+	doInfo       = commonProcess.DoInfo
+	doLighthouse = commonProcess.DoLighthouse
+	doResponse   = commonProcess.DoResponse
 )
 
 func main() {
+
+	log.Println("Starting Lighthouse audit server.")
 
 	if bParseFlags {
 		// Is the -version flag being used?
@@ -154,79 +174,130 @@ func main() {
 		log.SetFlags(oldFlags)
 	}
 
-	// If -url is set then prepare cMessage without a provider.
+	// Prepare the Tide Client if we're not writing to file.
+	if *flagOutput == "" {
+		log.Println("Authenticating with Tide API.")
+		err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
+		if err != nil {
+			log.Println("Tide API Error:", err)
+			terminateChannel <- struct{}{}
+		}
+	}
+
+	// If -url is set then send a message using the URL.
 	if *flagUrl != "" {
-		cMessage = make(chan *message.Message, 1)
-		cMessage <- &message.Message{
-			ResponseAPIEndpoint: fmt.Sprintf("%s://%s/api/tide/%s/audit", tideConfig.protocol, tideConfig.host, tideConfig.version),
-			Title:               "Single Project",
-			Content:             "Single project URL provided.",
-			SourceURL:           *flagUrl,
-			SourceType:          source.GetKind(*flagUrl),
-			Force:               true,
-			Visibility:          *flagVisibility,
-			RequestClient:       *flagClient,
+
+		singleMessageType := "tide"
+		singleMessageEndpoint := fmt.Sprintf("%s://%s/api/tide/%s/audit", tideConfig.protocol, tideConfig.host, tideConfig.version)
+
+		// If -output is set add it to Tide process OutputFile.
+		if *flagOutput != "" {
+			singleMessageType = "local-file"
+			singleMessageEndpoint = *flagOutput
 		}
-	}
 
-	// If -output is set add it to Tide process OutputFile.
-	if *flagOutput != "" {
-		var procs []audit.Processor
-
-		for _, proc := range processes {
-			if proc.Kind() != "tide" {
-				procs = append(procs, proc)
-			} else {
-				procs = append(procs, &tide.Processor{OutputFile: *flagOutput})
+		go func() {
+			cMessage <- message.Message{
+				ResponseAPIEndpoint: singleMessageEndpoint,
+				Title:               "Single Project",
+				Content:             "Single project URL provided.",
+				PayloadType:         singleMessageType,
+				SourceURL:           *flagUrl,
+				SourceType:          source.GetKind(*flagUrl),
+				Force:               true,
+				Visibility:          *flagVisibility,
+				RequestClient:       *flagClient,
+				Audits: &[]message.Audit{
+					{
+						Type:    "lighthouse",
+						Options: &message.AuditOption{},
+					},
+				},
 			}
-		}
-
-		processes = procs
+		}()
 	}
 
-	// Prepare the Tide Client.
-	err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
-	if err != nil {
-		log.Println("Tide API Error:", err)
-		terminateChannel <- struct{}{}
-	}
-
-	// Create a channel that receives messages from a queue, if it does not yet exist.
-	if cMessage == nil {
-		cMessage = messageChannel(messageProvider, buffer)
+	// Start polling the messageProvider if we didn't provide a url.
+	// Other processes can also queue the channel.
+	if *flagUrl == "" {
+		log.Println("Polling message provider.")
+		pollProvider(cMessage, messageProvider)
 	}
 
 	// Poll the message channel until the program is forcefully exited.
 	for {
 		select {
-		// Terminate signal received.
-		case <-terminateChannel:
-			break;
-			// Message received from the queue.
 		case msg := <-cMessage:
-			// If its a single process then don't run as goroutine.
-			if *flagUrl != "" {
-				// We still need to prime the bugger for processMessage() to be able to exit.
-				buffer <- struct{}{}
-				processMessage(msg, TideClient, buffer)
-				os.Exit(0)
-			} else {
-				// Process the message in a go routine.
-				go processMessage(msg, TideClient, buffer)
+			// Process Message
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			err := processMessage(msg, &wg)
+			if err != nil {
+				fmt.Println(err)
 			}
+			wg.Wait()
+
+		case <-terminateChannel:
+			// Terminate signal received.
+			goto terminated
 		}
 	}
+
+terminated:
+	fmt.Println("Server terminated.")
 }
 
-// messageChannel returns a channel of messages to be processed. The message provider gets polled for
-// the next message and upon success it gets added to the channel.
-func messageChannel(provider message.MessageProvider, buffer chan struct{}) chan *message.Message {
+// processMessage sends the message through a sequential process.
+func processMessage(msg message.Message, wg *sync.WaitGroup) error {
+	defer wg.Done()
 
-	// Create the message channel.
-	c := make(chan *message.Message)
+	// Initiate results pointer.
+	results := &process.Result{}
+
+	// Ingest.
+	if err := doIngest(&msg, results, procCfg.igTempFolder); err != nil {
+		return err
+	}
+
+	// Info.
+	if err := doInfo(&msg, results); err != nil {
+		return err
+	}
+
+	// Lighthouse.
+	if err := doLighthouse(&msg, results, procCfg.lhTempFolder, procCfg.lhStorageProvider); err != nil {
+		return err
+	}
+
+	// Prepare Response.
+	if err := doResponse(&msg, results, payloaders); err != nil {
+		return err
+	}
+
+	// Clean up.
+	res := *results
+	if res["responseSuccess"] != nil && res["responseSuccess"].(bool) {
+		// Output message.
+		log.Println(res["responseMessage"])
+
+		// Delete message from provider.
+		err := messageProvider.DeleteMessage(msg.ExternalRef)
+		if err != nil {
+			return err
+		} else {
+			log.Println("'" + msg.Title + "' removed from message queue.")
+		}
+	}
+
+	return nil
+}
+
+// pollProvider polls the message provider for
+// the next message and upon success it gets added to the channel.
+func pollProvider(c chan message.Message, provider message.MessageProvider) {
 
 	// Run this concurrently.
-	go func(b chan struct{}) {
+	go func() {
 		for {
 
 			// Get message from provider.
@@ -235,6 +306,7 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) chan
 			// Handle provider errors.
 			if err != nil {
 				// If its a Provider error we might need to panic and fail.
+
 				if pErr, ok := err.(*message.ProviderError); ok {
 					switch pErr.Type {
 					case message.ErrCritcal:
@@ -252,62 +324,13 @@ func messageChannel(provider message.MessageProvider, buffer chan struct{}) chan
 
 			// If message has been retrieved add it to the channel.
 			if msg != nil {
-				// Block if the buffer is full.
-				b <- struct{}{}
+
+				log.Println("Dispatching '" + msg.Title + "'")
 
 				// Send message to channel.
-				c <- msg
+				c <- *msg
 			}
 			time.Sleep(time.Second * time.Duration(2))
 		}
-	}(buffer)
-
-	// Return the message channel.
-	return c
-}
-
-// processMessage takes an SQS message and runs it through an audit process.
-func processMessage(msg *message.Message, client tideApi.ClientInterface, buffer <-chan struct{}) {
-
-	tidelog.Log(msg.Title, "Processing...")
-
-	var errors []error
-
-	// Initialise result with:
-	// - Tide client reference,
-	// - Temp folder for downloaded/extracted files,
-	// - Audits to run
-	result := &audit.Result{
-		"client":     &client,
-		"tempFolder": tempFolder,
-		"audits": []string{
-			"lighthouse",
-		},
-		"fileStore": &storageProvider,
-	}
-
-	// Pointer that we can use directly.
-	r := *result
-
-	// Run through each processor and update the result.
-	// Note: The result is a pointer so we're passing by reference.
-	for _, proc := range processes {
-		proc.Process(*msg, result)
-		kind := proc.Kind()
-		if r[kind+"Error"] != nil {
-			errors = append(errors, r[kind+"Error"].(error))
-			tidelog.Log(msg.Title, fmt.Sprintf("%s process error: %s", kind, r[kind+"Error"].(error)))
-		}
-	}
-
-	// Remove message on success.
-	if len(errors) == 0 {
-		messageProvider.DeleteMessage(msg.ExternalRef)
-		tidelog.Log(msg.Title, "Completed without errors.")
-	} else {
-		tidelog.Log(msg.Title, "Completed with some errors.")
-	}
-
-	// Release item from buffer so that next item can be polled.
-	<-buffer
+	}()
 }

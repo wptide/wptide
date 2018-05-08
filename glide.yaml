@@ -3,20 +3,16 @@ import:
 - package: github.com/nanobox-io/golang-scribble
 - package: github.com/wptide/pkg
   subpackages:
-  - audit
-  - audit/info
-  - audit/ingest
-  - audit/lighthouse
-  - audit/phpcs
-  - audit/tide
   - env
-  - log
-  - message
-  - message/sqs
-  - source
-  - storage
-  - storage/s3
-  - sync
-  - tide
-  - tide/api
-  - wporg
+    - message
+    - message/sqs
+    - payload
+    - pipe
+    - process
+    - source
+    - storage
+    - storage/s3
+    - sync
+    - tide
+    - tide/api
+    - wporg

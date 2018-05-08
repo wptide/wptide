@@ -50,27 +50,19 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: d0598ae9a4b6333a0892b12137bc20e648aa0189
+  version: 44de1a263a1d498882d1f37fdc41faaa0b0d6a07
   subpackages:
-  - audit
-  - audit/info
-  - audit/ingest
-  - audit/lighthouse
-  - audit/phpcs
-  - audit/tide
-  - env
-  - log
   - message
   - message/sqs
-  - phpcompat
+  - payload
+  - pipe
+  - process
   - source
-  - source/zip
   - storage
   - storage/s3
   - sync
   - tide
   - tide/api
-  - util
   - wporg
 - name: gopkg.in/src-d/enry.v1
   version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
