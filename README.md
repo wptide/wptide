@@ -301,7 +301,7 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 
 | Variable | Description |
 | :--- | :--- |
-| `LH_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
+| `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 
 #### Running Lighthouse audits
@@ -345,7 +345,7 @@ reports against both plugins and themes, then sends the results back to the Tide
 
 | Variable | Description |
 | :--- | :--- |
-| `PHPCS_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
+| `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 
 ---
@@ -395,7 +395,7 @@ plugins to process and writes them to a queue.
 | `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on` |
 | `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on` |
 | `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600` |
-| `SYNC_POOL_WORKERS` | The number of workers (concurrent Go routines) the server will create to ingest the wp.org API. Default is `125` |
+| `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125` |
 
 ---
 
@@ -500,7 +500,7 @@ and setup permalinks manually._
 
 #### Google Kubernetes Engine (GKE)
 
-All the Go routines are deployed with the same basic steps. Push the image to 
+All the goroutines are deployed with the same basic steps. Push the image to 
 Google Container Registry (GCR), create the Kubernetes cluster, and then create 
 a Kubernetes deployment.
 
