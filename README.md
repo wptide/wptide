@@ -60,7 +60,7 @@ The main focus of this documentation is to setup a local development environment
 Cloud deployments will be covered, though many assumptions will be made about your 
 level of understanding not only with GCP but also the Tide project and it's manual 
 setup process in relation to WordPress on App Engine. We will not be going into 
-great detail when it comes to deploying Tide on CGP.
+great detail when it comes to deploying Tide on GCP.
 
 ### Dependencies
 
