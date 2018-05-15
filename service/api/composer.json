@@ -16,7 +16,6 @@
     "wpackagist-plugin/wp-redis": "0.7.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "~5.7",
     "wp-cli/wp-cli": "~1.5"
   },
   "scripts": {

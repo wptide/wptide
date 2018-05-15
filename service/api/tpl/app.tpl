@@ -42,6 +42,7 @@ env_variables:
 
 skip_files:
 - tpl/
+- Dockerfile
 - Makefile
 - service-account.json
 - setup.sh
