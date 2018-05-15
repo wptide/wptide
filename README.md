@@ -30,6 +30,7 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
    + [Lighthouse Server](#lighthouse-server)
        - [Lighthouse Server Notes](#lighthouse-server-notes)
        - [Lighthouse Server Settings](#lighthouse-server-settings)
+       - [Running Lighthouse audits](#running-lighthouse-audits)
    + [PHPCS Server](#phpcs-server)
        - [PHPCS Server Notes](#phpcs-server-notes)
        - [PHPCS Server Settings](#phpcs-server-settings)
@@ -302,6 +303,10 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 | :--- | :--- |
 | `LH_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+
+#### Running Lighthouse audits
+
+Details on running Lighthouse audits are [available in the Tide wiki](https://github.com/xwp/go-tide/wiki/Running-Lighthouse-audits).
 
 ---
 
