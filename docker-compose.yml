@@ -4,7 +4,8 @@ services:
 
 ### API #########################################################
     api-php:
-        image: gcr.io/google-appengine/php72:latest
+        build:
+            context: ./service/api
         volumes:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
