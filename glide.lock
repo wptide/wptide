@@ -1,5 +1,5 @@
-hash: 3b6757a92645aeb51fdc7037d42eb02aae706406a6b6a14aba297cf501f5ea87
-updated: 2018-05-18T16:21:19.161698257+10:00
+hash: 06e46091c99823a9cc46c588e071077e0d1145fc56b2062c743810606c40bf07
+updated: 2018-05-18T16:55:22.557566524+10:00
 imports:
 - name: cloud.google.com/go
   version: 056a55f54a6cc77b440b31a56a5e7c3982d32811
@@ -72,7 +72,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 3aa74d6a5d19236f5027583d3fbe54b63ec3bcc6
+  version: 1eb8f3b36f71f2fd47eb58fcfde5dc25b4fe7c43
   subpackages:
   - env
   - log
