@@ -1,6 +1,6 @@
 # Tide
 
-[![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/xwp/go-tide/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md)
 
 > A rising tide lifts all boats.
 > -- United States President, John F. Kennedy (borrowed from the New England Council)
@@ -627,7 +627,7 @@ Props: [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp),
 [Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ### License
-Tide utilizes an [MIT license][mit-license].
+Tide utilizes an [MIT license](LICENSE).
 
 [composer]: https://getcomposer.org/
 [docker]: https://docs.docker.com/install/
@@ -644,4 +644,3 @@ Tide utilizes an [MIT license][mit-license].
 [sqs-region]: https://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region
 [tide-slack]: https://wordpress.slack.com/messages/C7TK8FBUJ/
 [wp-slack]: https://make.wordpress.org/chat/
-[mit-license]: https://github.com/xwp/go-tide/blob/master/LICENSE
