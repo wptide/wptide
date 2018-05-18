@@ -304,7 +304,6 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 		conf := config["gcp"]
 		return gcs.NewCloudStorageProvider(context.Background(), conf["project"], conf["gcs_bucket"])
 	case "local":
-		fmt.Println("Keeping it local!")
 		return local.NewLocalStorage(config["app"]["local_storage"])
 	default:
 		return nil

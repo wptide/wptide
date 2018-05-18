@@ -21,6 +21,7 @@ import (
 	commonPayload "github.com/xwp/go-tide/src/payload"
 	commonProcess "github.com/xwp/go-tide/src/process"
 	tideApi "github.com/wptide/pkg/tide"
+	"github.com/wptide/pkg/storage/local"
 )
 
 type processConfig struct {
@@ -197,7 +198,7 @@ func main() {
 	}
 
 	// If -wp-phpcompat-ruleset was provided then override the ruleset path.
-	if *flagWPRuleset != ""  {
+	if *flagWPRuleset != "" {
 		if _, err := os.Stat(*flagWPRuleset); err == nil {
 			commonProcess.PHPCompatibilityWPPath = *flagWPRuleset
 		}
@@ -327,6 +328,8 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 	case "gcs":
 		conf := config["gcp"]
 		return gcs.NewCloudStorageProvider(context.Background(), conf["project"], conf["gcs_bucket"])
+	case "local":
+		return local.NewLocalStorage(config["app"]["local_storage"])
 	default:
 		return nil
 	}
@@ -346,6 +349,7 @@ func getServiceConfig() map[string]map[string]string {
 		"app": {
 			"storage_provider_type": env.GetEnv("PHPCS_STORAGE_PROVIDER", ""),
 			"temp_folder":           env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp"),
+			"local_storage":         env.GetEnv("PHPCS_LOCAL_STORAGE_PATH", "/tmp"),
 		},
 		"aws":
 		{
