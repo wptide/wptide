@@ -11,6 +11,7 @@ import:
     - process
     - source
     - storage
+    - storage/gcs
     - storage/s3
     - sync
     - tide
