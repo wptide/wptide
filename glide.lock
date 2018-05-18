@@ -1,5 +1,5 @@
-hash: 48e98688644084313d77714e2e8e94186846c0527b2737759ad98171e35d6a93
-updated: 2018-05-17T20:19:39.309978-07:00
+hash: 3b6757a92645aeb51fdc7037d42eb02aae706406a6b6a14aba297cf501f5ea87
+updated: 2018-05-18T16:21:19.161698257+10:00
 imports:
 - name: cloud.google.com/go
   version: 056a55f54a6cc77b440b31a56a5e7c3982d32811
@@ -49,7 +49,7 @@ imports:
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
-  version: bda519ae5f4cbc60d391ff8610711627a08b86ae
+  version: 6333e38ac20b8949a8dd68baa3650f4dee8f39f0
 - name: github.com/golang/protobuf
   version: 668a607657a5d387d6333648a2d9c749761fdc69
   subpackages:
@@ -62,7 +62,7 @@ imports:
 - name: github.com/googleapis/gax-go
   version: de2cc08e690b99dd3f7d19937d80d3d54e04682f
 - name: github.com/hhatto/gocloc
-  version: 2530ab030fbe40407f12de1f90f01f277bbae0e9
+  version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
 - name: github.com/jcelliott/lumber
   version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
@@ -72,7 +72,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 4a1cf2754375795fdeff9f1d5087e07bb8339672
+  version: 3aa74d6a5d19236f5027583d3fbe54b63ec3bcc6
   subpackages:
   - env
   - log
@@ -88,6 +88,7 @@ imports:
   - source/zip
   - storage
   - storage/gcs
+  - storage/local
   - storage/s3
   - sync
   - tide
@@ -191,7 +192,7 @@ imports:
   - tap
   - transport
 - name: gopkg.in/src-d/enry.v1
-  version: 6712d4219fb747194f38d0fc72121ca0a46ebcea
+  version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
   subpackages:
   - data
   - internal/tokenizer
