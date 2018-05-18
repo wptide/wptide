@@ -1,7 +1,6 @@
 # Tide
 
-[![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/xwp/go-tide/blob/develop/CONTRIBUTING.md) <a href="https://zenhub.com"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>
-
+[![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md) [![Shipping faster with ZenHub.io](https://img.shields.io/badge/Shipping_faster_with-ZenHub.io-6567bd.svg?style=flat)](https://www.zenhub.com/)
 
 > A rising tide lifts all boats.
 > -- United States President, John F. Kennedy (borrowed from the New England Council)
@@ -31,6 +30,7 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
    + [Lighthouse Server](#lighthouse-server)
        - [Lighthouse Server Notes](#lighthouse-server-notes)
        - [Lighthouse Server Settings](#lighthouse-server-settings)
+       - [Running Lighthouse audits](#running-lighthouse-audits)
    + [PHPCS Server](#phpcs-server)
        - [PHPCS Server Notes](#phpcs-server-notes)
        - [PHPCS Server Settings](#phpcs-server-settings)
@@ -58,9 +58,9 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
 
 The main focus of this documentation is to setup a local development environment. 
 Cloud deployments will be covered, though many assumptions will be made about your 
-level of understanding not only with GCP but also the Tide project and it's manual 
+level of understanding not only with Google Cloud Platform (GCP) but also the Tide project and it's manual 
 setup process in relation to WordPress on App Engine. We will not be going into 
-great detail when it comes to deploying Tide on CGP.
+great detail when it comes to deploying Tide on GCP.
 
 ### Dependencies
 
@@ -234,6 +234,12 @@ directory to the `Preferences -> File Sharing` section of the Docker for Mac app
 ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: ...'
 ```
 
+For local development you can manually set the `API_KEY` and `API_SECRET` for the 
+`audit-server` user, which will automatically update the user meta values when 
+`make api.setup` is ran. If you do not set those environment variables, or are 
+running Tide in production, then you can access the auto generated key and secret 
+from the `audit-server` user profile. 
+
 #### API Settings
 
 | Variable | Description |
@@ -301,8 +307,12 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 
 | Variable | Description |
 | :--- | :--- |
-| `LH_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
+| `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+
+#### Running Lighthouse audits
+
+Details on running Lighthouse audits are [available in the Tide wiki](https://github.com/xwp/go-tide/wiki/Running-Lighthouse-audits).
 
 ---
 
@@ -341,7 +351,7 @@ reports against both plugins and themes, then sends the results back to the Tide
 
 | Variable | Description |
 | :--- | :--- |
-| `PHPCS_CONCURRENT_AUDITS` | Sets the number of Go Routines the server will perform concurrently. Default is `5` |
+| `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 
 ---
@@ -391,7 +401,7 @@ plugins to process and writes them to a queue.
 | `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on` |
 | `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on` |
 | `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600` |
-| `SYNC_POOL_WORKERS` | The number of workers (concurrent Go routines) the server will create to ingest the wp.org API. Default is `125` |
+| `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125` |
 
 ---
 
@@ -496,7 +506,7 @@ and setup permalinks manually._
 
 #### Google Kubernetes Engine (GKE)
 
-All the Go routines are deployed with the same basic steps. Push the image to 
+All the goroutines are deployed with the same basic steps. Push the image to 
 Google Container Registry (GCR), create the Kubernetes cluster, and then create 
 a Kubernetes deployment.
 
@@ -623,7 +633,7 @@ Props: [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp),
 [Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ### License
-Tide utilizes an [MIT license][mit-license].
+Tide utilizes an [MIT license](LICENSE).
 
 [composer]: https://getcomposer.org/
 [docker]: https://docs.docker.com/install/
@@ -640,4 +650,3 @@ Tide utilizes an [MIT license][mit-license].
 [sqs-region]: https://docs.aws.amazon.com/general/latest/gr/rande.html#sqs_region
 [tide-slack]: https://wordpress.slack.com/messages/C7TK8FBUJ/
 [wp-slack]: https://make.wordpress.org/chat/
-[mit-license]: https://github.com/xwp/go-tide/blob/master/LICENSE
