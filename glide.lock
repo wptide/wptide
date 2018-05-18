@@ -1,8 +1,18 @@
-hash: 1247cfc96c7bb10720c466f7f4140cd681441f4b68272d5c591d760c1fc83c49
-updated: 2018-03-08T21:35:55.006913468-08:00
+hash: 48e98688644084313d77714e2e8e94186846c0527b2737759ad98171e35d6a93
+updated: 2018-05-17T20:19:39.309978-07:00
 imports:
+- name: cloud.google.com/go
+  version: 056a55f54a6cc77b440b31a56a5e7c3982d32811
+  subpackages:
+  - compute/metadata
+  - iam
+  - internal
+  - internal/optional
+  - internal/trace
+  - internal/version
+  - storage
 - name: github.com/aws/aws-sdk-go
-  version: bafcd9ccc717e9bc5406acaea370577299223873
+  version: ee7b4b1162937cba700de23bd90acb742982e626
   subpackages:
   - aws
   - aws/awserr
@@ -20,6 +30,7 @@ imports:
   - aws/request
   - aws/session
   - aws/signer/v4
+  - internal/sdkio
   - internal/sdkrand
   - internal/shareddefaults
   - private/protocol
@@ -38,9 +49,20 @@ imports:
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
-  version: 6333e38ac20b8949a8dd68baa3650f4dee8f39f0
+  version: bda519ae5f4cbc60d391ff8610711627a08b86ae
+- name: github.com/golang/protobuf
+  version: 668a607657a5d387d6333648a2d9c749761fdc69
+  subpackages:
+  - proto
+  - protoc-gen-go/descriptor
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/timestamp
+- name: github.com/googleapis/gax-go
+  version: de2cc08e690b99dd3f7d19937d80d3d54e04682f
 - name: github.com/hhatto/gocloc
-  version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
+  version: 2530ab030fbe40407f12de1f90f01f277bbae0e9
 - name: github.com/jcelliott/lumber
   version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
@@ -52,12 +74,18 @@ imports:
 - name: github.com/wptide/pkg
   version: 4a1cf2754375795fdeff9f1d5087e07bb8339672
   subpackages:
+  - env
+  - log
   - message
   - message/sqs
   - payload
+  - phpcompat
   - pipe
   - process
+  - process/phpcs
+  - shell
   - source
+  - source/zip
   - storage
   - storage/gcs
   - storage/s3
@@ -65,8 +93,105 @@ imports:
   - tide
   - tide/api
   - wporg
+- name: go.opencensus.io
+  version: ebd8d31470fedf6c27d0e3056653ddff642509b8
+  subpackages:
+  - exporter/stackdriver/propagation
+  - internal
+  - internal/tagencoding
+  - plugin/ochttp
+  - plugin/ochttp/propagation/b3
+  - stats
+  - stats/internal
+  - stats/view
+  - tag
+  - trace
+  - trace/internal
+  - trace/propagation
+- name: golang.org/x/net
+  version: 2491c5de3490fced2f6cff376127c667efeed857
+  subpackages:
+  - context
+  - context/ctxhttp
+  - http/httpguts
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - trace
+- name: golang.org/x/oauth2
+  version: cdc340f7c179dbbfa4afd43b7614e8fcadde4269
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
+- name: golang.org/x/text
+  version: 5c1cf69b5978e5a34c5f9ba09a83e56acc4b7877
+  subpackages:
+  - secure/bidirule
+  - transform
+  - unicode/bidi
+  - unicode/norm
+- name: google.golang.org/api
+  version: aedc137bffcaca05f836e35c6d182fcb7a68b1c0
+  subpackages:
+  - gensupport
+  - googleapi
+  - googleapi/internal/uritemplates
+  - googleapi/transport
+  - internal
+  - iterator
+  - option
+  - storage/v1
+  - transport/http
+- name: google.golang.org/appengine
+  version: b9aad5d628b283f265adf8d3557faae187a8d015
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: google.golang.org/genproto
+  version: 7bb2a897381c9c5ab2aeb8614f758d7766af68ff
+  subpackages:
+  - googleapis/api/annotations
+  - googleapis/iam/v1
+  - googleapis/rpc/code
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: 3b7feb1847c899055b799fc77693e376cd4ea0d9
+  subpackages:
+  - balancer
+  - balancer/base
+  - balancer/roundrobin
+  - channelz
+  - codes
+  - connectivity
+  - credentials
+  - encoding
+  - encoding/proto
+  - grpclb/grpc_lb_v1/messages
+  - grpclog
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - resolver
+  - resolver/dns
+  - resolver/passthrough
+  - stats
+  - status
+  - tap
+  - transport
 - name: gopkg.in/src-d/enry.v1
-  version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
+  version: 6712d4219fb747194f38d0fc72121ca0a46ebcea
   subpackages:
   - data
   - internal/tokenizer

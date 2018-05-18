@@ -4,16 +4,16 @@ import:
 - package: github.com/wptide/pkg
   subpackages:
   - env
-    - message
-    - message/sqs
-    - payload
-    - pipe
-    - process
-    - source
-    - storage
-    - storage/gcs
-    - storage/s3
-    - sync
-    - tide
-    - tide/api
-    - wporg
+  - message
+  - message/sqs
+  - payload
+  - pipe
+  - process
+  - source
+  - storage
+  - storage/gcs
+  - storage/s3
+  - sync
+  - tide
+  - tide/api
+  - wporg
