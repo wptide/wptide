@@ -177,8 +177,8 @@ Finally, go to the [the Credentials section][credentials-section] of your projec
 in the Console. Click 'Create credentials' and then click 'Service account key.' 
 For the Service account, select 'App Engine app default service account.' Then 
 click 'Create' to create and download the JSON service account key to your local 
-machine. Save it as `service-account.json` in the `service/api` directory for use 
-with connecting to both Cloud Storage and Cloud SQL.
+machine. Save it as `service-account.json` in the the projects root directory for 
+use with connecting to both Cloud Storage and Cloud SQL.
 
 ---
 

@@ -11,6 +11,7 @@ services:
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
             - ./service/api/php.ini:/opt/php72/lib/php.ini
             - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads:ro
+            - ./service-account.json:/srv/service-account.json:ro
         depends_on:
             - api-mysql
             - api-redis
@@ -48,7 +49,7 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             DOCUMENT_ROOT: /app/wordpress
-            GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
 
     api-mysql:
         image: mariadb:10.3
@@ -75,6 +76,7 @@ services:
         image: ${GKE_LH_IMAGE}:latest
         volumes:
             - ./data/lighthouse-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
         environment:
             API_AUTH_URL: ${API_AUTH_URL}
             API_HTTP_HOST: ${API_HTTP_HOST}
@@ -91,6 +93,7 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
 
 ### PHPCS Server ################################################
@@ -98,6 +101,7 @@ services:
         image: ${GKE_PHPCS_IMAGE}:latest
         volumes:
             - ./data/phpcs-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
         environment:
             API_AUTH_URL: ${API_AUTH_URL}
             API_HTTP_HOST: ${API_HTTP_HOST}
@@ -115,6 +119,7 @@ services:
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
             PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
 
 ### Sync Server #################################################
