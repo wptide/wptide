@@ -35,5 +35,7 @@ service/api/wp-content/uploads
 service/api/wp-content/upgrade
 service/api/app.yaml
 service/api/cron.yaml
-service/api/service-account.json
 service/api/wp-config.php
+
+# GCP
+service-account.json
