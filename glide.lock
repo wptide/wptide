@@ -50,7 +50,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 44de1a263a1d498882d1f37fdc41faaa0b0d6a07
+  version: 4a1cf2754375795fdeff9f1d5087e07bb8339672
   subpackages:
   - message
   - message/sqs
