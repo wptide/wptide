@@ -13,6 +13,7 @@ import (
 	commonProcess "github.com/xwp/go-tide/src/process"
 	"github.com/wptide/pkg/storage/gcs"
 	"github.com/wptide/pkg/storage/s3"
+	"github.com/wptide/pkg/storage/local"
 )
 
 var (
@@ -409,6 +410,18 @@ func Test_getStorageProvider(t *testing.T) {
 				},
 			},
 			reflect.TypeOf(&gcs.Provider{}),
+		},
+		{
+			"Local Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"storage_provider_type": "local",
+						"local_storage": "./testdata",
+					},
+				},
+			},
+			reflect.TypeOf(&local.Provider{}),
 		},
 	}
 	for _, tt := range tests {

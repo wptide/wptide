@@ -20,6 +20,7 @@ import (
 	"github.com/wptide/pkg/storage/gcs"
 	"context"
 	"github.com/wptide/pkg/storage/s3"
+	"github.com/wptide/pkg/storage/local"
 )
 
 type processConfig struct {
@@ -302,6 +303,9 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 	case "gcs":
 		conf := config["gcp"]
 		return gcs.NewCloudStorageProvider(context.Background(), conf["project"], conf["gcs_bucket"])
+	case "local":
+		fmt.Println("Keeping it local!")
+		return local.NewLocalStorage(config["app"]["local_storage"])
 	default:
 		return nil
 	}
@@ -321,6 +325,7 @@ func getServiceConfig() map[string]map[string]string {
 		"app": {
 			"storage_provider_type": env.GetEnv("LH_STORAGE_PROVIDER", ""),
 			"temp_folder":           env.GetEnv("LH_TEMP_FOLDER", "/tmp"),
+			"local_storage":         env.GetEnv("LH_LOCAL_STORAGE_PATH", "/tmp"),
 		},
 		"aws":
 		{
