@@ -234,7 +234,11 @@ directory to the `Preferences -> File Sharing` section of the Docker for Mac app
 ERROR: for gotide_api-mysql_1  Cannot start service api-mysql: b'Mounts denied: ...'
 ```
 
-For local development you can manually set the `API_KEY` and `API_SECRET` which will be updated in the user meta
+For local development you can manually set the `API_KEY` and `API_SECRET` for the 
+`audit-server` user, which will automatically update the user meta values when 
+`make api.setup` is ran. If you do not set those environment variables, or are 
+running Tide in production, then you can access the auto generated key and secret 
+from the `audit-server` user profile. 
 
 #### API Settings
 
