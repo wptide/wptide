@@ -38,7 +38,7 @@ func Test_filePayload_SendPayload(t *testing.T) {
 			FilePayload{},
 			args{
 				"./testdata/tmp/temp.txt",
-				[]byte(`{"title":"","content":"","version":"","checksum":"abcdefg","visibility":"","project_type":"plugin","source_url":"","source_type":"","code_info":{"type":"plugin","details":[],"cloc":{}},"reports":{"phpcs_demo":{"full":{"type":"mock","key":"mock","bucket_name":"mock"},"details":{"type":"mock","key":"mock","bucket_name":"mock"},"summary":{}}}}`),
+				[]byte(`{"title":"","content":"","version":"","checksum":"abcdefg","visibility":"","project_type":"plugin","source_url":"","source_type":"","code_info":{"type":"plugin","details":[],"cloc":{}},"reports":{"phpcs_demo":{"raw":{"type":"mock","filename":"mock","path":"mock"},"parsed":{"type":"mock","filename":"mock","path":"mock"},"summary":{}}}}`),
 				nil,
 			},
 			[]byte("ok"),
@@ -60,7 +60,7 @@ func Test_filePayload_SendPayload(t *testing.T) {
 			FilePayload{},
 			args{
 				"./testdata/tmp/temp.txt",
-				[]byte(`{"title":"","content":"","version":"","checksum":"abcdefg","visibility":"","project_type":"plugin","source_url":"","source_type":"","code_info":{"type":"plugin","details":[],"cloc":{}},"reports":{"phpcs_demo":{"full":{"type":"mock","key":"mock","bucket_name":"mock"},"details":{"type":"mock","key":"mock","bucket_name":"mock"},"summary":{}}}}`),
+				[]byte(`{"title":"","content":"","version":"","checksum":"abcdefg","visibility":"","project_type":"plugin","source_url":"","source_type":"","code_info":{"type":"plugin","details":[],"cloc":{}},"reports":{"phpcs_demo":{"raw":{"type":"mock","filename":"mock","path":"mock"},"parsed":{"type":"mock","filename":"mock","path":"mock"},"summary":{}}}}`),
 				terminateChan,
 			},
 			[]byte("ok"),
@@ -118,21 +118,21 @@ func Test_filePayload_BuildPayload(t *testing.T) {
 						map[string]tide.ClocResult{},
 					},
 					"phpcs_demo": tide.AuditResult{
-						Full: tide.AuditDetails{
-							Type:       "mock",
-							Key:        "mock",
-							BucketName: "mock",
+						Raw: tide.AuditDetails{
+							Type:     "mock",
+							FileName: "mock",
+							Path:     "mock",
 						},
-						Details: tide.AuditDetails{
-							Type:       "mock",
-							Key:        "mock",
-							BucketName: "mock",
+						Parsed: tide.AuditDetails{
+							Type:     "mock",
+							FileName: "mock",
+							Path:     "mock",
 						},
 					},
 					"checksum": "abcdefg",
 				},
 			},
-			[]byte(`{"title":"","content":"","version":"","checksum":"abcdefg","visibility":"","project_type":"plugin","source_url":"","source_type":"","code_info":{"type":"plugin","details":[],"cloc":{}},"reports":{"phpcs_demo":{"full":{"type":"mock","key":"mock","bucket_name":"mock"},"details":{"type":"mock","key":"mock","bucket_name":"mock"},"summary":{}}}}`),
+			[]byte(`{"title":"","content":"","version":"","checksum":"abcdefg","visibility":"","project_type":"plugin","source_url":"","source_type":"","code_info":{"type":"plugin","details":[],"cloc":{}},"reports":{"phpcs_demo":{"raw":{"type":"mock","filename":"mock","path":"mock"},"parsed":{"type":"mock","filename":"mock","path":"mock"},"summary":{}}}}`),
 			false,
 		},
 	}
