@@ -9,7 +9,6 @@ import (
 	"log"
 	"github.com/wptide/pkg/env"
 	"github.com/wptide/pkg/storage"
-	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
 	"fmt"
@@ -18,6 +17,9 @@ import (
 	"flag"
 	"github.com/wptide/pkg/source"
 	"sync"
+	"github.com/wptide/pkg/storage/gcs"
+	"context"
+	"github.com/wptide/pkg/storage/s3"
 )
 
 type processConfig struct {
@@ -31,6 +33,9 @@ var (
 	/** Compile time variables. **/
 	Version string // Set during build.
 	Build   string // Set during build.
+
+	// Lighthouse service configuration (as var so that we can also override).
+	serviceConfig = getServiceConfig()
 
 	/** Initialize interface instances **/
 	// Use the interface so that we can test.
@@ -47,64 +52,14 @@ var (
 	}
 
 	// messageProvider is the primary source of messages to process.
-	messageProvider message.MessageProvider = sqs.NewSqsProvider(lhConfig.region, lhConfig.key, lhConfig.secret, lhConfig.queue)
-
-	// storageProvider is the cloud storage service for storing files.
-	storageProvider storage.StorageProvider = s3.NewS3Provider(lhS3Config.region, lhS3Config.key, lhS3Config.secret, lhS3Config.bucket)
-
-	// Temp folder for downloaded files.
-	tempFolder = env.GetEnv("LH_TEMP_FOLDER", "/tmp")
+	messageProvider = getMessageProvider(serviceConfig)
 
 	/** Processes Configuration **/
 	procCfg = processConfig{
-		tempFolder,
-		tempFolder,
-		storageProvider,
+		serviceConfig["app"]["temp_folder"],
+		serviceConfig["app"]["temp_folder"],
+		getStorageProvider(serviceConfig),
 		payloaders,
-	}
-
-	/** Service Configurations **/
-	// Tide API configuration.
-	tideConfig = struct {
-		id           string
-		secret       string
-		authEndpoint string
-		host         string
-		protocol     string
-		version      string
-	}{
-		env.GetEnv("API_KEY", ""),
-		env.GetEnv("API_SECRET", ""),
-		env.GetEnv("API_AUTH_URL", ""),
-		env.GetEnv("API_HTTP_HOST", ""),
-		env.GetEnv("API_PROTOCOL", ""),
-		env.GetEnv("API_VERSION", ""),
-	}
-
-	// Lighthouse SQS configuration.
-	lhConfig = struct {
-		region string
-		key    string
-		secret string
-		queue  string
-	}{
-		env.GetEnv("AWS_SQS_REGION", ""),
-		env.GetEnv("AWS_API_KEY", ""),
-		env.GetEnv("AWS_API_SECRET", ""),
-		env.GetEnv("AWS_SQS_QUEUE_LH", ""),
-	}
-
-	// Lighthouse SQS configuration.
-	lhS3Config = struct {
-		region string
-		key    string
-		secret string
-		bucket string
-	}{
-		env.GetEnv("AWS_S3_REGION", ""),
-		env.GetEnv("AWS_API_KEY", ""),
-		env.GetEnv("AWS_API_SECRET", ""),
-		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 	}
 
 	/** Channels **/
@@ -177,7 +132,8 @@ func main() {
 	// Prepare the Tide Client if we're not writing to file.
 	if *flagOutput == "" {
 		log.Println("Authenticating with Tide API.")
-		err := TideClient.Authenticate(tideConfig.id, tideConfig.secret, tideConfig.authEndpoint)
+		conf := serviceConfig["tide"]
+		err := TideClient.Authenticate(conf["key"], conf["secret"], conf["auth"])
 		if err != nil {
 			log.Println("Tide API Error:", err)
 			terminateChannel <- struct{}{}
@@ -188,7 +144,8 @@ func main() {
 	if *flagUrl != "" {
 
 		singleMessageType := "tide"
-		singleMessageEndpoint := fmt.Sprintf("%s://%s/api/tide/%s/audit", tideConfig.protocol, tideConfig.host, tideConfig.version)
+		conf := serviceConfig["tide"]
+		singleMessageEndpoint := fmt.Sprintf("%s://%s/api/tide/%s/audit", conf["protocol"], conf["host"], conf["version"])
 
 		// If -output is set add it to Tide process OutputFile.
 		if *flagOutput != "" {
@@ -333,4 +290,60 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 			time.Sleep(time.Second * time.Duration(2))
 		}
 	}()
+}
+
+// getStorageProvider returns a storage provider given the provided configurations from
+// the environment variables.
+func getStorageProvider(config map[string]map[string]string) storage.StorageProvider {
+	switch config["app"]["storage_provider_type"] {
+	case "s3":
+		conf := config["aws"]
+		return s3.NewS3Provider(conf["s3_region"], conf["key"], conf["secret"], conf["s3_bucket"])
+	case "gcs":
+		conf := config["gcp"]
+		return gcs.NewCloudStorageProvider(context.Background(), conf["project"], conf["gcs_bucket"])
+	default:
+		return nil
+	}
+}
+
+// getStorageProvider returns a message/queue provider given the provided configurations
+// from the environment variables.
+//
+// @todo Add additional providers.
+func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
+	conf := config["aws"]
+	return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
+}
+
+func getServiceConfig() map[string]map[string]string {
+	return map[string]map[string]string{
+		"app": {
+			"storage_provider_type": env.GetEnv("LH_STORAGE_PROVIDER", ""),
+			"temp_folder":           env.GetEnv("LH_TEMP_FOLDER", "/tmp"),
+		},
+		"aws":
+		{
+			"key":        env.GetEnv("AWS_API_KEY", ""),
+			"secret":     env.GetEnv("AWS_API_SECRET", ""),
+			"sqs_region": env.GetEnv("AWS_SQS_REGION", ""),
+			"sqs_queue":  env.GetEnv("AWS_SQS_QUEUE_LH", ""),
+			"s3_region":  env.GetEnv("AWS_S3_REGION", ""),
+			"s3_bucket":  env.GetEnv("AWS_S3_BUCKET_NAME", ""),
+		},
+		"gcp":
+		{
+			"project":    env.GetEnv("GCP_PROJECT", ""),
+			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
+		},
+		"tide":
+		{
+			"key":      env.GetEnv("API_KEY", ""),
+			"secret":   env.GetEnv("API_SECRET", ""),
+			"auth":     env.GetEnv("API_AUTH_URL", ""),
+			"host":     env.GetEnv("API_HTTP_HOST", ""),
+			"protocol": env.GetEnv("API_PROTOCOL", ""),
+			"version":  env.GetEnv("API_VERSION", ""),
+		},
+	}
 }
