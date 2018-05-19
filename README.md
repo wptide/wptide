@@ -22,7 +22,7 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
        - [Environment Variables](#environment-variables)
        - [Google Cloud SDK](#google-cloud-sdk)
        - [Google App Engine](#google-app-engine)
-       - [Google Cloud Storage](#google-cloud-storage)
+       - [Google Cloud Storage for App Engine](#google-cloud-storage-for-app-engine)
        - [Service Account](#service-account)
    + [API](#api)
        - [API Notes](#api-notes)
@@ -47,7 +47,9 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
            * [GKE Lighthouse Server Settings](#gke-lighthouse-server-settings)
            * [GKE PHPCS Server Settings](#gke-phpcs-server-settings)
            * [GKE Sync Server Settings](#gke-sync-server-settings)
-   + [AWS](#aws)
+   + [Google Cloud Storage (GCS)](#google-app-engine-gcs)
+       - [GCS Settings](#gcs-settings)
+   + [Amazon Web Services (AWS)](#amazon-web-services-aws)
        - [AWS Settings](#aws-settings)
    + [Contributing](#contributing)
    + [Contact Us](#contact-us)
@@ -144,7 +146,7 @@ Create an App Engine application within your new project:
 $ gcloud app create
 ```
 
-#### Google Cloud Storage
+#### Google Cloud Storage for App Engine
 
 Configure the App Engine default GCS bucket for later use. The default App Engine 
 bucket is named YOUR_PROJECT_ID.appspot.com. Change the default Access Control 
@@ -309,6 +311,7 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 | :--- | :--- |
 | `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+| `LH_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
 
 #### Running Lighthouse audits
 
@@ -353,6 +356,7 @@ reports against both plugins and themes, then sends the results back to the Tide
 | :--- | :--- |
 | `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+| `PHPCS_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
 
 ---
 
@@ -586,9 +590,23 @@ make phpcs.clean.cluster
 
 ---
 
-### AWS
+### Google Cloud Storage (GCS)
 
-@todo Remove the dependency on AWS.
+If you want to upload Tide audit reports to Google Cloud Storage then you'll need 
+to create a bucket for those reports. Open the [Cloud Storage Browser][cloud-storage-browser] 
+and click **Create Bucket**.
+
+#### GCS Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCS_BUCKET_NAME` | The name of the GCS bucket. |
+
+---
+
+### Amazon Web Services (AWS)
+
+@todo add docs for AWS.
 
 #### AWS Settings
 
