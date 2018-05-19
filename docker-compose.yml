@@ -10,8 +10,10 @@ services:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
             - ./service/api/php.ini:/opt/php72/lib/php.ini
-            - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads:ro
+            - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads
             - ./service-account.json:/srv/service-account.json:ro
+            - ./data/lighthouse-server:/app/wordpress/wp-content/uploads/lighthouse:ro
+            - ./data/phpcs-server:/app/wordpress/wp-content/uploads/phpcs:ro
         depends_on:
             - api-mysql
             - api-redis
@@ -93,6 +95,9 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
+            LH_STORAGE_PROVIDER: ${LH_STORAGE_PROVIDER}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
             GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
 
@@ -119,6 +124,9 @@ services:
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
             PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+            PHPCS_STORAGE_PROVIDER: ${PHPCS_STORAGE_PROVIDER}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
             GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
 

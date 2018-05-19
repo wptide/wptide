@@ -417,7 +417,8 @@ func Test_getStorageProvider(t *testing.T) {
 				map[string]map[string]string{
 					"app": {
 						"storage_provider_type": "local",
-						"local_storage": "./testdata",
+						"server_path": "./testdata",
+						"local_path": "subdir",
 					},
 				},
 			},

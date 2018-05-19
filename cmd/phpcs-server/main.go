@@ -329,7 +329,7 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 		conf := config["gcp"]
 		return gcs.NewCloudStorageProvider(context.Background(), conf["project"], conf["gcs_bucket"])
 	case "local":
-		return local.NewLocalStorage(config["app"]["local_storage"])
+		return local.NewLocalStorage(config["app"]["server_path"], config["app"]["local_path"])
 	default:
 		return nil
 	}
@@ -349,7 +349,8 @@ func getServiceConfig() map[string]map[string]string {
 		"app": {
 			"storage_provider_type": env.GetEnv("PHPCS_STORAGE_PROVIDER", ""),
 			"temp_folder":           env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp"),
-			"local_storage":         env.GetEnv("PHPCS_LOCAL_STORAGE_PATH", "/tmp"),
+			"server_path":           "/srv/data",
+			"local_path":            "phpcs",
 		},
 		"aws":
 		{
