@@ -163,6 +163,11 @@ class Upload {
 	public function filter_upload_dir( $uploads ) {
 		$bucket = get_option( self::BUCKET_NAME, '' );
 
+		// Do nothing if this is a local audit report request.
+		if ( ! empty( $_REQUEST['post_id'] ) && ! empty( $_REQUEST['type'] ) && ! empty( $_REQUEST['standard'] ) ) {
+			return $uploads;
+		}
+
 		// Do nothing without the bucket name.
 		if ( '' === $bucket ) {
 			return $uploads;
