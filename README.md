@@ -47,7 +47,7 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
            * [GKE Lighthouse Server Settings](#gke-lighthouse-server-settings)
            * [GKE PHPCS Server Settings](#gke-phpcs-server-settings)
            * [GKE Sync Server Settings](#gke-sync-server-settings)
-   + [Google Cloud Storage (GCS)](#google-app-engine-gcs)
+   + [Google Cloud Storage (GCS)](#google-cloud-storage-gcs)
        - [GCS Settings](#gcs-settings)
    + [Amazon Web Services (AWS)](#amazon-web-services-aws)
        - [AWS Settings](#aws-settings)
