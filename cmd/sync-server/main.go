@@ -33,7 +33,7 @@ var (
 	checkerDBPath = env.GetEnv("SYNC_DATA", "./db")
 
 	// Init the scribble (flat file) db used for checking currency of results.
-	checker sync.UpdateChecker = scribbleChecker{
+	checker sync.UpdateChecker = &scribbleChecker{
 		db: newScribbleChecker(checkerDBPath),
 	}
 
@@ -97,6 +97,7 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 
 			page := 1
 			pages := 1
+			lastUpdated, _ := checker.GetLastUpdated()
 
 			for page <= pages {
 
@@ -117,16 +118,34 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 					pages = maxPages
 				}
 
+				// If we're doing a sync by "updated" items then only continue if
+				// the most recently updated item is newer than our last recorded
+				// item.
+				mostRecent := mostRecentFromResponse(response)
+				if category == "updated" && mostRecent != nil {
+					// If the latest item's update time is less than the recorded last updated item
+					// then continue and wait for next sync process.
+					if ! timeAfter(mostRecent, lastUpdated) {
+						page = 1
+						pages = 0
+						continue
+					}
+				}
+
 				// Themes.
 				for _, project := range response.Themes {
 					project.Type = projectType
-					out <- project
+					if category != "updated" || (category == "updated" && timeAfter(&project, lastUpdated)) {
+						out <- project
+					}
 				}
 
 				// Plugins.
 				for _, project := range response.Plugins {
 					project.Type = projectType
-					out <- project
+					if category != "updated" || (category == "updated" && timeAfter(&project, lastUpdated)) {
+						out <- project
+					}
 				}
 
 				page += 1
@@ -205,6 +224,28 @@ func defaultAudits() *[]message.Audit {
 			},
 		},
 	}
+}
+
+// timeAfter checks if the first item's LastUpdated time is after the second item.
+func timeAfter(p1, p2 *wporg.RepoProject) bool {
+	p1Time, _ := time.Parse(wporg.TimeFormat, p1.LastUpdated)
+	p2Time, _ := time.Parse(wporg.TimeFormat, p2.LastUpdated)
+	return p1Time.After(p2Time)
+}
+
+// mostRecentFromResponse returns the most recent project from the response.
+func mostRecentFromResponse(response *wporg.ApiResponse) *wporg.RepoProject {
+	var mostRecent *wporg.RepoProject
+
+	if len(response.Themes) > 0 {
+		mostRecent = &response.Themes[0]
+	}
+
+	if len(response.Plugins) > 0 {
+		mostRecent = &response.Plugins[0]
+	}
+
+	return mostRecent
 }
 
 func main() {

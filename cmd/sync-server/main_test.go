@@ -91,10 +91,17 @@ func (m mockDispatcher) Dispatch(project wporg.RepoProject) error {
 
 func (m mockDispatcher) Init() error { return nil }
 
-type mockChecker struct{}
+type mockChecker struct {
+	LastDate string
+}
 
 func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool   { return true }
 func (m mockChecker) RecordUpdate(project wporg.RepoProject) error { return nil }
+func (m mockChecker) GetLastUpdated() (*wporg.RepoProject, error) {
+	return &wporg.RepoProject{
+		LastUpdated: m.LastDate,
+	}, nil
+}
 
 func Test_fetcher(t *testing.T) {
 
@@ -117,10 +124,11 @@ func Test_fetcher(t *testing.T) {
 		themes  string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		sources sources
-		want    reflect.Type
+		name     string
+		args     args
+		sources  sources
+		want     reflect.Type
+		lastDate string
 	}{
 		{
 			"Themes",
@@ -136,6 +144,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			"",
 		},
 		{
 			"Plugins - All",
@@ -151,6 +160,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			"",
 		},
 		{
 			"Plugins - Max Pages 2",
@@ -166,6 +176,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			"",
 		},
 		{
 			"Themes - Fail",
@@ -181,6 +192,23 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			"",
+		},
+		{
+			"Themes - Old",
+			args{
+				"themes",
+				"updated",
+				testBufferSize,
+				token,
+				-1,
+			},
+			sources{
+				mockPluginsApi.URL,
+				mockThemesApi.URL,
+			},
+			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			"2020-02-02 3:00pm GMT",
 		},
 	}
 	for _, tt := range tests {
@@ -189,6 +217,16 @@ func Test_fetcher(t *testing.T) {
 			// Set mock sources.
 			client.SetPluginApiSource(tt.sources.plugins)
 			client.SetThemeApiSource(tt.sources.themes)
+
+			if tt.lastDate != "" {
+				oldChecker := checker
+				checker = &mockChecker{
+					LastDate: tt.lastDate,
+				}
+				defer func() {
+					checker = oldChecker
+				}()
+			}
 
 			// Initialise a token.
 			go func() { token <- struct{}{} }()
@@ -210,9 +248,16 @@ func Test_fetcher(t *testing.T) {
 			if tt.args.maxPages > -1 && tt.args.maxPages < 4 {
 				expected = tt.args.maxPages * testBufferSize
 			}
+
+			if tt.lastDate != "" {
+				expected = -1
+			}
+
 			for i := 0; i < expected; i++ {
 				<-projects
 			}
+
+			time.Sleep(time.Millisecond * 10)
 		})
 	}
 }

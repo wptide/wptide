@@ -9,7 +9,7 @@
       "name": "Plugin 6",
       "slug": "plugin-6",
       "version": "6.0.0",
-      "last_updated": "2018-02-21",
+      "last_updated": "2018-02-21 12:00am GMT",
       "short_description": "Plugin 6 Short",
       "description": "",
       "download_link": "http://example.local/plugin-6-6.0.0.zip"
@@ -18,7 +18,7 @@
       "name": "Plugin 7",
       "slug": "plugin-7",
       "version": "7.0.0",
-      "last_updated": "2018-02-22",
+      "last_updated": "2018-02-22 12:00am GMT",
       "short_description": "Plugin 7 Short",
       "description": "",
       "download_link": "http://example.local/plugin-7-7.0.0.zip"
@@ -27,7 +27,7 @@
       "name": "Plugin 8",
       "slug": "plugin-8",
       "version": "8.0.0",
-      "last_updated": "2018-02-23",
+      "last_updated": "2018-02-23 12:00am GMT",
       "short_description": "Plugin 8 Short",
       "description": "",
       "download_link": "http://example.local/plugin-8-8.0.0.zip"
@@ -36,7 +36,7 @@
       "name": "Plugin 9",
       "slug": "plugin-9",
       "version": "9.0.0",
-      "last_updated": "2018-02-24",
+      "last_updated": "2018-02-24 12:00am GMT",
       "short_description": "Plugin 9 Short",
       "description": "",
       "download_link": "http://example.local/plugin-9-9.0.0.zip"
@@ -45,7 +45,7 @@
       "name": "Plugin 10",
       "slug": "plugin-10",
       "version": "10.0.0",
-      "last_updated": "2018-02-25",
+      "last_updated": "2018-02-25 12:00am GMT",
       "short_description": "Plugin 10 Short",
       "description": "",
       "download_link": "http://example.local/plugin-10-10.0.0.zip"
