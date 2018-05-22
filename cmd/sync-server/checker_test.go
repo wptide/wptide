@@ -166,7 +166,7 @@ func Test_scribbleChecker_GetSyncTime(t *testing.T) {
 	nowString := []byte(fmt.Sprintf("%v", nowTime.UnixNano()))
 	nowParsed, _ := strconv.ParseInt(string(nowString), 10, 64)
 
-	ioutil.WriteFile("./testdata/testdb/info/mock-sync-start.json", nowString, 0550)
+	ioutil.WriteFile("./testdata/testdb/info/mock-sync-start.json", nowString, 0644)
 	defer os.Remove("./testdata/testdb/info/mock-sync-start.json")
 
 	type fields struct {
