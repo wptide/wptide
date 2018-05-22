@@ -6,13 +6,13 @@ import (
 	"errors"
 	"sync"
 	"time"
+	"fmt"
 )
 
 var mutex = sync.Mutex{}
 
 type scribbleChecker struct {
-	db          *scribble.Driver
-	lastUpdated *wporg.RepoProject
+	db *scribble.Driver
 }
 
 func (s scribbleChecker) UpdateCheck(project wporg.RepoProject) bool {
@@ -35,39 +35,28 @@ func (s *scribbleChecker) RecordUpdate(project wporg.RepoProject) error {
 		return errors.New("no db to write to")
 	}
 
-	lastDate, _ := time.Parse(wporg.TimeFormat, s.lastUpdated.LastUpdated)
-	thisDate, _ := time.Parse(wporg.TimeFormat, project.LastUpdated)
-
-	if thisDate.After(lastDate) {
-		s.setLastUpdated(project)
-		s.db.Write("info", "last-updated", project)
-	}
-
 	err := s.db.Write(project.Type, project.Slug, project)
 	return err
 }
 
-func (s *scribbleChecker) GetLastUpdated() (*wporg.RepoProject, error) {
-	record := wporg.RepoProject{}
-
-	if s.db == nil {
-		return nil, errors.New("no db to get last record from")
-	}
-
-	err := s.db.Read("info", "last-updated", &record)
-	if err != nil {
-		record = wporg.RepoProject{
-			LastUpdated: "1970-01-01 12:00am MST",
-		}
-	}
-
-	s.setLastUpdated(record)
-
-	return &record, err
+func (s *scribbleChecker) SetSyncTime(event, projectType string, t time.Time) {
+	key := fmt.Sprintf("%s-sync-%s", projectType, event)
+	s.db.Write("info", key, t.UnixNano())
 }
 
-func (s *scribbleChecker) setLastUpdated(project wporg.RepoProject) {
-	s.lastUpdated = &project
+func (s scribbleChecker) GetSyncTime(event, projectType string) time.Time {
+	key := fmt.Sprintf("%s-sync-%s", projectType, event)
+	var timestamp int64
+	var t time.Time
+
+	err := s.db.Read("info", key, &timestamp)
+	if err != nil {
+		t, _ = time.Parse(wporg.TimeFormat, "1970-01-01 12:00am MST")
+	} else {
+		t = time.Unix(0, timestamp)
+	}
+
+	return t
 }
 
 func newScribbleChecker(path string) *scribble.Driver {

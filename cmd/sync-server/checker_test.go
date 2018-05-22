@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/nanobox-io/golang-scribble"
 	"github.com/wptide/pkg/wporg"
@@ -146,9 +150,6 @@ func Test_scribbleChecker_RecordUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &scribbleChecker{
 				db: tt.fields.db,
-				lastUpdated: &wporg.RepoProject{
-					LastUpdated: "1970-01-01 12:00am, MST",
-				},
 			}
 			if err := s.RecordUpdate(tt.args.project); (err != nil) != tt.wantErr {
 				t.Errorf("scribbleChecker.RecordUpdate() error = %v, wantErr %v", err, tt.wantErr)
@@ -157,66 +158,111 @@ func Test_scribbleChecker_RecordUpdate(t *testing.T) {
 	}
 }
 
-func Test_scribbleChecker_GetLastUpdated(t *testing.T) {
+func Test_scribbleChecker_GetSyncTime(t *testing.T) {
+
 	testDriver, _ := scribble.New("./testdata/testdb", nil)
-	notFoundDriver, _ := scribble.New("./testdata/", nil)
+	epoc, _ := time.Parse(wporg.TimeFormat, "1970-01-01 12:00am MST")
+	nowTime := time.Now()
+	nowString := []byte(fmt.Sprintf("%v", nowTime.UnixNano()))
+	nowParsed, _ := strconv.ParseInt(string(nowString), 10, 64)
+
+	ioutil.WriteFile("./testdata/testdb/info/mock-sync-start.json", nowString, 0550)
+	defer os.Remove("./testdata/testdb/info/mock-sync-start.json")
 
 	type fields struct {
-		db          *scribble.Driver
-		lastUpdated *wporg.RepoProject
+		db *scribble.Driver
+	}
+	type args struct {
+		event       string
+		projectType string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		want    *wporg.RepoProject
-		wantErr bool
+		name   string
+		fields fields
+		args   args
+		want   time.Time
 	}{
 		{
-			"DB Error",
+			"Test Sync Time Error",
 			fields{
-				db: nil,
+				testDriver,
 			},
-			nil,
-			true,
+			args{
+				"start",
+				"theme",
+			},
+			epoc,
 		},
 		{
-			"Get Last Updated",
+			"Get Sync Time",
 			fields{
-				db: testDriver,
+				testDriver,
 			},
-			&wporg.RepoProject{
-				Name:        "Theme One",
-				Slug:        "theme-one",
-				Version:     "1.0.1",
-				LastUpdated: "2018-02-28 12:00am GMT",
+			args{
+				"start",
+				"mock",
 			},
-			false,
+			time.Unix(0, nowParsed),
 		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := scribbleChecker{
+				db: tt.fields.db,
+			}
+			if got := s.GetSyncTime(tt.args.event, tt.args.projectType); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("scribbleChecker.GetSyncTime() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_scribbleChecker_SetSyncTime(t *testing.T) {
+
+	testDriver, _ := scribble.New("./testdata/testdb", nil)
+	epoc, _ := time.Parse(wporg.TimeFormat, "1970-01-01 12:00am MST")
+
+	defer os.Remove("./testdata/testdb/info/mock-sync-stop.json")
+
+	type fields struct {
+		db *scribble.Driver
+	}
+	type args struct {
+		event       string
+		projectType string
+		t           time.Time
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
 		{
-			"Get Last Updated - Not Found",
+			"Set Sync Time",
 			fields{
-				db: notFoundDriver,
+				testDriver,
 			},
-			&wporg.RepoProject{
-				LastUpdated: "1970-01-01 12:00am MST",
+			args{
+				"stop",
+				"mock",
+				epoc,
 			},
-			true,
+			"0", // Epoc is 0
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &scribbleChecker{
-				db:          tt.fields.db,
-				lastUpdated: tt.fields.lastUpdated,
+				db: tt.fields.db,
 			}
-			got, err := s.GetLastUpdated()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("scribbleChecker.GetLastUpdated() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			s.SetSyncTime(tt.args.event, tt.args.projectType, tt.args.t)
+
+			b, _ := ioutil.ReadFile(fmt.Sprintf("./testdata/testdb/info/%s-sync-%s.json", tt.args.projectType, tt.args.event))
+			if string(b) != tt.want {
+				t.Errorf("scribbleChecker.GetSyncTime() = %v, expected %v", string(b), tt.want)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("scribbleChecker.GetLastUpdated() = %v, want %v", got, tt.want)
-			}
+
 		})
 	}
 }

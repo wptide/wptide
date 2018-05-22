@@ -8,15 +8,15 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
 	"errors"
-	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/sync"
 	"github.com/wptide/pkg/wporg"
 	"os"
+	"github.com/wptide/pkg/sync"
+	"github.com/wptide/pkg/message"
+	"reflect"
 )
 
 var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -92,18 +92,27 @@ func (m mockDispatcher) Dispatch(project wporg.RepoProject) error {
 func (m mockDispatcher) Init() error { return nil }
 
 type mockChecker struct {
-	LastDate string
+	LastSync *time.Time
 }
 
 func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool   { return true }
 func (m mockChecker) RecordUpdate(project wporg.RepoProject) error { return nil }
-func (m mockChecker) GetLastUpdated() (*wporg.RepoProject, error) {
-	return &wporg.RepoProject{
-		LastUpdated: m.LastDate,
-	}, nil
+func (m mockChecker) SetSyncTime(event, projectType string, t time.Time) {}
+func (m mockChecker) GetSyncTime(event, projectType string) time.Time {
+	if m.LastSync != nil {
+		return *m.LastSync
+	}
+	return time.Now().AddDate(-10,0,0)
 }
 
 func Test_fetcher(t *testing.T) {
+
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+		defer os.RemoveAll("./db")
+	}()
 
 	b := bytes.Buffer{}
 	log.SetOutput(&b)
@@ -128,7 +137,7 @@ func Test_fetcher(t *testing.T) {
 		args     args
 		sources  sources
 		want     reflect.Type
-		lastDate string
+		checker  sync.UpdateSyncChecker
 	}{
 		{
 			"Themes",
@@ -144,7 +153,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
-			"",
+			mockChecker{},
 		},
 		{
 			"Plugins - All",
@@ -160,7 +169,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
-			"",
+			mockChecker{},
 		},
 		{
 			"Plugins - Max Pages 2",
@@ -176,7 +185,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
-			"",
+			mockChecker{},
 		},
 		{
 			"Themes - Fail",
@@ -192,7 +201,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
-			"",
+			mockChecker{},
 		},
 		{
 			"Themes - Old",
@@ -208,20 +217,25 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
-			"2020-02-02 3:00pm GMT",
+			nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			// Set mock sources.
 			client.SetPluginApiSource(tt.sources.plugins)
 			client.SetThemeApiSource(tt.sources.themes)
 
-			if tt.lastDate != "" {
+			if tt.checker != nil {
+				oldChecker := checker
+				checker = tt.checker
+				defer func() {
+					checker = oldChecker
+				}()
+			} else {
 				oldChecker := checker
 				checker = &mockChecker{
-					LastDate: tt.lastDate,
+					LastSync: &[]time.Time{time.Now()}[0],
 				}
 				defer func() {
 					checker = oldChecker
@@ -249,8 +263,8 @@ func Test_fetcher(t *testing.T) {
 				expected = tt.args.maxPages * testBufferSize
 			}
 
-			if tt.lastDate != "" {
-				expected = -1
+			if tt.checker == nil {
+				expected = 0
 			}
 
 			for i := 0; i < expected; i++ {
@@ -263,6 +277,12 @@ func Test_fetcher(t *testing.T) {
 }
 
 func Test_infoWorker(t *testing.T) {
+
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+	}()
 
 	// Don't send log to os.Stdout.
 	b := bytes.Buffer{}
@@ -311,6 +331,12 @@ func Test_infoWorker(t *testing.T) {
 
 func Test_pool(t *testing.T) {
 
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+	}()
+
 	// Basic test here, the tests for infoWorker will have
 	// the bulk of the testing.
 
@@ -346,6 +372,13 @@ func Test_pool(t *testing.T) {
 }
 
 func Test_main(t *testing.T) {
+
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+		defer os.RemoveAll("./db")
+	}()
 
 	// Don't log to os.Stdout.
 	b := bytes.Buffer{}

@@ -33,7 +33,7 @@ var (
 	checkerDBPath = env.GetEnv("SYNC_DATA", "./db")
 
 	// Init the scribble (flat file) db used for checking currency of results.
-	checker sync.UpdateChecker = &scribbleChecker{
+	checker sync.UpdateSyncChecker = &scribbleChecker{
 		db: newScribbleChecker(checkerDBPath),
 	}
 
@@ -97,7 +97,12 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 
 			page := 1
 			pages := 1
-			lastUpdated, _ := checker.GetLastUpdated()
+
+			// Get last sync start time for projectType, and subtract 5 minutes for a buffer.
+			lastSync := checker.GetSyncTime("start", projectType).Add(-1 * (time.Minute * 5))
+
+			// Set current sync time for projectType.
+			checker.SetSyncTime("start", projectType, time.Now())
 
 			for page <= pages {
 
@@ -119,23 +124,23 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 				}
 
 				// If we're doing a sync by "updated" items then only continue if
-				// the most recently updated item is newer than our last recorded
-				// item.
+				// the most recently updated item is newer than our last sync time.
 				mostRecent := mostRecentFromResponse(response)
 				if category == "updated" && mostRecent != nil {
 					// If the latest item's update time is less than the recorded last updated item
-					// then continue and wait for next sync process.
-					if ! timeAfter(mostRecent, lastUpdated) {
-						page = 1
+					// then set pages out of bounds to break the next loop.
+					// We won't `continue` yet and might as well continue looping the items we have.
+					if ! timeAfter(mostRecent, lastSync) {
+						page = pages
 						pages = 0
-						continue
 					}
+
 				}
 
 				// Themes.
 				for _, project := range response.Themes {
 					project.Type = projectType
-					if category != "updated" || (category == "updated" && timeAfter(&project, lastUpdated)) {
+					if category != "updated" || (category == "updated" && timeAfter(&project, lastSync)) {
 						out <- project
 					}
 				}
@@ -143,7 +148,7 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 				// Plugins.
 				for _, project := range response.Plugins {
 					project.Type = projectType
-					if category != "updated" || (category == "updated" && timeAfter(&project, lastUpdated)) {
+					if category != "updated" || (category == "updated" && timeAfter(&project, lastSync)) {
 						out <- project
 					}
 				}
@@ -226,11 +231,10 @@ func defaultAudits() *[]message.Audit {
 	}
 }
 
-// timeAfter checks if the first item's LastUpdated time is after the second item.
-func timeAfter(p1, p2 *wporg.RepoProject) bool {
-	p1Time, _ := time.Parse(wporg.TimeFormat, p1.LastUpdated)
-	p2Time, _ := time.Parse(wporg.TimeFormat, p2.LastUpdated)
-	return p1Time.After(p2Time)
+// timeAfter checks if the project's LastUpdated time is after the given time.
+func timeAfter(project *wporg.RepoProject, t time.Time) bool {
+	pT, _ := time.Parse(wporg.TimeFormat, project.LastUpdated)
+	return pT.After(t)
 }
 
 // mostRecentFromResponse returns the most recent project from the response.

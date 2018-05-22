@@ -38,5 +38,8 @@ service/api/app.yaml
 service/api/cron.yaml
 service/api/wp-config.php
 
+# Sync Server
+cmd/sync-server/db
+
 # GCP
 service-account.json
