@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 
@@ -162,12 +161,6 @@ func Test_scribbleChecker_GetSyncTime(t *testing.T) {
 
 	testDriver, _ := scribble.New("./testdata/testdb", nil)
 	epoc, _ := time.Parse(wporg.TimeFormat, "1970-01-01 12:00am MST")
-	nowTime := time.Now()
-	nowString := []byte(fmt.Sprintf("%v", nowTime.UnixNano()))
-	nowParsed, _ := strconv.ParseInt(string(nowString), 10, 64)
-
-	ioutil.WriteFile("./testdata/testdb/info/mock-sync-start.json", nowString, 0644)
-	defer os.Remove("./testdata/testdb/info/mock-sync-start.json")
 
 	type fields struct {
 		db *scribble.Driver
@@ -202,7 +195,7 @@ func Test_scribbleChecker_GetSyncTime(t *testing.T) {
 				"start",
 				"mock",
 			},
-			time.Unix(0, nowParsed),
+			time.Unix(0, 1526956796534182580),
 		},
 	}
 	for _, tt := range tests {
