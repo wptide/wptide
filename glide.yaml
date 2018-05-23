@@ -2,7 +2,6 @@ package: github.com/xwp/go-tide
 import:
 - package: github.com/nanobox-io/golang-scribble
 - package: github.com/wptide/pkg
-  version: d3617f0f47f5b5ef5289eb2a890e3d04f5aef8f3
   subpackages:
   - env
   - message

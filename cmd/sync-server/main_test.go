@@ -14,7 +14,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/sync"
 	"github.com/wptide/pkg/wporg"
@@ -464,11 +463,11 @@ func Test_getSyncProvider(t *testing.T) {
 			nil,
 		},
 		{
-			"Files Provider",
+			"Local Provider",
 			args{
 				map[string]map[string]string{
-					"app": {"syncDBType": "files"},
-					"files": {
+					"app": {"syncDBProvider": "local"},
+					"local": {
 						"dbPath": "./testdata/testdb",
 					},
 				},
@@ -479,7 +478,7 @@ func Test_getSyncProvider(t *testing.T) {
 			"Firestore Provider",
 			args{
 				map[string]map[string]string{
-					"app": {"syncDBType": "firestore"},
+					"app": {"syncDBProvider": "firestore"},
 					"firestore": {
 						"projectID": "",
 						"syncRoot":  "",

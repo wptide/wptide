@@ -304,9 +304,9 @@ func main() {
 }
 
 func getSyncProvider(c map[string]map[string]string) sync.UpdateSyncChecker {
-	switch c["app"]["syncDBType"] {
-	case "files":
-		conf := c["files"]
+	switch c["app"]["syncDBProvider"] {
+	case "local":
+		conf := c["local"]
 		// Init the scribble (flat file) db used for checking currency of results.
 		return &scribbleChecker{
 			db: newScribbleChecker(conf["dbPath"]),
@@ -329,7 +329,7 @@ func getServiceConfig() map[string]map[string]string {
 			"poolSize":             env.GetEnv("SYNC_POOL_WORKERS", "250"),
 			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "300"),
 			"browseCategory":       env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated"),
-			"syncDBType":           env.GetEnv("SYNC_DB_TYPE", "files"),
+			"syncDBProvider":       env.GetEnv("SYNC_DB_PROVIDER", "local"),
 		},
 		"message":
 		{
@@ -337,7 +337,7 @@ func getServiceConfig() map[string]map[string]string {
 			"apiClient":  env.GetEnv("SYNC_DEFAULT_CLIENT", "wporg"),
 			"visibility": env.GetEnv("SYNC_DEFAULT_VISIBILITY", "public"),
 		},
-		"files":
+		"local":
 		{
 			"dbPath": env.GetEnv("SYNC_DATA", "./db"),
 		},
