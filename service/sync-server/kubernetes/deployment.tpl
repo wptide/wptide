@@ -68,6 +68,8 @@ spec:
           value: "${SYNC_API_BROWSE_CATEGORY}"
         - name: SYNC_DATA
           value: "${SYNC_DATA}"
+        - name: SYNC_DATABASE_PROVIDER
+          value: "${SYNC_DATABASE_PROVIDER}"
         - name: SYNC_DEFAULT_CLIENT
           value: "${SYNC_DEFAULT_CLIENT}"
         - name: SYNC_DEFAULT_VISIBILITY
