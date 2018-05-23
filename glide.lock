@@ -1,18 +1,23 @@
-hash: 06e46091c99823a9cc46c588e071077e0d1145fc56b2062c743810606c40bf07
-updated: 2018-05-18T16:55:22.557566524+10:00
+hash: ad507fbfdacf0ecec11ea80211a3df68a8bba33eeb6c38d0a72e400d713b0540
+updated: 2018-05-23T16:16:30.223675473+10:00
 imports:
 - name: cloud.google.com/go
-  version: 056a55f54a6cc77b440b31a56a5e7c3982d32811
+  version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
   subpackages:
   - compute/metadata
+  - firestore
+  - firestore/apiv1beta1
   - iam
   - internal
+  - internal/atomiccache
+  - internal/btree
+  - internal/fields
   - internal/optional
   - internal/trace
   - internal/version
   - storage
 - name: github.com/aws/aws-sdk-go
-  version: ee7b4b1162937cba700de23bd90acb742982e626
+  version: fad131ddc707880428615dc8bc1587b55fb46d74
   subpackages:
   - aws
   - aws/awserr
@@ -58,7 +63,10 @@ imports:
   - ptypes
   - ptypes/any
   - ptypes/duration
+  - ptypes/empty
+  - ptypes/struct
   - ptypes/timestamp
+  - ptypes/wrappers
 - name: github.com/googleapis/gax-go
   version: de2cc08e690b99dd3f7d19937d80d3d54e04682f
 - name: github.com/hhatto/gocloc
@@ -72,7 +80,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: fbe40cd4195e95daa9a9af8cc5f72111187f26fd
+  version: d3617f0f47f5b5ef5289eb2a890e3d04f5aef8f3
   subpackages:
   - env
   - log
@@ -91,6 +99,7 @@ imports:
   - storage/local
   - storage/s3
   - sync
+  - sync/firestore
   - tide
   - tide/api
   - wporg
@@ -100,6 +109,7 @@ imports:
   - exporter/stackdriver/propagation
   - internal
   - internal/tagencoding
+  - plugin/ocgrpc
   - plugin/ochttp
   - plugin/ochttp/propagation/b3
   - stats
@@ -145,6 +155,8 @@ imports:
   - iterator
   - option
   - storage/v1
+  - transport
+  - transport/grpc
   - transport/http
 - name: google.golang.org/appengine
   version: b9aad5d628b283f265adf8d3557faae187a8d015
@@ -156,15 +168,19 @@ imports:
   - internal/log
   - internal/modules
   - internal/remote_api
+  - internal/socket
   - internal/urlfetch
+  - socket
   - urlfetch
 - name: google.golang.org/genproto
   version: 7bb2a897381c9c5ab2aeb8614f758d7766af68ff
   subpackages:
   - googleapis/api/annotations
+  - googleapis/firestore/v1beta1
   - googleapis/iam/v1
   - googleapis/rpc/code
   - googleapis/rpc/status
+  - googleapis/type/latlng
 - name: google.golang.org/grpc
   version: 3b7feb1847c899055b799fc77693e376cd4ea0d9
   subpackages:
@@ -175,6 +191,7 @@ imports:
   - codes
   - connectivity
   - credentials
+  - credentials/oauth
   - encoding
   - encoding/proto
   - grpclb/grpc_lb_v1/messages
