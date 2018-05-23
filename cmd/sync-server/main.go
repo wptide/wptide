@@ -313,7 +313,7 @@ func getSyncProvider(c map[string]map[string]string) sync.UpdateSyncChecker {
 		}
 	case "firestore":
 		conf := c["firestore"]
-		return firestore.New(context.Background(), conf["projectID"], conf["syncRoot"])
+		return firestore.New(context.Background(), conf["projectID"], conf["docPath"])
 	default:
 		return nil
 	}
@@ -352,7 +352,7 @@ func getServiceConfig() map[string]map[string]string {
 		"firestore":
 		{
 			"projectID": env.GetEnv("GCP_PROJECT", ""),
-			"syncRoot":  env.GetEnv("SYNC_FIRESTORE_SYNCROOT", ""),
+			"docPath":   env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
 		},
 		"tide":
 		{

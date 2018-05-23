@@ -480,8 +480,8 @@ func Test_getSyncProvider(t *testing.T) {
 				map[string]map[string]string{
 					"app": {"syncDBProvider": "firestore"},
 					"firestore": {
-						"projectID": "",
-						"syncRoot":  "",
+						"projectID": "fake-project-id-12345",
+						"docPath":  "sync-server/wporg",
 					},
 				},
 			},
