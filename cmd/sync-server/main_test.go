@@ -2,21 +2,23 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
-	"errors"
-	"github.com/wptide/pkg/wporg"
-	"os"
-	"github.com/wptide/pkg/sync"
+
 	"github.com/wptide/pkg/message"
-	"reflect"
+	"github.com/wptide/pkg/sync"
+	"github.com/wptide/pkg/wporg"
+	"github.com/wptide/pkg/sync/firestore"
 )
 
 var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -95,14 +97,14 @@ type mockChecker struct {
 	LastSync *time.Time
 }
 
-func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool   { return true }
-func (m mockChecker) RecordUpdate(project wporg.RepoProject) error { return nil }
+func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool         { return true }
+func (m mockChecker) RecordUpdate(project wporg.RepoProject) error       { return nil }
 func (m mockChecker) SetSyncTime(event, projectType string, t time.Time) {}
 func (m mockChecker) GetSyncTime(event, projectType string) time.Time {
 	if m.LastSync != nil {
 		return *m.LastSync
 	}
-	return time.Now().AddDate(-10,0,0)
+	return time.Now().AddDate(-10, 0, 0)
 }
 
 func Test_fetcher(t *testing.T) {
@@ -133,11 +135,11 @@ func Test_fetcher(t *testing.T) {
 		themes  string
 	}
 	tests := []struct {
-		name     string
-		args     args
-		sources  sources
-		want     reflect.Type
-		checker  sync.UpdateSyncChecker
+		name    string
+		args    args
+		sources sources
+		want    reflect.Type
+		checker sync.UpdateSyncChecker
 	}{
 		{
 			"Themes",
@@ -444,5 +446,54 @@ func Test_main(t *testing.T) {
 		browseCategory = browseCategoryOld
 		poolSize = poolSizeOld
 		quit = quitOld
+	}
+}
+
+func Test_getSyncProvider(t *testing.T) {
+	type args struct {
+		c map[string]map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want reflect.Type
+	}{
+		{
+			"No Provider",
+			args{},
+			nil,
+		},
+		{
+			"Files Provider",
+			args{
+				map[string]map[string]string{
+					"app": {"syncDBType": "files"},
+					"files": {
+						"dbPath": "./testdata/testdb",
+					},
+				},
+			},
+			reflect.TypeOf(&scribbleChecker{}),
+		},
+		{
+			"Firestore Provider",
+			args{
+				map[string]map[string]string{
+					"app": {"syncDBType": "firestore"},
+					"firestore": {
+						"projectID": "",
+						"syncRoot":  "",
+					},
+				},
+			},
+			reflect.TypeOf(&firestore.FirestoreSync{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getSyncProvider(tt.args.c); reflect.TypeOf(got) != tt.want {
+				t.Errorf("getSyncProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
 	}
 }
