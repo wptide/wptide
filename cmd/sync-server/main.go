@@ -33,7 +33,7 @@ var (
 	client = &wporg.Client{}
 
 	// Checks to see if we need to send an update.
-	checker sync.UpdateSyncChecker = getSyncProvider(conf)
+	checker, checkerError = getSyncProvider(conf)
 
 	// Create the SQS dispatcher.
 	dispatcher = &sqsDispatcher{
@@ -268,6 +268,12 @@ func main() {
 		return;
 	}
 
+	// If sync client doesn't exist then exit.
+	if checkerError != nil {
+		log.Println("Sync client failed to initialize.")
+		return;
+	}
+
 	// Message channel.
 	messages := make(chan *message.Message, perPage)
 
@@ -303,23 +309,20 @@ func main() {
 	}
 }
 
-func getSyncProvider(c map[string]map[string]string) sync.UpdateSyncChecker {
+func getSyncProvider(c map[string]map[string]string) (sync.UpdateSyncChecker, error) {
 	switch c["app"]["syncDBProvider"] {
 	case "local":
 		conf := c["local"]
 		// Init the scribble (flat file) db used for checking currency of results.
 		return &scribbleChecker{
 			db: newScribbleChecker(conf["dbPath"]),
-		}
+		}, nil
 	case "firestore":
 		conf := c["firestore"]
 		syncClient, err := firestore.New(context.Background(), conf["projectID"], conf["docPath"])
-		if err != nil {
-			log.Fatal(err)
-		}
-		return syncClient
+		return syncClient, err
 	default:
-		return nil
+		return nil, nil
 	}
 }
 

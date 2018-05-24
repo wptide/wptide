@@ -391,6 +391,7 @@ func Test_main(t *testing.T) {
 		browseCategory string
 		poolSize       int
 		quit           chan struct{}
+		checkerError error
 	}
 
 	tests := []struct {
@@ -405,6 +406,7 @@ func Test_main(t *testing.T) {
 				"updated",
 				5,
 				make(chan struct{}, 1),
+				nil,
 			},
 		},
 		{
@@ -415,6 +417,7 @@ func Test_main(t *testing.T) {
 				"updated",
 				5,
 				make(chan struct{}, 1),
+				nil,
 			},
 		},
 	}
@@ -430,6 +433,8 @@ func Test_main(t *testing.T) {
 		poolSize = tt.serverConfig.poolSize
 		quitOld := quit
 		quit = tt.serverConfig.quit
+		checkerOld := checker
+		checker = &mockChecker{}
 
 		go func() {
 			time.Sleep(time.Second)
@@ -445,7 +450,28 @@ func Test_main(t *testing.T) {
 		browseCategory = browseCategoryOld
 		poolSize = poolSizeOld
 		quit = quitOld
+		checker = checkerOld
 	}
+}
+
+func Test_mainCheckerError(t *testing.T) {
+		oldServerActive := serverActive
+		serverActive = true
+		oldCheckerError := checkerError
+		checkerError = errors.New("error")
+		defer func() {
+			serverActive = oldServerActive
+			checkerError = oldCheckerError
+		}()
+
+		go func() {
+			time.Sleep(time.Second)
+			quit <- struct{}{}
+		}()
+
+		t.Run("Checker Fail Test", func(t *testing.T) {
+			main()
+		})
 }
 
 func Test_getSyncProvider(t *testing.T) {
@@ -490,7 +516,7 @@ func Test_getSyncProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getSyncProvider(tt.args.c); reflect.TypeOf(got) != tt.want {
+			if got, _ := getSyncProvider(tt.args.c); reflect.TypeOf(got) != tt.want {
 				t.Errorf("getSyncProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
 			}
 		})
