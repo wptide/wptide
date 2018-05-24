@@ -135,6 +135,7 @@ services:
         image: ${GKE_SYNC_IMAGE}:latest
         volumes:
             - ./data/sync-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
         environment:
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_PROTOCOL: ${API_PROTOCOL}
@@ -158,4 +159,5 @@ services:
             SYNC_PHPCS_ACTIVE: ${SYNC_PHPCS_ACTIVE}
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
