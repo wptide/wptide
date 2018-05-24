@@ -1,5 +1,5 @@
-hash: ad507fbfdacf0ecec11ea80211a3df68a8bba33eeb6c38d0a72e400d713b0540
-updated: 2018-05-23T15:12:59.673324-07:00
+hash: e19b7943354721ac66525e45e7e106aa36f2948cc4ff9cef489b8b0d80098be4
+updated: 2018-05-24T00:23:47.34849-07:00
 imports:
 - name: cloud.google.com/go
   version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
@@ -68,7 +68,7 @@ imports:
   - ptypes/timestamp
   - ptypes/wrappers
 - name: github.com/googleapis/gax-go
-  version: de2cc08e690b99dd3f7d19937d80d3d54e04682f
+  version: 254b60fe060127b9fd3c420fadd0906bf0382227
 - name: github.com/hhatto/gocloc
   version: 2530ab030fbe40407f12de1f90f01f277bbae0e9
 - name: github.com/jcelliott/lumber
@@ -80,7 +80,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 28eb4c652d1f32dc27368139610e7b8f847e8e2b
+  version: 38e378877a95aca3a4148d9be14dd2673e6cdc9a
   subpackages:
   - env
   - log
@@ -104,7 +104,7 @@ imports:
   - tide/api
   - wporg
 - name: go.opencensus.io
-  version: 275a4ed44f8c4680cfb9d80b62ada9bc3a6a79d9
+  version: 3a827557227b08de330abfac83b8299810c42ac2
   subpackages:
   - exporter/stackdriver/propagation
   - internal
@@ -131,7 +131,7 @@ imports:
   - internal/timeseries
   - trace
 - name: golang.org/x/oauth2
-  version: dd5f5d8e78ce062a4aa881dff95a94f2a0fd405a
+  version: 770e5ebd4ab27c4d70b0983674d138217f5e2c72
   subpackages:
   - google
   - internal
