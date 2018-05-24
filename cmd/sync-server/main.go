@@ -313,7 +313,11 @@ func getSyncProvider(c map[string]map[string]string) sync.UpdateSyncChecker {
 		}
 	case "firestore":
 		conf := c["firestore"]
-		return firestore.New(context.Background(), conf["projectID"], conf["docPath"])
+		syncClient, err := firestore.New(context.Background(), conf["projectID"], conf["docPath"])
+		if err != nil {
+			log.Fatal(err)
+		}
+		return syncClient
 	default:
 		return nil
 	}
