@@ -1,18 +1,23 @@
-hash: 06e46091c99823a9cc46c588e071077e0d1145fc56b2062c743810606c40bf07
-updated: 2018-05-18T16:55:22.557566524+10:00
+hash: e19b7943354721ac66525e45e7e106aa36f2948cc4ff9cef489b8b0d80098be4
+updated: 2018-05-24T00:23:47.34849-07:00
 imports:
 - name: cloud.google.com/go
-  version: 056a55f54a6cc77b440b31a56a5e7c3982d32811
+  version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
   subpackages:
   - compute/metadata
+  - firestore
+  - firestore/apiv1beta1
   - iam
   - internal
+  - internal/atomiccache
+  - internal/btree
+  - internal/fields
   - internal/optional
   - internal/trace
   - internal/version
   - storage
 - name: github.com/aws/aws-sdk-go
-  version: ee7b4b1162937cba700de23bd90acb742982e626
+  version: fad131ddc707880428615dc8bc1587b55fb46d74
   subpackages:
   - aws
   - aws/awserr
@@ -49,20 +54,23 @@ imports:
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
-  version: 6333e38ac20b8949a8dd68baa3650f4dee8f39f0
+  version: bda519ae5f4cbc60d391ff8610711627a08b86ae
 - name: github.com/golang/protobuf
-  version: 668a607657a5d387d6333648a2d9c749761fdc69
+  version: 3a3da3a4e26776cc22a79ef46d5d58477532dede
   subpackages:
   - proto
   - protoc-gen-go/descriptor
   - ptypes
   - ptypes/any
   - ptypes/duration
+  - ptypes/empty
+  - ptypes/struct
   - ptypes/timestamp
+  - ptypes/wrappers
 - name: github.com/googleapis/gax-go
-  version: de2cc08e690b99dd3f7d19937d80d3d54e04682f
+  version: 254b60fe060127b9fd3c420fadd0906bf0382227
 - name: github.com/hhatto/gocloc
-  version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
+  version: 2530ab030fbe40407f12de1f90f01f277bbae0e9
 - name: github.com/jcelliott/lumber
   version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
@@ -72,7 +80,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 3f90b1a56150886df75bdeb190670aa33759eed3
+  version: 38e378877a95aca3a4148d9be14dd2673e6cdc9a
   subpackages:
   - env
   - log
@@ -91,15 +99,17 @@ imports:
   - storage/local
   - storage/s3
   - sync
+  - sync/firestore
   - tide
   - tide/api
   - wporg
 - name: go.opencensus.io
-  version: ebd8d31470fedf6c27d0e3056653ddff642509b8
+  version: 3a827557227b08de330abfac83b8299810c42ac2
   subpackages:
   - exporter/stackdriver/propagation
   - internal
   - internal/tagencoding
+  - plugin/ocgrpc
   - plugin/ochttp
   - plugin/ochttp/propagation/b3
   - stats
@@ -110,7 +120,7 @@ imports:
   - trace/internal
   - trace/propagation
 - name: golang.org/x/net
-  version: 2491c5de3490fced2f6cff376127c667efeed857
+  version: 9ef9f5bb98a1fdc41f8cf6c250a4404b4085e389
   subpackages:
   - context
   - context/ctxhttp
@@ -121,7 +131,7 @@ imports:
   - internal/timeseries
   - trace
 - name: golang.org/x/oauth2
-  version: cdc340f7c179dbbfa4afd43b7614e8fcadde4269
+  version: 770e5ebd4ab27c4d70b0983674d138217f5e2c72
   subpackages:
   - google
   - internal
@@ -135,7 +145,7 @@ imports:
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/api
-  version: aedc137bffcaca05f836e35c6d182fcb7a68b1c0
+  version: 348810ff778af56686d572415ce79e6c9fad9613
   subpackages:
   - gensupport
   - googleapi
@@ -145,9 +155,11 @@ imports:
   - iterator
   - option
   - storage/v1
+  - transport
+  - transport/grpc
   - transport/http
 - name: google.golang.org/appengine
-  version: b9aad5d628b283f265adf8d3557faae187a8d015
+  version: b1f26356af11148e710935ed1ac8a7f5702c7612
   subpackages:
   - internal
   - internal/app_identity
@@ -156,17 +168,21 @@ imports:
   - internal/log
   - internal/modules
   - internal/remote_api
+  - internal/socket
   - internal/urlfetch
+  - socket
   - urlfetch
 - name: google.golang.org/genproto
-  version: 7bb2a897381c9c5ab2aeb8614f758d7766af68ff
+  version: 694d95ba50e67b2e363f3483057db5d4910c18f9
   subpackages:
   - googleapis/api/annotations
+  - googleapis/firestore/v1beta1
   - googleapis/iam/v1
   - googleapis/rpc/code
   - googleapis/rpc/status
+  - googleapis/type/latlng
 - name: google.golang.org/grpc
-  version: 3b7feb1847c899055b799fc77693e376cd4ea0d9
+  version: d33a92319019fc969bb3e428348297ddf01257d1
   subpackages:
   - balancer
   - balancer/base
@@ -175,6 +191,7 @@ imports:
   - codes
   - connectivity
   - credentials
+  - credentials/oauth
   - encoding
   - encoding/proto
   - grpclb/grpc_lb_v1/messages
@@ -192,7 +209,7 @@ imports:
   - tap
   - transport
 - name: gopkg.in/src-d/enry.v1
-  version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
+  version: 6712d4219fb747194f38d0fc72121ca0a46ebcea
   subpackages:
   - data
   - internal/tokenizer
