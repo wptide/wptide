@@ -159,5 +159,6 @@ services:
             SYNC_PHPCS_ACTIVE: ${SYNC_PHPCS_ACTIVE}
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
+            GCP_PROJECT: ${GCP_PROJECT}
             GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
