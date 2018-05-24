@@ -135,6 +135,7 @@ services:
         image: ${GKE_SYNC_IMAGE}:latest
         volumes:
             - ./data/sync-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
         environment:
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_PROTOCOL: ${API_PROTOCOL}
@@ -148,6 +149,8 @@ services:
             SYNC_ACTIVE: ${SYNC_ACTIVE}
             SYNC_API_BROWSE_CATEGORY: ${SYNC_API_BROWSE_CATEGORY}
             SYNC_DATA: ${SYNC_DATA}
+            SYNC_DATABASE_DOCUMENT_PATH: ${SYNC_DATABASE_DOCUMENT_PATH}
+            SYNC_DATABASE_PROVIDER: ${SYNC_DATABASE_PROVIDER}
             SYNC_DEFAULT_CLIENT: ${SYNC_DEFAULT_CLIENT}
             SYNC_DEFAULT_VISIBILITY: ${SYNC_DEFAULT_VISIBILITY}
             SYNC_FORCE_AUDITS: ${SYNC_FORCE_AUDITS}
@@ -156,4 +159,6 @@ services:
             SYNC_PHPCS_ACTIVE: ${SYNC_PHPCS_ACTIVE}
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host
