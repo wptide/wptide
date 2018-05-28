@@ -36,37 +36,7 @@ var (
 	checker, checkerError = getSyncProvider(conf)
 
 	// Create the SQS dispatcher.
-	dispatcher = &sqsDispatcher{
-		Queues: map[string]struct {
-			Region   string
-			Key      string
-			Secret   string
-			Queue    string
-			Endpoint string
-			Active   bool
-			Accepts  string // "all" or "themes" or "plugins"
-		}{
-			"phpcs": {
-				conf["aws"]["sqs_region"],
-				conf["aws"]["key"],
-				conf["aws"]["secret"],
-				conf["aws"]["sqs_phpcs_queue"],
-				apiEndpoint,
-				strings.ToLower(conf["app"]["syncPHPCSActive"]) == "on",
-				"all",
-			},
-			"lighthouse": {
-				conf["aws"]["sqs_region"],
-				conf["aws"]["key"],
-				conf["aws"]["secret"],
-				conf["aws"]["sqs_lh_queue"],
-				apiEndpoint,
-				strings.ToLower(conf["app"]["syncLighthouseActive"]) == "on",
-				"themes",
-			},
-		},
-		providers: make(map[string]message.MessageProvider),
-	}
+	dispatcher, _ = getDispatcher(conf)
 
 	// Tide API settings.
 	apiVersion  = conf["tide"]["version"]
@@ -309,6 +279,69 @@ func main() {
 	}
 }
 
+func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
+	switch c["app"]["messageProvider"] {
+	case "aws":
+		conf := c["aws"]
+		return &sqsDispatcher{
+			Queues: map[string]struct {
+				Region   string
+				Key      string
+				Secret   string
+				Queue    string
+				Endpoint string
+				Active   bool
+				Accepts  string // "all" or "themes" or "plugins"
+			}{
+				"phpcs": {
+					conf["sqs_region"],
+					conf["key"],
+					conf["secret"],
+					conf["sqs_phpcs_queue"],
+					apiEndpoint,
+					strings.ToLower(c["app"]["syncPHPCSActive"]) == "on",
+					"all",
+				},
+				"lighthouse": {
+					conf["sqs_region"],
+					conf["key"],
+					conf["secret"],
+					conf["sqs_lh_queue"],
+					apiEndpoint,
+					strings.ToLower(c["app"]["syncLighthouseActive"]) == "on",
+					"themes",
+				},
+			},
+			providers: make(map[string]message.MessageProvider),
+		}, nil
+		case "firestore":
+			conf := c["firestore"]
+
+			return &firestoreDispatcher{
+				ProjectID: conf["projectID"],
+				Collections: map[string]struct {
+					Collection string
+					Active     bool
+					Accepts    string // "all" or "themes" or "plugins"
+				}{
+					"phpcs": {
+						conf["phpcsCollection"],
+						strings.ToLower(c["app"]["syncPHPCSActive"]) == "on",
+						"all",
+					},
+					"lighthouse": {
+						conf["lighthouseCollection"],
+						strings.ToLower(c["app"]["syncLighthouseActive"]) == "on",
+						"themes",
+					},
+				},
+				providers: make(map[string]message.MessageProvider),
+			}, nil
+	default:
+		return nil, nil
+	}
+}
+
 func getSyncProvider(c map[string]map[string]string) (sync.UpdateSyncChecker, error) {
 	switch c["app"]["syncDBProvider"] {
 	case "local":
@@ -337,6 +370,7 @@ func getServiceConfig() map[string]map[string]string {
 			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "300"),
 			"browseCategory":       env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated"),
 			"syncDBProvider":       env.GetEnv("SYNC_DATABASE_PROVIDER", "local"),
+			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "aws"),
 		},
 		"message":
 		{
@@ -358,8 +392,10 @@ func getServiceConfig() map[string]map[string]string {
 		},
 		"firestore":
 		{
-			"projectID": env.GetEnv("GCP_PROJECT", ""),
-			"docPath":   env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
+			"projectID":            env.GetEnv("GCP_PROJECT", ""),
+			"docPath":              env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
+			"lighthouseCollection": env.GetEnv("SYNC_FIRESTORE_LH", "queue-lighthouse"),
+			"phpcsCollection":      env.GetEnv("SYNC_FIRESTORE_PHPCS", "queue-phpcs"),
 		},
 		"tide":
 		{

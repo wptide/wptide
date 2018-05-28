@@ -14,10 +14,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/sync"
-	"github.com/wptide/pkg/wporg"
 	"github.com/wptide/pkg/sync/firestore"
+	"github.com/wptide/pkg/wporg"
 )
 
 var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -391,7 +392,7 @@ func Test_main(t *testing.T) {
 		browseCategory string
 		poolSize       int
 		quit           chan struct{}
-		checkerError error
+		checkerError   error
 	}
 
 	tests := []struct {
@@ -455,23 +456,23 @@ func Test_main(t *testing.T) {
 }
 
 func Test_mainCheckerError(t *testing.T) {
-		oldServerActive := serverActive
-		serverActive = true
-		oldCheckerError := checkerError
-		checkerError = errors.New("error")
-		defer func() {
-			serverActive = oldServerActive
-			checkerError = oldCheckerError
-		}()
+	oldServerActive := serverActive
+	serverActive = true
+	oldCheckerError := checkerError
+	checkerError = errors.New("error")
+	defer func() {
+		serverActive = oldServerActive
+		checkerError = oldCheckerError
+	}()
 
-		go func() {
-			time.Sleep(time.Second)
-			quit <- struct{}{}
-		}()
+	go func() {
+		time.Sleep(time.Second)
+		quit <- struct{}{}
+	}()
 
-		t.Run("Checker Fail Test", func(t *testing.T) {
-			main()
-		})
+	t.Run("Checker Fail Test", func(t *testing.T) {
+		main()
+	})
 }
 
 func Test_getSyncProvider(t *testing.T) {
@@ -507,7 +508,7 @@ func Test_getSyncProvider(t *testing.T) {
 					"app": {"syncDBProvider": "firestore"},
 					"firestore": {
 						"projectID": "fake-project-id-12345",
-						"docPath":  "sync-server/wporg",
+						"docPath":   "sync-server/wporg",
 					},
 				},
 			},
@@ -518,6 +519,80 @@ func Test_getSyncProvider(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got, _ := getSyncProvider(tt.args.c); reflect.TypeOf(got) != tt.want {
 				t.Errorf("getSyncProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
+	}
+}
+
+func Test_getDispatcher(t *testing.T) {
+	type args struct {
+		c map[string]map[string]string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    reflect.Type
+		wantErr bool
+	}{
+		{
+			"Firestore Dispatcher",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncPHPCSActive":      "on",
+						"syncLighthouseActive": "on",
+						"messageProvider":      "firestore",
+					},
+					"firestore":
+					{
+						"projectID":            "fake-id",
+						"docPath":              "doc",
+						"lighthouseCollection": "fake-lh",
+						"phpcsCollection":      "fake-phpcs",
+					},
+				},
+			},
+			reflect.TypeOf(&firestoreDispatcher{}),
+			false,
+		},
+		{
+			"SQS Dispatcher",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncPHPCSActive":      "on",
+						"syncLighthouseActive": "on",
+						"messageProvider":      "aws",
+					},
+					"aws":
+					{
+						"key":             "abc",
+						"secret":          "def",
+						"sqs_region":      "us-west-2",
+						"sqs_lh_queue":    "fake-lh",
+						"sqs_phpcs_queue": "fake-phpcs",
+					},
+				},
+			},
+			reflect.TypeOf(&sqsDispatcher{}),
+			false,
+		},
+		{
+			"Nil Dispatcher",
+			args{},
+			nil,
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getDispatcher(tt.args.c)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getDispatcher() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if reflect.TypeOf(got) != tt.want {
+				t.Errorf("getDispatcher() = %v, want %v", reflect.TypeOf(got), tt.want)
 			}
 		})
 	}
