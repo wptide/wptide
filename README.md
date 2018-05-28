@@ -312,6 +312,7 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 | `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 | `LH_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
+| `LH_MESSAGE_PROVIDER` | Tells the Sync Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `aws`, `firestore`. |
 
 #### Running Lighthouse audits
 
