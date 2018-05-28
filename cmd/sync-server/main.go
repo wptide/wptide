@@ -394,8 +394,8 @@ func getServiceConfig() map[string]map[string]string {
 		{
 			"projectID":            env.GetEnv("GCP_PROJECT", ""),
 			"docPath":              env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
-			"lighthouseCollection": env.GetEnv("SYNC_FIRESTORE_LH", "queue-lighthouse"),
-			"phpcsCollection":      env.GetEnv("SYNC_FIRESTORE_PHPCS", "queue-phpcs"),
+			"lighthouseCollection": env.GetEnv("FIRESTORE_QUEUE_LH", "queue-lighthouse"),
+			"phpcsCollection":      env.GetEnv("FIRESTORE_QUEUE_PHPCS", "queue-phpcs"),
 		},
 		"tide":
 		{

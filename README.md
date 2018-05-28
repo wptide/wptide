@@ -400,6 +400,7 @@ plugins to process and writes them to a queue.
 | `SYNC_DATA` | When the database provider is set to `local` this will be where the data is stored relative to the `/srv/data` working directory. Default is `./db` |
 | `SYNC_DATABASE_DOCUMENT_PATH` |  When the database provider is set to `firestore` this value is the path to the document in Cloud Firestore. Must be in the form of `<collection>/<document>`. Default is `sync-server/wporg`. |
 | `SYNC_DATABASE_PROVIDER` | Tells the Sync Server which database provider to use; either the local file system or Google Cloud Firestore. Must be one of: `local`, `firestore`. Default is `local`. |
+| `SYNC_MESSAGE_PROVIDER` | Tells the Sync Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `aws`, `firestore`. Default is `aws`. |
 | `SYNC_DEFAULT_CLIENT` | The API client used to make requests by the audit servers; also associated with the key and secret those server use. Default is `wporg` |
 | `SYNC_DEFAULT_VISIBILITY` | The audit and report visibility. Must be one of: `public`, `private`. Default is `public` |
 | `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no` |
@@ -408,6 +409,8 @@ plugins to process and writes them to a queue.
 | `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on` |
 | `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600` |
 | `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125` |
+| `FIRESTORE_QUEUE_LH` | Specifies which collection in Firestore to use for the Lighthouse message queue. This is a Firestore collection **path**. |
+| `FIRESTORE_QUEUE_PHPCS` | Specifies which collection in Firestore to use for the PHPCS message queue. This is a Firestore collection **path**. |
 
 ---
 
