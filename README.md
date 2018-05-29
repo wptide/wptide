@@ -312,7 +312,7 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 | `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 | `LH_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
-| `LH_MESSAGE_PROVIDER` | Tells the Lighthouse Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `aws`, `firestore`. |
+| `LH_MESSAGE_PROVIDER` | Tells the Lighthouse Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `sqs`, `firestore`. |
 
 #### Running Lighthouse audits
 
@@ -358,7 +358,7 @@ reports against both plugins and themes, then sends the results back to the Tide
 | `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
 | `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
 | `PHPCS_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
-| `PHPCS_MESSAGE_PROVIDER` | Tells the PHPCS Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `aws`, `firestore`. |
+| `PHPCS_MESSAGE_PROVIDER` | Tells the PHPCS Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `sqs`, `firestore`. |
 
 ---
 
@@ -402,7 +402,7 @@ plugins to process and writes them to a queue.
 | `SYNC_DATA` | When the database provider is set to `local` this will be where the data is stored relative to the `/srv/data` working directory. Default is `./db` |
 | `SYNC_DATABASE_DOCUMENT_PATH` |  When the database provider is set to `firestore` this value is the path to the document in Cloud Firestore. Must be in the form of `<collection>/<document>`. Default is `sync-server/wporg`. |
 | `SYNC_DATABASE_PROVIDER` | Tells the Sync Server which database provider to use; either the local file system or Google Cloud Firestore. Must be one of: `local`, `firestore`. Default is `local`. |
-| `SYNC_MESSAGE_PROVIDER` | Tells the Sync Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `aws`, `firestore`. Default is `aws`. |
+| `SYNC_MESSAGE_PROVIDER` | Tells the Sync Server which message/queue provider to use; either the AWS SQS or Google Cloud Firestore. Must be one of: `sqs`, `firestore`. Default is `sqs`. |
 | `SYNC_DEFAULT_CLIENT` | The API client used to make requests by the audit servers; also associated with the key and secret those server use. Default is `wporg` |
 | `SYNC_DEFAULT_VISIBILITY` | The audit and report visibility. Must be one of: `public`, `private`. Default is `public` |
 | `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no` |

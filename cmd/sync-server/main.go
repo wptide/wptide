@@ -281,7 +281,7 @@ func main() {
 
 func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 	switch c["app"]["messageProvider"] {
-	case "aws":
+	case "sqs":
 		conf := c["aws"]
 		return &sqsDispatcher{
 			Queues: map[string]struct {

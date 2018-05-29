@@ -315,7 +315,7 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
 
 	switch config["app"]["message_provider"] {
-	case "aws":
+	case "sqs":
 		conf := config["aws"]
 		return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
 	case "firestore":
