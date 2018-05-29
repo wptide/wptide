@@ -22,6 +22,7 @@ import (
 	commonProcess "github.com/xwp/go-tide/src/process"
 	tideApi "github.com/wptide/pkg/tide"
 	"github.com/wptide/pkg/storage/local"
+	"github.com/wptide/pkg/message/firestore"
 )
 
 type processConfig struct {
@@ -337,17 +338,27 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 
 // getStorageProvider returns a message/queue provider given the provided configurations
 // from the environment variables.
-//
-// @todo Add additional providers.
 func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
 	conf := config["aws"]
 	return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
+	switch config["app"]["message_provider"] {
+	case "aws":
+		conf := config["aws"]
+		return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
+	case "firestore":
+		conf := config["firestore"]
+		fp, _ := firestore.New(context.Background(), conf["project_id"], conf["queue"])
+		return fp
+	default:
+		return nil
+	}
 }
 
 func getServiceConfig() map[string]map[string]string {
 	return map[string]map[string]string{
 		"app": {
 			"storage_provider_type": env.GetEnv("PHPCS_STORAGE_PROVIDER", ""),
+			"message_provider":      env.GetEnv("PHPCS_MESSAGE_PROVIDER", ""),
 			"temp_folder":           env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp"),
 			"server_path":           "/srv/data",
 			"local_path":            "phpcs",
@@ -365,6 +376,11 @@ func getServiceConfig() map[string]map[string]string {
 		{
 			"project":    env.GetEnv("GCP_PROJECT", ""),
 			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
+		},
+		"firestore":
+		{
+			"project_id": env.GetEnv("GCP_PROJECT", ""),
+			"queue":      env.GetEnv("FIRESTORE_QUEUE_PHPCS", "queue-phpcs"),
 		},
 		"tide":
 		{
