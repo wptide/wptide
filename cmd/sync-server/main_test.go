@@ -2,21 +2,22 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
-	"errors"
-	"github.com/wptide/pkg/wporg"
-	"os"
-	"github.com/wptide/pkg/sync"
 	"github.com/wptide/pkg/message"
-	"reflect"
+	"github.com/wptide/pkg/sync"
+	"github.com/wptide/pkg/wporg"
+	"github.com/wptide/pkg/sync/firestore"
 )
 
 var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -95,14 +96,14 @@ type mockChecker struct {
 	LastSync *time.Time
 }
 
-func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool   { return true }
-func (m mockChecker) RecordUpdate(project wporg.RepoProject) error { return nil }
+func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool         { return true }
+func (m mockChecker) RecordUpdate(project wporg.RepoProject) error       { return nil }
 func (m mockChecker) SetSyncTime(event, projectType string, t time.Time) {}
 func (m mockChecker) GetSyncTime(event, projectType string) time.Time {
 	if m.LastSync != nil {
 		return *m.LastSync
 	}
-	return time.Now().AddDate(-10,0,0)
+	return time.Now().AddDate(-10, 0, 0)
 }
 
 func Test_fetcher(t *testing.T) {
@@ -133,11 +134,11 @@ func Test_fetcher(t *testing.T) {
 		themes  string
 	}
 	tests := []struct {
-		name     string
-		args     args
-		sources  sources
-		want     reflect.Type
-		checker  sync.UpdateSyncChecker
+		name    string
+		args    args
+		sources sources
+		want    reflect.Type
+		checker sync.UpdateSyncChecker
 	}{
 		{
 			"Themes",
@@ -390,6 +391,7 @@ func Test_main(t *testing.T) {
 		browseCategory string
 		poolSize       int
 		quit           chan struct{}
+		checkerError error
 	}
 
 	tests := []struct {
@@ -404,6 +406,7 @@ func Test_main(t *testing.T) {
 				"updated",
 				5,
 				make(chan struct{}, 1),
+				nil,
 			},
 		},
 		{
@@ -414,6 +417,7 @@ func Test_main(t *testing.T) {
 				"updated",
 				5,
 				make(chan struct{}, 1),
+				nil,
 			},
 		},
 	}
@@ -429,6 +433,8 @@ func Test_main(t *testing.T) {
 		poolSize = tt.serverConfig.poolSize
 		quitOld := quit
 		quit = tt.serverConfig.quit
+		checkerOld := checker
+		checker = &mockChecker{}
 
 		go func() {
 			time.Sleep(time.Second)
@@ -444,5 +450,75 @@ func Test_main(t *testing.T) {
 		browseCategory = browseCategoryOld
 		poolSize = poolSizeOld
 		quit = quitOld
+		checker = checkerOld
+	}
+}
+
+func Test_mainCheckerError(t *testing.T) {
+		oldServerActive := serverActive
+		serverActive = true
+		oldCheckerError := checkerError
+		checkerError = errors.New("error")
+		defer func() {
+			serverActive = oldServerActive
+			checkerError = oldCheckerError
+		}()
+
+		go func() {
+			time.Sleep(time.Second)
+			quit <- struct{}{}
+		}()
+
+		t.Run("Checker Fail Test", func(t *testing.T) {
+			main()
+		})
+}
+
+func Test_getSyncProvider(t *testing.T) {
+	type args struct {
+		c map[string]map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want reflect.Type
+	}{
+		{
+			"No Provider",
+			args{},
+			nil,
+		},
+		{
+			"Local Provider",
+			args{
+				map[string]map[string]string{
+					"app": {"syncDBProvider": "local"},
+					"local": {
+						"dbPath": "./testdata/testdb",
+					},
+				},
+			},
+			reflect.TypeOf(&scribbleChecker{}),
+		},
+		{
+			"Firestore Provider",
+			args{
+				map[string]map[string]string{
+					"app": {"syncDBProvider": "firestore"},
+					"firestore": {
+						"projectID": "fake-project-id-12345",
+						"docPath":  "sync-server/wporg",
+					},
+				},
+			},
+			reflect.TypeOf(&firestore.FirestoreSync{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, _ := getSyncProvider(tt.args.c); reflect.TypeOf(got) != tt.want {
+				t.Errorf("getSyncProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
 	}
 }
