@@ -457,7 +457,7 @@ func Test_getMessageProvider(t *testing.T) {
 			args{
 				map[string]map[string]string{
 					"app": {
-						"message_provider": "aws",
+						"message_provider": "sqs",
 					},
 					"aws":
 					{

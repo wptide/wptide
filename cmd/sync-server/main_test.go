@@ -562,7 +562,7 @@ func Test_getDispatcher(t *testing.T) {
 					"app": {
 						"syncPHPCSActive":      "on",
 						"syncLighthouseActive": "on",
-						"messageProvider":      "aws",
+						"messageProvider":      "sqs",
 					},
 					"aws":
 					{

@@ -370,7 +370,7 @@ func getServiceConfig() map[string]map[string]string {
 			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "300"),
 			"browseCategory":       env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated"),
 			"syncDBProvider":       env.GetEnv("SYNC_DATABASE_PROVIDER", "local"),
-			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "aws"),
+			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "sqs"),
 		},
 		"message":
 		{
