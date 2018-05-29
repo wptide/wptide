@@ -10,10 +10,12 @@ import (
 	"time"
 
 	"github.com/wptide/pkg/message"
-	commonProcess "github.com/xwp/go-tide/src/process"
 	"github.com/wptide/pkg/storage/gcs"
-	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/storage/local"
+	"github.com/wptide/pkg/storage/s3"
+	commonProcess "github.com/xwp/go-tide/src/process"
+	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/message/sqs"
 )
 
 var (
@@ -417,8 +419,8 @@ func Test_getStorageProvider(t *testing.T) {
 				map[string]map[string]string{
 					"app": {
 						"storage_provider_type": "local",
-						"server_path": "./testdata",
-						"local_path": "subdir",
+						"server_path":           "./testdata",
+						"local_path":            "subdir",
 					},
 				},
 			},
@@ -429,6 +431,67 @@ func Test_getStorageProvider(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getStorageProvider(tt.args.config); reflect.TypeOf(got) != tt.want {
 				t.Errorf("getStorageProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
+	}
+}
+
+func Test_getMessageProvider(t *testing.T) {
+	type args struct {
+		config map[string]map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want reflect.Type
+	}{
+		{
+			"Nil Provider",
+			args{
+				make(map[string]map[string]string),
+			},
+			nil,
+		},
+		{
+			"SQS Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"message_provider": "aws",
+					},
+					"aws":
+					{
+						"key":        "",
+						"secret":     "",
+						"sqs_region": "",
+						"sqs_queue":  "",
+						"s3_region":  "",
+					},
+				},
+			},
+			reflect.TypeOf(&sqs.SqsProvider{}),
+		},
+		{
+			"Firestore Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"message_provider": "firestore",
+					},
+					"firestore":
+					{
+						"project_id": "mock-project-id",
+						"queue":      "test-queue",
+					},
+				},
+			},
+			reflect.TypeOf(&firestore.FirestoreProvider{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getMessageProvider(tt.args.config); reflect.TypeOf(got) != tt.want {
+				t.Errorf("getMessageProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
 			}
 		})
 	}

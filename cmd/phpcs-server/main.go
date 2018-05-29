@@ -339,8 +339,6 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 // getStorageProvider returns a message/queue provider given the provided configurations
 // from the environment variables.
 func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
-	conf := config["aws"]
-	return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
 	switch config["app"]["message_provider"] {
 	case "aws":
 		conf := config["aws"]
