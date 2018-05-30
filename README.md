@@ -248,10 +248,10 @@ from the `audit-server` user profile.
 
 | Variable | Description |
 | :--- | :--- |
-| `API_ADMIN_EMAIL` | The email associated with the local admin account |
-| `API_ADMIN_PASSWORD` | The password associated with the local admin account |
-| `API_ADMIN_USER` | The username associated with the local admin account |
-| `API_AUTH_URL` | The [`wp-tide-api`][wp-tide-api] authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth` |
+| `API_ADMIN_EMAIL` | The email associated with the local admin account. |
+| `API_ADMIN_PASSWORD` | The password associated with the local admin account. |
+| `API_ADMIN_USER` | The username associated with the local admin account. |
+| `API_AUTH_URL` | The [`wp-tide-api`][wp-tide-api] authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth`. |
 | `API_BLOG_DESCRIPTION` | Site tagline (set in Settings > General). Default is `Automated insight into your WordPress code`. |
 | `API_BLOG_NAME` | Site title (set in Settings > General). Default is `Tide`. |
 | `API_CACHE` | Whether caching should be active or not. Must be one of: `true`, `false`. Default is `true`. |
@@ -311,10 +311,10 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 
 | Variable | Description |
 | :--- | :--- |
-| `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
+| `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5`. |
 | `LH_MESSAGE_PROVIDER` | Queue audit messages using Google Cloud Firestore, or AWS SQS. Must be one of: `firestore`, `sqs`. Default is `sqs`. |
 | `LH_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
-| `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+| `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp`. |
 
 #### Running Lighthouse audits
 
@@ -357,10 +357,10 @@ reports against both plugins and themes, then sends the results back to the Tide
 
 | Variable | Description |
 | :--- | :--- |
-| `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
+| `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5`. |
 | `PHPCS_MESSAGE_PROVIDER` | Queue audit messages using Google Cloud Firestore, or AWS SQS. Must be one of: `firestore`, `sqs`. Default is `sqs`. |
 | `PHPCS_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
-| `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+| `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp`. |
 
 ---
 
@@ -399,20 +399,20 @@ plugins to process and writes them to a queue.
 
 | Variable | Description |
 | :--- | :--- |
-| `SYNC_ACTIVE` | Whether the Sync Server is active or not. Must be one of: `on`, `off`. Default is `off` |
-| `SYNC_API_BROWSE_CATEGORY` | The API category used to ingest the wp.org themes and plugins. Must be one of: `popular`, `featured`, `updated`, `new`. Default is `updated` |
-| `SYNC_DATA` | When the database provider is set to `local` this will be where the data is stored relative to the `/srv/data` working directory. Default is `./db` |
+| `SYNC_ACTIVE` | Whether the Sync Server is active or not. Must be one of: `on`, `off`. Default is `off`. |
+| `SYNC_API_BROWSE_CATEGORY` | The API category used to ingest the wp.org themes and plugins. Must be one of: `popular`, `featured`, `updated`, `new`. Default is `updated`. |
+| `SYNC_DATA` | When the database provider is set to `local` this will be where the data is stored relative to the `/srv/data` working directory. Default is `./db`. |
 | `SYNC_DATABASE_DOCUMENT_PATH` |  When the database provider is set to `firestore` this value is the path to the document in Cloud Firestore. Must be in the form of `<collection>/<document>`. Default is `sync-server/wporg`. |
 | `SYNC_DATABASE_PROVIDER` | Tells the Sync Server which database provider to use; either the local file system or Google Cloud Firestore. Must be one of: `local`, `firestore`. Default is `local`. |
-| `SYNC_DEFAULT_CLIENT` | The API client used to make requests by the audit servers; also associated with the key and secret those server use. Default is `wporg` |
-| `SYNC_DEFAULT_VISIBILITY` | The audit and report visibility. Must be one of: `public`, `private`. Default is `public` |
-| `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no` |
-| `SYNC_ITEMS_PER_PAGE` | The number of plugins or themes per page in the API request. Default is `250` |
-| `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on` |
+| `SYNC_DEFAULT_CLIENT` | The API client used to make requests by the audit servers; also associated with the key and secret those server use. Default is `wporg`. |
+| `SYNC_DEFAULT_VISIBILITY` | The audit and report visibility. Must be one of: `public`, `private`. Default is `public`. |
+| `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no`. |
+| `SYNC_ITEMS_PER_PAGE` | The number of plugins or themes per page in the API request. Default is `250`. |
+| `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on`. |
 | `SYNC_MESSAGE_PROVIDER` | Queue audit messages using Google Cloud Firestore, or AWS SQS. Must be one of: `firestore`, `sqs`. Default is `sqs`. |
-| `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on` |
-| `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600` |
-| `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125` |
+| `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on`. |
+| `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600`. |
+| `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125`. |
 
 ---
 
@@ -431,7 +431,7 @@ GCP. Be sure to use the same region you chose during the earlier
 | :--- | :--- |
 | `GCP_PROJECT` | The unique ID of you Google project. |
 | `GCP_REGION` | The [region][regions-and-zones] where all your resources will be created. For example, `us-west1`. |
-| `GCP_ZONE` | The preferred [zone][regions-and-zones] in your region that resources will be created, For example, `us-west1-a` |
+| `GCP_ZONE` | The preferred [zone][regions-and-zones] in your region that resources will be created, For example, `us-west1-a`. |
 
 #### Google Cloud SQL (GCSQL)
 
@@ -636,11 +636,11 @@ and click **Create Bucket**.
 | `AWS_API_SECRET` | The AWS API secret. |
 | `AWS_S3_BUCKET_NAME` | The name of the S3 bucket.  |
 | `AWS_S3_REGION` | The region of the S3 bucket. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][s3-region].  |
-| `AWS_S3_VERSION` | The S3 API version. Default is `2006-03-01` |
+| `AWS_S3_VERSION` | The S3 API version. Default is `2006-03-01`. |
 | `AWS_SQS_QUEUE_LH` | The name of the SQS queue for the Lighthouse Server. |
 | `AWS_SQS_QUEUE_PHPCS` | The name of the SQS queue for the PHPCS Server. |
 | `AWS_SQS_REGION` | The region of the SQS queue. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][sqs-region].  |
-| `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05` |
+| `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05`. |
 
 ---
 
