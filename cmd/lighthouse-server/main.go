@@ -296,7 +296,7 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 // getStorageProvider returns a storage provider given the provided configurations from
 // the environment variables.
 func getStorageProvider(config map[string]map[string]string) storage.StorageProvider {
-	switch config["app"]["storage_provider_type"] {
+	switch config["app"]["storage_provider"] {
 	case "s3":
 		conf := config["aws"]
 		return s3.NewS3Provider(conf["s3_region"], conf["key"], conf["secret"], conf["s3_bucket"])
@@ -319,8 +319,8 @@ func getMessageProvider(config map[string]map[string]string) message.MessageProv
 		conf := config["aws"]
 		return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
 	case "firestore":
-		conf := config["firestore"]
-		fp, _ := firestore.New(context.Background(), conf["project_id"], conf["queue"])
+		conf := config["gcp"]
+		fp, _ := firestore.New(context.Background(), conf["project"], conf["gcf_queue"])
 		return fp
 	default:
 		return nil
@@ -331,11 +331,11 @@ func getMessageProvider(config map[string]map[string]string) message.MessageProv
 func getServiceConfig() map[string]map[string]string {
 	return map[string]map[string]string{
 		"app": {
-			"storage_provider_type": env.GetEnv("LH_STORAGE_PROVIDER", ""),
-			"message_provider":      env.GetEnv("LH_MESSAGE_PROVIDER", ""),
-			"temp_folder":           env.GetEnv("LH_TEMP_FOLDER", "/tmp"),
-			"server_path":           "/srv/data",
-			"local_path":            "lighthouse",
+			"storage_provider": env.GetEnv("LH_STORAGE_PROVIDER", ""),
+			"message_provider": env.GetEnv("LH_MESSAGE_PROVIDER", ""),
+			"temp_folder":      env.GetEnv("LH_TEMP_FOLDER", "/tmp"),
+			"server_path":      "/srv/data",
+			"local_path":       "lighthouse",
 		},
 		"aws":
 		{
@@ -350,11 +350,7 @@ func getServiceConfig() map[string]map[string]string {
 		{
 			"project":    env.GetEnv("GCP_PROJECT", ""),
 			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
-		},
-		"firestore":
-		{
-			"project_id": env.GetEnv("GCP_PROJECT", ""),
-			"queue":      env.GetEnv("FIRESTORE_QUEUE_LH", "queue-lighthouse"),
+			"gcf_queue":  env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
 		},
 		"tide":
 		{

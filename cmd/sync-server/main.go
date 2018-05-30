@@ -315,7 +315,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 			providers: make(map[string]message.MessageProvider),
 		}, nil
 		case "firestore":
-			conf := c["firestore"]
+			conf := c["gcp"]
 
 			return &firestoreDispatcher{
 				ProjectID: conf["projectID"],
@@ -351,7 +351,7 @@ func getSyncProvider(c map[string]map[string]string) (sync.UpdateSyncChecker, er
 			db: newScribbleChecker(conf["dbPath"]),
 		}, nil
 	case "firestore":
-		conf := c["firestore"]
+		conf := c["gcp"]
 		syncClient, err := firestore.New(context.Background(), conf["projectID"], conf["docPath"])
 		return syncClient, err
 	default:
@@ -390,12 +390,12 @@ func getServiceConfig() map[string]map[string]string {
 			"sqs_lh_queue":    env.GetEnv("AWS_SQS_QUEUE_LH", ""),
 			"sqs_phpcs_queue": env.GetEnv("AWS_SQS_QUEUE_PHPCS", ""),
 		},
-		"firestore":
+		"gcp":
 		{
 			"projectID":            env.GetEnv("GCP_PROJECT", ""),
 			"docPath":              env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
-			"lighthouseCollection": env.GetEnv("FIRESTORE_QUEUE_LH", "queue-lighthouse"),
-			"phpcsCollection":      env.GetEnv("FIRESTORE_QUEUE_PHPCS", "queue-phpcs"),
+			"lighthouseCollection": env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
+			"phpcsCollection":      env.GetEnv("GCF_QUEUE_PHPCS", "queue-phpcs"),
 		},
 		"tide":
 		{

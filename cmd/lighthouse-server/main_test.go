@@ -389,7 +389,9 @@ func Test_getStorageProvider(t *testing.T) {
 			"S3 Provider",
 			args{
 				map[string]map[string]string{
-					"app": {"storage_provider_type": "s3"},
+					"app": {
+						"storage_provider": "s3",
+					},
 					"aws": {
 						"key":       "",
 						"secret":    "",
@@ -404,7 +406,9 @@ func Test_getStorageProvider(t *testing.T) {
 			"GCS Provider",
 			args{
 				map[string]map[string]string{
-					"app": {"storage_provider_type": "gcs"},
+					"app": {
+						"storage_provider": "gcs",
+					},
 					"gcp": {
 						"project":    "",
 						"gcs_bucket": "",
@@ -418,9 +422,9 @@ func Test_getStorageProvider(t *testing.T) {
 			args{
 				map[string]map[string]string{
 					"app": {
-						"storage_provider_type": "local",
-						"server_path":           "./testdata",
-						"local_path":            "subdir",
+						"storage_provider": "local",
+						"server_path":      "./testdata",
+						"local_path":       "subdir",
 					},
 				},
 			},
@@ -478,10 +482,10 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "firestore",
 					},
-					"firestore":
+					"gcp":
 					{
-						"project_id": "mock-project-id",
-						"queue":      "test-queue",
+						"project":   "mock-project-id",
+						"gcf_queue": "test-queue",
 					},
 				},
 			},

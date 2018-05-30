@@ -73,8 +73,18 @@ spec:
           value: "${AWS_SQS_VERSION}"
         - name: PHPCS_CONCURRENT_AUDITS
           value: "${PHPCS_CONCURRENT_AUDITS}"
+        - name: PHPCS_MESSAGE_PROVIDER
+          value: "${PHPCS_MESSAGE_PROVIDER}"
+        - name: PHPCS_STORAGE_PROVIDER
+          value: "${PHPCS_STORAGE_PROVIDER}"
         - name: PHPCS_TEMP_FOLDER
           value: "${PHPCS_TEMP_FOLDER}"
+        - name: GCF_QUEUE_PHPCS
+          value: "${GCF_QUEUE_PHPCS}"
+        - name: GCP_PROJECT
+          value: "${GCP_PROJECT}"
+        - name: GCS_BUCKET_NAME
+          value: "${GCS_BUCKET_NAME}"
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler

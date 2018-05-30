@@ -505,8 +505,10 @@ func Test_getSyncProvider(t *testing.T) {
 			"Firestore Provider",
 			args{
 				map[string]map[string]string{
-					"app": {"syncDBProvider": "firestore"},
-					"firestore": {
+					"app": {
+						"syncDBProvider": "firestore",
+					},
+					"gcp": {
 						"projectID": "fake-project-id-12345",
 						"docPath":   "sync-server/wporg",
 					},
@@ -543,7 +545,7 @@ func Test_getDispatcher(t *testing.T) {
 						"syncLighthouseActive": "on",
 						"messageProvider":      "firestore",
 					},
-					"firestore":
+					"gcp":
 					{
 						"projectID":            "fake-id",
 						"docPath":              "doc",
