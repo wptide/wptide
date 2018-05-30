@@ -62,6 +62,14 @@ spec:
           value: "${AWS_SQS_QUEUE_PHPCS}"
         - name: AWS_SQS_REGION
           value: "${AWS_SQS_REGION}"
+        - name: AWS_SQS_VERSION
+          value: "${AWS_SQS_VERSION}"
+        - name: GCF_QUEUE_LH
+          value: "${GCF_QUEUE_LH}"
+        - name: GCF_QUEUE_PHPCS
+          value: "${GCF_QUEUE_PHPCS}"
+        - name: GCP_PROJECT
+          value: "${GCP_PROJECT}"
         - name: SYNC_ACTIVE
           value: "${SYNC_ACTIVE}"
         - name: SYNC_API_BROWSE_CATEGORY
@@ -82,6 +90,8 @@ spec:
           value: "${SYNC_ITEMS_PER_PAGE}"
         - name: SYNC_LH_ACTIVE
           value: "${SYNC_LH_ACTIVE}"
+        - name: SYNC_MESSAGE_PROVIDER
+          value: "${SYNC_MESSAGE_PROVIDER}"
         - name: SYNC_PHPCS_ACTIVE
           value: "${SYNC_PHPCS_ACTIVE}"
         - name: SYNC_POOL_DELAY
