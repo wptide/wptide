@@ -51,6 +51,9 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             DOCUMENT_ROOT: /app/wordpress
+            GCF_QUEUE_LH: ${GCF_QUEUE_LH}
+            GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
+            GCP_PROJECT: ${GCP_PROJECT}
             GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
 
     api-mysql:
@@ -95,7 +98,10 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
+            LH_MESSAGE_PROVIDER: ${LH_MESSAGE_PROVIDER}
             LH_STORAGE_PROVIDER: ${LH_STORAGE_PROVIDER}
+            LH_TEMP_FOLDER: ${LH_TEMP_FOLDER}
+            GCF_QUEUE_LH: ${GCF_QUEUE_LH}
             GCP_PROJECT: ${GCP_PROJECT}
             GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
             GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
@@ -123,8 +129,10 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
-            PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+            PHPCS_MESSAGE_PROVIDER: ${PHPCS_MESSAGE_PROVIDER}
             PHPCS_STORAGE_PROVIDER: ${PHPCS_STORAGE_PROVIDER}
+            PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
+            GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
             GCP_PROJECT: ${GCP_PROJECT}
             GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
             GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
@@ -146,6 +154,10 @@ services:
             AWS_SQS_QUEUE_PHPCS: ${AWS_SQS_QUEUE_PHPCS}
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
+            GCF_QUEUE_LH: ${GCF_QUEUE_LH}
+            GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
             SYNC_ACTIVE: ${SYNC_ACTIVE}
             SYNC_API_BROWSE_CATEGORY: ${SYNC_API_BROWSE_CATEGORY}
             SYNC_DATA: ${SYNC_DATA}
@@ -156,9 +168,8 @@ services:
             SYNC_FORCE_AUDITS: ${SYNC_FORCE_AUDITS}
             SYNC_ITEMS_PER_PAGE: ${SYNC_ITEMS_PER_PAGE}
             SYNC_LH_ACTIVE: ${SYNC_LH_ACTIVE}
+            SYNC_MESSAGE_PROVIDER: ${SYNC_MESSAGE_PROVIDER}
             SYNC_PHPCS_ACTIVE: ${SYNC_PHPCS_ACTIVE}
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
-            GCP_PROJECT: ${GCP_PROJECT}
-            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
         network_mode: host

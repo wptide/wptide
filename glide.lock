@@ -1,5 +1,5 @@
-hash: e19b7943354721ac66525e45e7e106aa36f2948cc4ff9cef489b8b0d80098be4
-updated: 2018-05-24T00:23:47.34849-07:00
+hash: 80a354e88c808b2d1afcf912396dcdc62d030898cc3291db645e319540d934da
+updated: 2018-05-28T14:56:45.629605345+10:00
 imports:
 - name: cloud.google.com/go
   version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
@@ -54,7 +54,7 @@ imports:
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
-  version: bda519ae5f4cbc60d391ff8610711627a08b86ae
+  version: 06f5f3d67269ccec1fe5fe4134ba6e982984f7f5
 - name: github.com/golang/protobuf
   version: 3a3da3a4e26776cc22a79ef46d5d58477532dede
   subpackages:
@@ -80,11 +80,12 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 38e378877a95aca3a4148d9be14dd2673e6cdc9a
+  version: faeaf64a72c50a3b97c95f7b35be2d25e28b332f
   subpackages:
   - env
   - log
   - message
+  - message/firestore
   - message/sqs
   - payload
   - phpcompat
@@ -103,8 +104,9 @@ imports:
   - tide
   - tide/api
   - wporg
+  - wrapper/firestore
 - name: go.opencensus.io
-  version: 3a827557227b08de330abfac83b8299810c42ac2
+  version: c3ed530f775d85e577ca652cb052a52c078aad26
   subpackages:
   - exporter/stackdriver/propagation
   - internal
@@ -120,7 +122,7 @@ imports:
   - trace/internal
   - trace/propagation
 - name: golang.org/x/net
-  version: 9ef9f5bb98a1fdc41f8cf6c250a4404b4085e389
+  version: dfa909b99c79129e1100513e5cd36307665e5723
   subpackages:
   - context
   - context/ctxhttp
@@ -145,7 +147,7 @@ imports:
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/api
-  version: 348810ff778af56686d572415ce79e6c9fad9613
+  version: 8180fb51da879301a8ddb7e2ee122ca5862da7f5
   subpackages:
   - gensupport
   - googleapi
@@ -182,7 +184,7 @@ imports:
   - googleapis/rpc/status
   - googleapis/type/latlng
 - name: google.golang.org/grpc
-  version: d33a92319019fc969bb3e428348297ddf01257d1
+  version: 1fa3750c9a209f5efbdc2722d40f2657885af5e5
   subpackages:
   - balancer
   - balancer/base
