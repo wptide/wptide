@@ -255,6 +255,9 @@ func main() {
 	// Init the dispatcher.
 	dispatcher.Init()
 
+	// Close all clients where applicable.
+	defer dispatcher.Close()
+
 	// Start the theme worker pool.
 	go pool(poolSize, themeTasks, checker, dispatcher, messages)
 
