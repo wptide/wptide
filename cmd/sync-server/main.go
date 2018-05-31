@@ -185,8 +185,8 @@ func defaultStandards() []string {
 }
 
 // defaultAudits gets the audits to run against a project.
-func defaultAudits() *[]message.Audit {
-	return &[]message.Audit{
+func defaultAudits() []*message.Audit {
+	return []*message.Audit{
 		{
 			Type: "phpcs",
 			Options: &message.AuditOption{

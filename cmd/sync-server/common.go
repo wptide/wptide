@@ -25,7 +25,7 @@ func getDispatchMessage(project wporg.RepoProject) *message.Message {
 		msg.ProjectType = "theme"
 		msg.Content = project.Description
 		msg.Standards = append(msg.Standards, "lighthouse")
-		*msg.Audits = append(*msg.Audits, message.Audit{
+		msg.Audits = append(msg.Audits, &message.Audit{
 			Type:    "lighthouse",
 			Options: &message.AuditOption{},
 		})

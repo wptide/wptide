@@ -22,6 +22,7 @@ import (
 	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/message/mongo"
 )
 
 type processConfig struct {
@@ -170,7 +171,7 @@ func main() {
 				Force:               true,
 				Visibility:          *flagVisibility,
 				RequestClient:       *flagClient,
-				Audits: &[]message.Audit{
+				Audits: []*message.Audit{
 					{
 						Type:    "lighthouse",
 						Options: &message.AuditOption{},
@@ -279,6 +280,8 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 						log.Println(pErr, "delaying for 60 seconds")
 						time.Sleep(time.Second * time.Duration(60))
 					}
+				} else {
+					log.Println("Polling Error: ", err)
 				}
 			}
 
@@ -326,6 +329,10 @@ func getMessageProvider(config map[string]map[string]string) message.MessageProv
 		conf := config["gcp"]
 		fp, _ := firestore.New(context.Background(), conf["project"], conf["gcf_queue"])
 		return fp
+	case "mongo":
+		conf := config["mongo"]
+		mp, _ := mongo.New(context.Background(), conf["user"], conf["pass"], conf["host"], conf["database"], conf["queue"], nil)
+		return mp
 	default:
 		return nil
 	}
@@ -355,6 +362,14 @@ func getServiceConfig() map[string]map[string]string {
 			"project":    env.GetEnv("GCP_PROJECT", ""),
 			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
 			"gcf_queue":  env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
+		},
+		"mongo":
+		{
+			"user":     env.GetEnv("MONGO_INITDB_ROOT_USERNAME", ""),
+			"pass":     env.GetEnv("MONGO_INITDB_ROOT_PASSWORD", ""),
+			"host":     env.GetEnv("MONGO_HOST", "localhost:27017"),
+			"database": env.GetEnv("MONGO_INITDB_DATABASE", "queue"),
+			"queue":    env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
 		},
 		"tide":
 		{

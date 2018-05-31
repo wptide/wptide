@@ -177,7 +177,7 @@ func main() {
 				Force:               true,
 				Visibility:          *flagVisibility,
 				RequestClient:       *flagClient,
-				Audits: &[]message.Audit{
+				Audits: []*message.Audit{
 					{
 						Type: "phpcs",
 						Options: &message.AuditOption{
