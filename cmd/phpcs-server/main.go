@@ -105,6 +105,10 @@ var (
 
 func main() {
 
+	if messageProvider != nil {
+		defer messageProvider.Close()
+	}
+
 	log.Println("Starting PHPCS audit server.")
 
 	if bParseFlags {
