@@ -7,6 +7,7 @@ import:
   - message
   - message/sqs
   - message/firestore
+  - message/mongo
   - payload
   - pipe
   - process
@@ -20,3 +21,4 @@ import:
   - tide/api
   - wporg
   - wrapper/firestore
+  - wrapper/mongo

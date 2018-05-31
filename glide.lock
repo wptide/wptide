@@ -1,5 +1,5 @@
-hash: 80a354e88c808b2d1afcf912396dcdc62d030898cc3291db645e319540d934da
-updated: 2018-05-28T14:56:45.629605345+10:00
+hash: 1b106cb240ef8a1e0cf04c348a3cc4312d9e254d377db6c19d3483ae15ce70fb
+updated: 2018-05-31T16:02:33.28538506+10:00
 imports:
 - name: cloud.google.com/go
   version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
@@ -17,7 +17,7 @@ imports:
   - internal/version
   - storage
 - name: github.com/aws/aws-sdk-go
-  version: fad131ddc707880428615dc8bc1587b55fb46d74
+  version: 398d14696895d68a3409bb3ccb1cfe8abc2d4376
   subpackages:
   - aws
   - aws/awserr
@@ -55,6 +55,8 @@ imports:
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
   version: 06f5f3d67269ccec1fe5fe4134ba6e982984f7f5
+- name: github.com/go-stack/stack
+  version: 259ab82a6cad3992b4e21ff5cac294ccb06474bc
 - name: github.com/golang/protobuf
   version: 3a3da3a4e26776cc22a79ef46d5d58477532dede
   subpackages:
@@ -75,17 +77,45 @@ imports:
   version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
   version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
+- name: github.com/mongodb/mongo-go-driver
+  version: 29a4d7d5b648e5b0b60e03e3bd71c11703f0c203
+  subpackages:
+  - bson
+  - bson/builder
+  - bson/decimal
+  - bson/elements
+  - bson/objectid
+  - core/addr
+  - core/auth
+  - core/auth/internal/gssapi
+  - core/command
+  - core/connection
+  - core/connstring
+  - core/description
+  - core/dispatch
+  - core/options
+  - core/readconcern
+  - core/readpref
+  - core/result
+  - core/tag
+  - core/topology
+  - core/version
+  - core/wiremessage
+  - core/writeconcern
+  - internal
+  - mongo
 - name: github.com/nanobox-io/golang-scribble
   version: ced58d671850da57ce8c11315424513b608083d7
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: faeaf64a72c50a3b97c95f7b35be2d25e28b332f
+  version: 85ba6656d15521d09230e566a2cb33ac524ebb3e
   subpackages:
   - env
   - log
   - message
   - message/firestore
+  - message/mongo
   - message/sqs
   - payload
   - phpcompat
@@ -105,6 +135,7 @@ imports:
   - tide/api
   - wporg
   - wrapper/firestore
+  - wrapper/mongo
 - name: go.opencensus.io
   version: c3ed530f775d85e577ca652cb052a52c078aad26
   subpackages:
@@ -121,6 +152,10 @@ imports:
   - trace
   - trace/internal
   - trace/propagation
+- name: golang.org/x/crypto
+  version: ab813273cd59e1333f7ae7bff5d027d4aadf528c
+  subpackages:
+  - pbkdf2
 - name: golang.org/x/net
   version: dfa909b99c79129e1100513e5cd36307665e5723
   subpackages:
@@ -139,6 +174,10 @@ imports:
   - internal
   - jws
   - jwt
+- name: golang.org/x/sync
+  version: 1d60e4601c6fd243af51cc01ddf169918a5407ca
+  subpackages:
+  - semaphore
 - name: golang.org/x/text
   version: 5c1cf69b5978e5a34c5f9ba09a83e56acc4b7877
   subpackages:
