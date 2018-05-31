@@ -93,6 +93,8 @@ func (m mockDispatcher) Dispatch(project wporg.RepoProject) error {
 
 func (m mockDispatcher) Init() error { return nil }
 
+func (m mockDispatcher) Close() error { return nil }
+
 type mockChecker struct {
 	LastSync *time.Time
 }
@@ -577,6 +579,29 @@ func Test_getDispatcher(t *testing.T) {
 				},
 			},
 			reflect.TypeOf(&sqsDispatcher{}),
+			false,
+		},
+		{
+			"MongoDB Dispatcher",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncPHPCSActive":      "on",
+						"syncLighthouseActive": "on",
+						"messageProvider":      "mongo",
+					},
+					"mongo":
+					{
+						"user": "",
+						"pass": "",
+						"host": "localhost:12345",
+						"database": "queue",
+						"lighthouseCollection": "fake-lh",
+						"phpcsCollection":      "fake-phpcs",
+					},
+				},
+			},
+			reflect.TypeOf(&mongoDispatcher{}),
 			false,
 		},
 		{
