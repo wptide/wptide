@@ -47,6 +47,7 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
            * [GKE Lighthouse Server Settings](#gke-lighthouse-server-settings)
            * [GKE PHPCS Server Settings](#gke-phpcs-server-settings)
            * [GKE Sync Server Settings](#gke-sync-server-settings)
+           * [GKE Redis Settings](#gke-redis-settings)
    + [Google Cloud Storage (GCS)](#google-cloud-storage-gcs)
        - [GCS Settings](#gcs-settings)
    + [Google Cloud Firestore (GCF)](#google-cloud-firestore-gcf)
@@ -594,6 +595,16 @@ make phpcs.clean.cluster
 | `GKE_SYNC_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
 | `GKE_SYNC_IMAGE` | The name of the Docker image. Default is `sync-server`. |
 | `GKE_SYNC_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
+
+##### GKE Redis Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GKE_REDIS_CLUSTER` | The name of the cluster. Default is `api-redis`. |
+| `GKE_REDIS_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
+| | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
+| `GKE_REDIS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_REDIS_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
 
 ---
 
