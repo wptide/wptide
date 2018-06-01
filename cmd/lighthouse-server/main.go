@@ -280,8 +280,6 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 						log.Println(pErr, "delaying for 60 seconds")
 						time.Sleep(time.Second * time.Duration(60))
 					}
-				} else {
-					log.Println("Polling Error: ", err)
 				}
 			}
 
