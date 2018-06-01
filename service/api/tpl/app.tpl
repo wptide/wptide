@@ -41,8 +41,11 @@ env_variables:
   AWS_SQS_VERSION: ${AWS_SQS_VERSION}
 
 skip_files:
+- docker/
 - tpl/
-- Dockerfile
+- vendor/
+- wordpress/
 - Makefile
+- redis.yaml
 - setup.sh
 - wptests.sql

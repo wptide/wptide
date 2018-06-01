@@ -9,6 +9,12 @@ api.usage:
 	@echo "\tapi.tpl:\n\t\t- Generate the API templates."
 	@echo "\tapi.deploy.sql:\n\t\t- Deploy the Cloud SQL database & setup the users."
 	@echo "\tapi.deploy.app:\n\t\t- Deploy the API to Google App Engine."
+	@echo "\tapi.build.disk:\n\t\t- Build the Redis GKE persistent disk."
+	@echo "\tapi.build.cluster:\n\t\t- Build the Redis GKE cluster."
+	@echo "\tapi.deploy.cluster:\n\t\t- Deploy the Redis GKE cluster."
+	@echo "\tapi.get.cluster:\n\t\t- Get the Redis GKE cluster status."
+	@echo "\tapi.clean.cluster:\n\t\t- Clean the Redis GKE cluster."
+	@echo "\tapi.creds:\n\t\t- Get the Redis GKE cluster credentials."
 
 # Run the API Docker images in isolation with docker-compose up.
 api.up:
@@ -38,6 +44,7 @@ api.setup:
 api.tpl:
 	@./bin/tpl -t=service/api/tpl/app.tpl -d=service/api/app.yaml -e=.env.gcp
 	@./bin/tpl -t=service/api/tpl/cron.tpl -d=service/api/cron.yaml -e=.env.gcp
+	@./bin/tpl -t=service/api/tpl/redis.tpl -d=service/api/redis.yaml -e=.env.gcp
 	@./bin/tpl -t=service/api/tpl/wp-config.tpl -d=service/api/wp-config.php -e=.env.gcp
 
 # Deploy the Cloud SQL database & setup the users.
@@ -58,5 +65,43 @@ api.deploy.sql:
 	@gcloud sql users create ${GCSQL_API_DB_USER} % --instance ${GCSQL_API_INSTANCE} --password "${GCSQL_API_DB_PASSWORD}"
 
 # Deploy the API to Google App Engine.
-api.deploy.app:
+api.deploy.app: api.tpl
 	@cd service/api && gcloud app deploy --promote --stop-previous-version app.yaml cron.yaml && cd --
+
+# Build the Redis GKE persistent disk.
+api.build.disk: config
+	@gcloud compute --project ${GCP_PROJECT} disks create ${GKE_REDIS_CLUSTER}-disk \
+	--zone ${GCP_ZONE} \
+	--type pd-ssd \
+	--size 100GB
+
+# Build the Redis GKE cluster.
+api.build.cluster: config
+	@gcloud container --project ${GCP_PROJECT} clusters create ${GKE_REDIS_CLUSTER} \
+	--zone ${GCP_ZONE} \
+	--cluster-version ${GKE_REDIS_CLUSTER_VERSION} \
+	--machine-type ${GKE_REDIS_MACHINE_TYPE} \
+	--image-type "COS" \
+	--disk-size ${GKE_REDIS_DISK_SIZE} \
+	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
+	--num-nodes 1 \
+	--enable-cloud-logging \
+	--enable-cloud-monitoring
+
+# Deploy the Redis GKE cluster.
+api.deploy.cluster: config api.creds api.tpl
+	@kubectl apply -f service/api/redis.yaml
+
+# Get the Redis GKE cluster status.
+api.get.cluster: config api.creds
+	@kubectl get deployment ${GKE_REDIS_CLUSTER} -o yaml
+
+# Clean the Redis GKE cluster.
+api.clean.cluster: config api.creds api.tpl
+	@kubectl delete -f service/api/redis.yaml
+	@gcloud compute --project ${GCP_PROJECT} disks delete ${GKE_REDIS_CLUSTER}-disk
+	@gcloud container clusters delete ${GKE_REDIS_CLUSTER} -q
+
+# Get the Redis GKE cluster credentials.
+api.creds:
+	@gcloud container clusters get-credentials ${GKE_REDIS_CLUSTER}
