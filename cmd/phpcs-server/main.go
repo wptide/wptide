@@ -22,6 +22,7 @@ import (
 	commonProcess "github.com/xwp/go-tide/src/process"
 	tideApi "github.com/wptide/pkg/tide"
 	"github.com/wptide/pkg/storage/local"
+	"github.com/wptide/pkg/message/firestore"
 )
 
 type processConfig struct {
@@ -321,7 +322,7 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 // getStorageProvider returns a storage provider given the provided configurations from
 // the environment variables.
 func getStorageProvider(config map[string]map[string]string) storage.StorageProvider {
-	switch config["app"]["storage_provider_type"] {
+	switch config["app"]["storage_provider"] {
 	case "s3":
 		conf := config["aws"]
 		return s3.NewS3Provider(conf["s3_region"], conf["key"], conf["secret"], conf["s3_bucket"])
@@ -337,20 +338,28 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 
 // getStorageProvider returns a message/queue provider given the provided configurations
 // from the environment variables.
-//
-// @todo Add additional providers.
 func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
-	conf := config["aws"]
-	return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
+	switch config["app"]["message_provider"] {
+	case "sqs":
+		conf := config["aws"]
+		return sqs.NewSqsProvider(conf["sqs_region"], conf["key"], conf["secret"], conf["sqs_queue"])
+	case "firestore":
+		conf := config["gcp"]
+		fp, _ := firestore.New(context.Background(), conf["project"], conf["gcf_queue"])
+		return fp
+	default:
+		return nil
+	}
 }
 
 func getServiceConfig() map[string]map[string]string {
 	return map[string]map[string]string{
 		"app": {
-			"storage_provider_type": env.GetEnv("PHPCS_STORAGE_PROVIDER", ""),
-			"temp_folder":           env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp"),
-			"server_path":           "/srv/data",
-			"local_path":            "phpcs",
+			"storage_provider": env.GetEnv("PHPCS_STORAGE_PROVIDER", ""),
+			"message_provider": env.GetEnv("PHPCS_MESSAGE_PROVIDER", ""),
+			"temp_folder":      env.GetEnv("PHPCS_TEMP_FOLDER", "/tmp"),
+			"server_path":      "/srv/data",
+			"local_path":       "phpcs",
 		},
 		"aws":
 		{
@@ -365,6 +374,7 @@ func getServiceConfig() map[string]map[string]string {
 		{
 			"project":    env.GetEnv("GCP_PROJECT", ""),
 			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
+			"gcf_queue":  env.GetEnv("GCF_QUEUE_PHPCS", "queue-phpcs"),
 		},
 		"tide":
 		{

@@ -6,6 +6,7 @@ import:
   - env
   - message
   - message/sqs
+  - message/firestore
   - payload
   - pipe
   - process
@@ -14,6 +15,8 @@ import:
   - storage/gcs
   - storage/s3
   - sync
+  - sync/firestore
   - tide
   - tide/api
   - wporg
+  - wrapper/firestore
