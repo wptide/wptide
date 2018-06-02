@@ -81,6 +81,19 @@ services:
         volumes:
             - ./data/api/redis:/data
 
+### MongoDB #####################################################
+    mongo:
+        image: mongo
+        restart: always
+        volumes:
+            - ./data/mongo:/data/db
+        ports:
+            - 27017:27017
+        environment:
+            MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DATABASE_PASSWORD}
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_DATABASE_USERNAME}
+
 ### Lighthouse Server ###########################################
     lighthouse-server:
         image: ${GKE_LH_IMAGE}:latest
@@ -191,16 +204,3 @@ services:
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
         network_mode: host
-
-### MongoDB #####################################################
-    mongo:
-        image: mongo
-        restart: always
-        volumes:
-            - ./data/mongo:/data/db
-        ports:
-            - 27017:27017
-        environment:
-            MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
-            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DATABASE_PASSWORD}
-            MONGO_INITDB_ROOT_USERNAME: ${MONGO_DATABASE_USERNAME}
