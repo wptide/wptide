@@ -557,7 +557,7 @@ make phpcs.clean.cluster
 | `GKE_LH_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
 | `GKE_LH_CPU_PERCENT` | The average percent CPU utilization across all pods. Must be a range of `1-100`. |
-| `GKE_LH_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_LH_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_LH_IMAGE` | The name of the Docker image. Default is`lighthouse-server`. |
 | `GKE_LH_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
 | `GKE_LH_MAX_NODES` | Maximum number of nodes to which the node pool can scale. |
@@ -575,7 +575,7 @@ make phpcs.clean.cluster
 | `GKE_PHPCS_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
 | `GKE_PHPCS_CPU_PERCENT` | The average percent CPU utilization across all pods. Must be a range of `1-100`. |
-| `GKE_PHPCS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_PHPCS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_PHPCS_IMAGE` | The name of the Docker image. Default is `phpcs-server`. |
 | `GKE_PHPCS_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
 | `GKE_PHPCS_MAX_NODES` | Maximum number of nodes to which the node pool can scale. |
@@ -592,9 +592,11 @@ make phpcs.clean.cluster
 | `GKE_SYNC_CLUSTER` | The name of the cluster. Default is `sync-server`. |
 | `GKE_SYNC_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
-| `GKE_SYNC_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_SYNC_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_SYNC_IMAGE` | The name of the Docker image. Default is `sync-server`. |
 | `GKE_SYNC_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
+| `GKE_SYNC_PERSISTENT_DISK_TYPE` | Type of persistent disk. Must be one of: `pd-standard`, `pd-ssd`. |
+| `GKE_SYNC_PERSISTENT_DISK_SIZE` | Size in GB for the persistent disk. An example value is `100GB`. |
 
 ##### GKE Redis Settings
 
@@ -603,8 +605,10 @@ make phpcs.clean.cluster
 | `GKE_REDIS_CLUSTER` | The name of the cluster. Default is `api-redis`. |
 | `GKE_REDIS_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
-| `GKE_REDIS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_REDIS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_REDIS_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
+| `GKE_REDIS_PERSISTENT_DISK_TYPE` | Type of persistent disk. Must be one of: `pd-standard`, `pd-ssd`. |
+| `GKE_REDIS_PERSISTENT_DISK_SIZE` | Size in GB for the persistent disk. An example value is `100GB`. |
 
 ---
 

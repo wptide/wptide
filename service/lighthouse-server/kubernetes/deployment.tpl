@@ -30,6 +30,7 @@ spec:
       containers:
       - image: ${GCR_LH_IMAGE_TAG}
         name: ${GKE_LH_CLUSTER}
+        terminationMessagePolicy: FallbackToLogsOnError
         env:
         - name: API_AUTH_URL
           value: "${API_AUTH_URL}"

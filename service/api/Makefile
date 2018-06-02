@@ -72,8 +72,8 @@ api.deploy.app: api.tpl
 api.build.disk: config
 	@gcloud compute --project ${GCP_PROJECT} disks create ${GKE_REDIS_CLUSTER}-disk \
 	--zone ${GCP_ZONE} \
-	--type pd-ssd \
-	--size 100GB
+	--type ${GKE_REDIS_PERSISTENT_DISK_TYPE} \
+	--size ${GKE_REDIS_PERSISTENT_DISK_SIZE}
 
 # Build the Redis GKE cluster.
 api.build.cluster: config
@@ -99,8 +99,8 @@ api.get.cluster: config api.creds
 # Clean the Redis GKE cluster.
 api.clean.cluster: config api.creds api.tpl
 	@kubectl delete -f service/api/redis.yaml
-	@gcloud compute --project ${GCP_PROJECT} disks delete ${GKE_REDIS_CLUSTER}-disk
 	@gcloud container clusters delete ${GKE_REDIS_CLUSTER} -q
+	@gcloud compute --project ${GCP_PROJECT} disks delete ${GKE_REDIS_CLUSTER}-disk
 
 # Get the Redis GKE cluster credentials.
 api.creds:
