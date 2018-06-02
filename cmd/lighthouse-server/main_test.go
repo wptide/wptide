@@ -497,7 +497,7 @@ func Test_getMessageProvider(t *testing.T) {
 			args{
 				map[string]map[string]string{
 					"app": {
-						"message_provider": "mongo",
+						"message_provider": "local",
 					},
 					"mongo":
 					{

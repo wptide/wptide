@@ -340,7 +340,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 			},
 			providers: make(map[string]message.MessageProvider),
 		}, nil
-	case "mongo":
+	case "local":
 		conf := c["mongo"]
 
 		return &mongoDispatcher{
@@ -401,7 +401,7 @@ func getServiceConfig() map[string]map[string]string {
 			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "300"),
 			"browseCategory":       env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated"),
 			"syncDBProvider":       env.GetEnv("SYNC_DATABASE_PROVIDER", "local"),
-			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "sqs"),
+			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "local"),
 		},
 		"message":
 		{
@@ -430,10 +430,10 @@ func getServiceConfig() map[string]map[string]string {
 		},
 		"mongo":
 		{
-			"user":                 env.GetEnv("MONGO_INITDB_ROOT_USERNAME", ""),
-			"pass":                 env.GetEnv("MONGO_INITDB_ROOT_PASSWORD", ""),
+			"user":                 env.GetEnv("MONGO_DATABASE_USERNAME", ""),
+			"pass":                 env.GetEnv("MONGO_DATABASE_PASSWORD", ""),
 			"host":                 env.GetEnv("MONGO_HOST", "localhost:27017"),
-			"database":             env.GetEnv("MONGO_INITDB_DATABASE", "queue"),
+			"database":             env.GetEnv("MONGO_DATABASE_NAME", "queue"),
 			"lighthouseCollection": env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
 			"phpcsCollection":      env.GetEnv("MONGO_QUEUE_PHPCS", "phpcs"),
 		},
