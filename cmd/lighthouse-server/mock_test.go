@@ -121,6 +121,10 @@ func (m mockMessageProvider) DeleteMessage(ref *string) error {
 	return nil
 }
 
+func (m mockMessageProvider) Close() error {
+	return nil
+}
+
 /** ----------------------------------------------
 	Mock Tide Client
  */

@@ -20,3 +20,6 @@ func (m mockProvider) GetNextMessage() (*message.Message, error) {
 func (m mockProvider) DeleteMessage(ref *string) error {
 	return nil
 }
+func (m mockProvider) Close() error {
+	return nil
+}

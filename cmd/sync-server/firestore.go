@@ -47,3 +47,12 @@ func (fs *firestoreDispatcher) Init() error {
 	}
 	return nil
 }
+
+func (fs *firestoreDispatcher) Close() error {
+	for collectionID, _ := range fs.Collections {
+		if messageProvider, ok := fs.providers[collectionID]; ok {
+			messageProvider.Close()
+		}
+	}
+	return nil
+}

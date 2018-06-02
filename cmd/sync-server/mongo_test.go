@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"testing"
 
 	"github.com/wptide/pkg/message"
@@ -8,7 +9,7 @@ import (
 )
 
 var (
-	testCollections = map[string]struct {
+	mongoCollections = map[string]struct {
 		Collection string
 		Active     bool
 		Accepts    string // "all" or "themes" or "plugins"
@@ -36,19 +37,23 @@ var (
 	}
 )
 
-func initMockFSProviders(fs *firestoreDispatcher) {
-	for collectionID, _ := range fs.Collections {
-		queueProvider, ok := fs.providers[collectionID]
+func initMockMongoProviders(m mongoDispatcher) {
+	for collectionID, _ := range m.Collections {
+		queueProvider, ok := m.providers[collectionID]
 		if !ok {
 			queueProvider = &mockProvider{}
-			fs.providers[collectionID] = queueProvider
+			m.providers[collectionID] = queueProvider
 		}
 	}
 }
 
-func Test_firestoreDispatcher_Dispatch(t *testing.T) {
+func Test_mongoDispatcher_Dispatch(t *testing.T) {
 	type fields struct {
-		ProjectID   string
+		ctx         context.Context
+		user        string
+		pass        string
+		host        string
+		database    string
 		Collections map[string]struct {
 			Collection string
 			Active     bool
@@ -69,8 +74,12 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 		{
 			"Theme Project",
 			fields{
-				"fake-id",
-				testCollections,
+				context.Background(),
+				"",
+				"",
+				"mock-host:1234",
+				"test-queue",
+				mongoCollections,
 				make(map[string]message.MessageProvider),
 			},
 			args{
@@ -84,8 +93,12 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 		{
 			"Plugin Project",
 			fields{
-				"fake-id",
-				testCollections,
+				context.Background(),
+				"",
+				"",
+				"mock-host:1234",
+				"test-queue",
+				mongoCollections,
 				make(map[string]message.MessageProvider),
 			},
 			args{
@@ -99,8 +112,12 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 		{
 			"Theme Project - No Init()",
 			fields{
-				"fake-id",
-				testCollections,
+				context.Background(),
+				"",
+				"",
+				"mock-host:1234",
+				"test-queue",
+				mongoCollections,
 				make(map[string]message.MessageProvider),
 			},
 			args{
@@ -114,8 +131,12 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 		{
 			"Theme Project - Provider Fail",
 			fields{
-				"fake-id",
-				testCollections,
+				context.Background(),
+				"",
+				"",
+				"mock-host:1234",
+				"test-queue",
+				mongoCollections,
 				make(map[string]message.MessageProvider),
 			},
 			args{
@@ -126,29 +147,38 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 			},
 			false,
 			true,
-		}}
+		},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fs := &firestoreDispatcher{
-				ProjectID:   tt.fields.ProjectID,
+			m := mongoDispatcher{
+				ctx:         tt.fields.ctx,
+				user:        tt.fields.user,
+				pass:        tt.fields.pass,
+				host:        tt.fields.host,
+				database:    tt.fields.database,
 				Collections: tt.fields.Collections,
 				providers:   tt.fields.providers,
 			}
 
 			if !tt.skipInit {
-				initMockFSProviders(fs)
+				initMockMongoProviders(m)
 			}
 
-			if err := fs.Dispatch(tt.args.project); (err != nil) != tt.wantErr {
-				t.Errorf("firestoreDispatcher.Dispatch() error = %v, wantErr %v", err, tt.wantErr)
+			if err := m.Dispatch(tt.args.project); (err != nil) != tt.wantErr {
+				t.Errorf("mongoDispatcher.Dispatch() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_firestoreDispatcher_Init(t *testing.T) {
+func Test_mongoDispatcher_Init(t *testing.T) {
 	type fields struct {
-		ProjectID   string
+		ctx         context.Context
+		user        string
+		pass        string
+		host        string
+		database    string
 		Collections map[string]struct {
 			Collection string
 			Active     bool
@@ -164,29 +194,41 @@ func Test_firestoreDispatcher_Init(t *testing.T) {
 		{
 			"Init Providers",
 			fields{
-				"fake-id",
-				testCollections,
+				context.Background(),
+				"",
+				"",
+				"mock-host:1234",
+				"test-queue",
+				mongoCollections,
 				make(map[string]message.MessageProvider),
 			},
 			false,
 		}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fs := &firestoreDispatcher{
-				ProjectID:   tt.fields.ProjectID,
+			m := &mongoDispatcher{
+				ctx:         tt.fields.ctx,
+				user:        tt.fields.user,
+				pass:        tt.fields.pass,
+				host:        tt.fields.host,
+				database:    tt.fields.database,
 				Collections: tt.fields.Collections,
 				providers:   tt.fields.providers,
 			}
-			if err := fs.Init(); (err != nil) != tt.wantErr {
-				t.Errorf("firestoreDispatcher.Init() error = %v, wantErr %v", err, tt.wantErr)
+			if err := m.Init(); (err != nil) != tt.wantErr {
+				t.Errorf("mongoDispatcher.Init() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func Test_firestoreDispatcher_Close(t *testing.T) {
+func Test_mongoDispatcher_Close(t *testing.T) {
 	type fields struct {
-		ProjectID   string
+		ctx         context.Context
+		user        string
+		pass        string
+		host        string
+		database    string
 		Collections map[string]struct {
 			Collection string
 			Active     bool
@@ -202,8 +244,12 @@ func Test_firestoreDispatcher_Close(t *testing.T) {
 		{
 			"Close with collections",
 			fields{
-				"abc",
-				testCollections,
+				context.Background(),
+				"",
+				"",
+				"localhost:27017",
+				"mock-db",
+				mongoCollections,
 				make(map[string]message.MessageProvider),
 			},
 			false,
@@ -211,16 +257,20 @@ func Test_firestoreDispatcher_Close(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fs := &firestoreDispatcher{
-				ProjectID:   tt.fields.ProjectID,
+			m := &mongoDispatcher{
+				ctx:         tt.fields.ctx,
+				user:        tt.fields.user,
+				pass:        tt.fields.pass,
+				host:        tt.fields.host,
+				database:    tt.fields.database,
 				Collections: tt.fields.Collections,
 				providers:   tt.fields.providers,
 			}
 
-			initMockFSProviders(fs)
+			initMockMongoProviders(*m)
 
-			if err := fs.Close(); (err != nil) != tt.wantErr {
-				t.Errorf("firestoreDispatcher.Close() error = %v, wantErr %v", err, tt.wantErr)
+			if err := m.Close(); (err != nil) != tt.wantErr {
+				t.Errorf("mongoDispatcher.Close() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
