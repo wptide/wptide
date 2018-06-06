@@ -486,6 +486,37 @@ database._
 | `GCSQL_API_MAINTENANCE_WINDOW_HOUR` | Hour of day - `0` to `23`. Determines a one-hour window when Cloud SQL can perform disruptive maintenance on your instance. |
 | `GCSQL_API_STORAGE_SIZE` | Amount of storage allocated to the instance. Must be an integer number of `GB` between `10GB` and `10230GB` inclusive. |
 
+#### Google Cloud Memorystore (GCM)
+
+Deploying a Redis instance to Cloud Memory for the WordPress API only requires a bit of 
+configuration to the environment variable and then to run a single `make` command.
+
+Deploy the Google Cloud Memorystore Redis instance:
+
+```
+make api.deploy.redis
+```
+
+Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance:
+
+```
+make api.get.redis
+```
+
+Delete the Google Cloud Memorystore Redis instance:
+
+```
+make api.clean.redis
+```
+
+##### GCM API Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCM_INSTANCE_NAME` | The name of the Redis instance. |
+| `GCM_INSTANCE_SIZE` | The memory size of the instance in GiB. Must be an integer number between `1-300`. This setting dramatically changes costs, do your research before deploying an instance. |
+| `GCM_INSTANCE_TIER` | The service tier of the instance. Must be one of: `basic`, `standard`. Basic means the Redis instance will not have replication. Standard is a high-availability Redis instance with replication for failover. |
+
 #### Google App Engine (GAE)
 
 Deploying the API to App Engine is fairly straight forward. You'll need to 
@@ -616,18 +647,6 @@ make phpcs.clean.cluster
 | `GKE_SYNC_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
 | `GKE_SYNC_PERSISTENT_DISK_TYPE` | Type of persistent disk. Must be one of: `pd-standard`, `pd-ssd`. |
 | `GKE_SYNC_PERSISTENT_DISK_SIZE` | Size in GB for the persistent disk. An example value is `100GB`. |
-
-##### GKE Redis Settings
-
-| Variable | Description |
-| :--- | :--- |
-| `GKE_REDIS_CLUSTER` | The name of the cluster. Default is `api-redis`. |
-| `GKE_REDIS_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
-| | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
-| `GKE_REDIS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
-| `GKE_REDIS_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
-| `GKE_REDIS_PERSISTENT_DISK_TYPE` | Type of persistent disk. Must be one of: `pd-standard`, `pd-ssd`. |
-| `GKE_REDIS_PERSISTENT_DISK_SIZE` | Size in GB for the persistent disk. An example value is `100GB`. |
 
 ---
 

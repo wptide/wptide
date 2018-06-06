@@ -9,12 +9,9 @@ api.usage:
 	@echo "\tapi.tpl:\n\t\t- Generate the API templates."
 	@echo "\tapi.deploy.sql:\n\t\t- Deploy the Cloud SQL database & setup the users."
 	@echo "\tapi.deploy.app:\n\t\t- Deploy the API to Google App Engine."
-	@echo "\tapi.build.disk:\n\t\t- Build the Redis GKE persistent disk."
-	@echo "\tapi.build.cluster:\n\t\t- Build the Redis GKE cluster."
-	@echo "\tapi.deploy.cluster:\n\t\t- Deploy the Redis GKE cluster."
-	@echo "\tapi.get.cluster:\n\t\t- Get the Redis GKE cluster status."
-	@echo "\tapi.clean.cluster:\n\t\t- Clean the Redis GKE cluster."
-	@echo "\tapi.creds:\n\t\t- Get the Redis GKE cluster credentials."
+	@echo "\tapi.deploy.redis:\n\t\t- Deploy the Google Cloud Memorystore Redis instance."
+	@echo "\tapi.get.redis:\n\t\t- Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance"
+	@echo "\tapi.clean.redis:\n\t\t- Delete the Google Cloud Memorystore Redis instance."
 
 # Run the API Docker images in isolation with docker-compose up.
 api.up:
@@ -44,7 +41,6 @@ api.setup:
 api.tpl:
 	@./bin/tpl -t=service/api/tpl/app.tpl -d=service/api/app.yaml -e=.env.gcp
 	@./bin/tpl -t=service/api/tpl/cron.tpl -d=service/api/cron.yaml -e=.env.gcp
-	@./bin/tpl -t=service/api/tpl/redis.tpl -d=service/api/redis.yaml -e=.env.gcp
 	@./bin/tpl -t=service/api/tpl/wp-config.tpl -d=service/api/wp-config.php -e=.env.gcp
 
 # Deploy the Cloud SQL database & setup the users.
@@ -68,40 +64,18 @@ api.deploy.sql:
 api.deploy.app: api.tpl
 	@cd service/api && gcloud app deploy --promote --stop-previous-version app.yaml cron.yaml && cd --
 
-# Build the Redis GKE persistent disk.
-api.build.disk: config
-	@gcloud compute --project ${GCP_PROJECT} disks create ${GKE_REDIS_CLUSTER}-disk \
-	--zone ${GCP_ZONE} \
-	--type ${GKE_REDIS_PERSISTENT_DISK_TYPE} \
-	--size ${GKE_REDIS_PERSISTENT_DISK_SIZE}
+# Deploy the Google Cloud Memorystore Redis instance.
+api.deploy.redis: config
+	@gcloud beta redis instances create ${GCM_INSTANCE_NAME} \
+	--region=${GCP_REGION} \
+	--zone=${GCP_ZONE} \
+	--size=${GCM_INSTANCE_SIZE} \
+	--tier=${GCM_INSTANCE_TIER}
 
-# Build the Redis GKE cluster.
-api.build.cluster: config
-	@gcloud container --project ${GCP_PROJECT} clusters create ${GKE_REDIS_CLUSTER} \
-	--zone ${GCP_ZONE} \
-	--cluster-version ${GKE_REDIS_CLUSTER_VERSION} \
-	--machine-type ${GKE_REDIS_MACHINE_TYPE} \
-	--image-type "COS" \
-	--disk-size ${GKE_REDIS_DISK_SIZE} \
-	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
-	--num-nodes 1 \
-	--enable-cloud-logging \
-	--enable-cloud-monitoring
+# Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance.
+api.get.redis: config
+	@gcloud beta redis instances describe ${GCM_INSTANCE_NAME} --region=${GCP_REGION}
 
-# Deploy the Redis GKE cluster.
-api.deploy.cluster: config api.creds api.tpl
-	@kubectl apply -f service/api/redis.yaml
-
-# Get the Redis GKE cluster status.
-api.get.cluster: config api.creds
-	@kubectl get deployment ${GKE_REDIS_CLUSTER} -o yaml
-
-# Clean the Redis GKE cluster.
-api.clean.cluster: config api.creds api.tpl
-	@kubectl delete -f service/api/redis.yaml
-	@gcloud container clusters delete ${GKE_REDIS_CLUSTER} -q
-	@gcloud compute --project ${GCP_PROJECT} disks delete ${GKE_REDIS_CLUSTER}-disk
-
-# Get the Redis GKE cluster credentials.
-api.creds:
-	@gcloud container clusters get-credentials ${GKE_REDIS_CLUSTER}
+# Delete the Google Cloud Memorystore Redis instance.
+api.clean.redis: config
+	@gcloud beta redis instances delete ${GCM_INSTANCE_NAME} --region=${GCP_REGION}
