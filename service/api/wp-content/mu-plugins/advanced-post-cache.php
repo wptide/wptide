@@ -8,6 +8,10 @@ Author: Automattic
 Author URI: http://automattic.com/
 */
 
+if ( ! defined( 'WP_CACHE' ) || true !== WP_CACHE ) {
+	return;
+}
+
 class Advanced_Post_Cache {
 	var $CACHE_GROUP_PREFIX = 'advanced_post_cache_';
 

@@ -18,13 +18,15 @@
  * @package WordPress
  */
 
-// Register GCS stream wrapper
-require_once( __DIR__ . '/../vendor/autoload.php' );
-$storageClient = new Google\Cloud\Storage\StorageClient();
-$storageClient->registerStreamWrapper();
-
 // $is_gae is true on Google App Engine.
 $is_gae = ( getenv( 'GAE_VERSION' ) !== false );
+
+// Register GCS stream wrapper
+if ( $is_gae || 'gcs' === getenv( 'API_UPLOAD_HANDLER' ) ) {
+    require_once( __DIR__ . '/../vendor/autoload.php' );
+    $storageClient = new Google\Cloud\Storage\StorageClient();
+    $storageClient->registerStreamWrapper();
+}
 
 // Disable pseudo cron behavior
 define( 'DISABLE_WP_CRON', true );
@@ -131,6 +133,12 @@ if ( true === WP_CACHE ) {
         'debug'               => getenv( 'API_CACHE_DEBUG' ),
         'gzip'                => true,
     );
+
+    // Cloud Memorystore does not need to authorize.
+    if ( $is_gae ) {
+        unset( $redis_server['auth'] );
+        unset( $redis_page_cache_config['redis_auth'] );
+    }
 }
 
 /**

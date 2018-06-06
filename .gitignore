@@ -28,6 +28,7 @@ data
 service/api/vendor
 service/api/wordpress
 service/api/wp-content/plugins/flush-opcache
+service/api/wp-content/plugins/gmail-smtp
 service/api/wp-content/plugins/pj-page-cache-red
 service/api/wp-content/plugins/wp-redis
 service/api/wp-content/themes

@@ -70,7 +70,8 @@ api.deploy.redis: config
 	--region=${GCP_REGION} \
 	--zone=${GCP_ZONE} \
 	--size=${GCM_INSTANCE_SIZE} \
-	--tier=${GCM_INSTANCE_TIER}
+	--tier=${GCM_INSTANCE_TIER} \
+	--redis-config=maxmemory-policy=allkeys-lru
 
 # Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance.
 api.get.redis: config
