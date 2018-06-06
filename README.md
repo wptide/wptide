@@ -281,20 +281,7 @@ from the `audit-server` user profile.
 
 ### MongoDB
 
-By default MongoDB is used as the local message provider for the Lighthouse/PHPCS Servers. In order for these services to use MongoDB you'll need to run the following command.
-
-Run the MongoDB Docker image in isolation with docker-compose up:
-
-```
-make mongo.up
-```
-
-Take the isolated MongoDB Docker image down:
-
-```
-make mongo.down
-```
-
+By default MongoDB is used as the local message provider for the Lighthouse/PHPCS Servers. In order for these services to use MongoDB you'll need to ensure the following settings are in you `.env`. The only setting that you should **not** change is `MONGO_HOST`.
 
 #### MongoDB Settings
 

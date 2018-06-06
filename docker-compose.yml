@@ -17,6 +17,7 @@ services:
         depends_on:
             - api-mysql
             - api-redis
+            - mongo
         ports:
             - 80:8080
         environment:
@@ -100,6 +101,8 @@ services:
         volumes:
             - ./data/lighthouse-server:/srv/data
             - ./service-account.json:/srv/service-account.json:ro
+        depends_on:
+            - mongo
         environment:
             API_AUTH_URL: ${API_AUTH_URL}
             API_HTTP_HOST: ${API_HTTP_HOST}
@@ -135,6 +138,8 @@ services:
         volumes:
             - ./data/phpcs-server:/srv/data
             - ./service-account.json:/srv/service-account.json:ro
+        depends_on:
+            - mongo
         environment:
             API_AUTH_URL: ${API_AUTH_URL}
             API_HTTP_HOST: ${API_HTTP_HOST}
@@ -170,6 +175,8 @@ services:
         volumes:
             - ./data/sync-server:/srv/data
             - ./service-account.json:/srv/service-account.json:ro
+        depends_on:
+            - mongo
         environment:
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_PROTOCOL: ${API_PROTOCOL}

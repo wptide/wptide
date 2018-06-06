@@ -27,10 +27,6 @@ usage:
 	@echo "\tup:\n\t\t- Run the Docker images with docker-compose up."
 	@echo "\tdown:\n\t\t- Stop the Docker images with docker-compose down."
 	@echo "\ttest:\n\t\t- Run the GO test suite."
-	@echo "\tmongo.up:\n\t\t- Run the MongoDB Docker image in isolation with docker-compose up."
-	@echo "\tmongo.down:\n\t\t- Take the isolated MongoDB Docker image down."
-	@echo "\tmongo.stop:\n\t\t- Stop the isolated MongoDB Docker image with docker-compose stop."
-	@echo "\tmongo.rm:\n\t\t- Remove the isolated MongoDB Docker image with docker-compose rm."
 	@make api.usage
 	@make lighthouse.usage
 	@make phpcs.usage
@@ -77,18 +73,3 @@ down:
 test:
 	@echo "Running tests ..."
 	@${GOTEST}
-
-# Run the MongoDB Docker image in isolation with docker-compose up.
-mongo.up:
-	@docker-compose up mongo
-
-# Take the isolated MongoDB Docker image down.
-mongo.down: mongo.stop mongo.rm
-
-# Stop the isolated MongoDB Docker image with docker-compose stop.
-mongo.stop:
-	@docker-compose stop mongo
-
-# Remove the isolated MongoDB Docker image with docker-compose rm.
-mongo.rm:
-	@docker-compose rm -f mongo
