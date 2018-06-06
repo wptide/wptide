@@ -27,6 +27,8 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
    + [API](#api)
        - [API Notes](#api-notes)
        - [API Settings](#api-settings)
+   * [MongoDB](#mongodb)
+       - [MongoDB Settings](#mongodb-settings)
    + [Lighthouse Server](#lighthouse-server)
        - [Lighthouse Server Notes](#lighthouse-server-notes)
        - [Lighthouse Server Settings](#lighthouse-server-settings)
@@ -277,6 +279,36 @@ from the `audit-server` user profile.
 
 ---
 
+### MongoDB
+
+By default MongoDB is used as the local message provider for the Lighthouse/PHPCS Servers. In order for these services to use MongoDB you'll need to run the following command.
+
+Run the MongoDB Docker image in isolation with docker-compose up:
+
+```
+make mongo.up
+```
+
+Take the isolated MongoDB Docker image down:
+
+```
+make mongo.down
+```
+
+
+#### MongoDB Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `MONGO_DATABASE_NAME` | The name of the database. Default is `queue`. |
+| `MONGO_DATABASE_PASSWORD` | The database root password. Default is `root`. |
+| `MONGO_DATABASE_USERNAME` | The database root username. Default is `root`. |
+| `MONGO_HOST` | The MongoDB database host and port. Default is `localhost:27017`. |
+| `MONGO_QUEUE_LH` | Specifies which collection in MongoDB to use for the Lighthouse message queue. Default is `lighthouse`. |
+| `MONGO_QUEUE_PHPCS` | Specifies which collection in MongoDB to use for the PHPCS message queue. Default is `phpcs`. |
+
+---
+
 ### Lighthouse Server
 
 First build the Lighthouse Server Docker image:
@@ -313,7 +345,7 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 | Variable | Description |
 | :--- | :--- |
 | `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5`. |
-| `LH_MESSAGE_PROVIDER` | Queue audit messages using Google Cloud Firestore, or AWS SQS. Must be one of: `firestore`, `sqs`. Default is `sqs`. |
+| `LH_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
 | `LH_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
 | `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp`. |
 
@@ -359,7 +391,7 @@ reports against both plugins and themes, then sends the results back to the Tide
 | Variable | Description |
 | :--- | :--- |
 | `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5`. |
-| `PHPCS_MESSAGE_PROVIDER` | Queue audit messages using Google Cloud Firestore, or AWS SQS. Must be one of: `firestore`, `sqs`. Default is `sqs`. |
+| `PHPCS_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
 | `PHPCS_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
 | `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp`. |
 
@@ -410,7 +442,7 @@ plugins to process and writes them to a queue.
 | `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no`. |
 | `SYNC_ITEMS_PER_PAGE` | The number of plugins or themes per page in the API request. Default is `250`. |
 | `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on`. |
-| `SYNC_MESSAGE_PROVIDER` | Queue audit messages using Google Cloud Firestore, or AWS SQS. Must be one of: `firestore`, `sqs`. Default is `sqs`. |
+| `SYNC_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
 | `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on`. |
 | `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600`. |
 | `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125`. |

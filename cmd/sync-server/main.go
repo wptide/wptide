@@ -185,8 +185,8 @@ func defaultStandards() []string {
 }
 
 // defaultAudits gets the audits to run against a project.
-func defaultAudits() *[]message.Audit {
-	return &[]message.Audit{
+func defaultAudits() []*message.Audit {
+	return []*message.Audit{
 		{
 			Type: "phpcs",
 			Options: &message.AuditOption{
@@ -255,6 +255,9 @@ func main() {
 	// Init the dispatcher.
 	dispatcher.Init()
 
+	// Close all clients where applicable.
+	defer dispatcher.Close()
+
 	// Start the theme worker pool.
 	go pool(poolSize, themeTasks, checker, dispatcher, messages)
 
@@ -314,29 +317,57 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 			},
 			providers: make(map[string]message.MessageProvider),
 		}, nil
-		case "firestore":
-			conf := c["gcp"]
+	case "firestore":
+		conf := c["gcp"]
 
-			return &firestoreDispatcher{
-				ProjectID: conf["projectID"],
-				Collections: map[string]struct {
-					Collection string
-					Active     bool
-					Accepts    string // "all" or "themes" or "plugins"
-				}{
-					"phpcs": {
-						conf["phpcsCollection"],
-						strings.ToLower(c["app"]["syncPHPCSActive"]) == "on",
-						"all",
-					},
-					"lighthouse": {
-						conf["lighthouseCollection"],
-						strings.ToLower(c["app"]["syncLighthouseActive"]) == "on",
-						"themes",
-					},
+		return &firestoreDispatcher{
+			ProjectID: conf["projectID"],
+			Collections: map[string]struct {
+				Collection string
+				Active     bool
+				Accepts    string // "all" or "themes" or "plugins"
+			}{
+				"phpcs": {
+					conf["phpcsCollection"],
+					strings.ToLower(c["app"]["syncPHPCSActive"]) == "on",
+					"all",
 				},
-				providers: make(map[string]message.MessageProvider),
-			}, nil
+				"lighthouse": {
+					conf["lighthouseCollection"],
+					strings.ToLower(c["app"]["syncLighthouseActive"]) == "on",
+					"themes",
+				},
+			},
+			providers: make(map[string]message.MessageProvider),
+		}, nil
+	case "local":
+		conf := c["mongo"]
+
+		return &mongoDispatcher{
+			ctx:      context.Background(),
+			user:     conf["user"],
+			pass:     conf["pass"],
+			host:     conf["host"],
+			database: conf["database"],
+
+			Collections: map[string]struct {
+				Collection string
+				Active     bool
+				Accepts    string // "all" or "themes" or "plugins"
+			}{
+				"phpcs": {
+					conf["phpcsCollection"],
+					strings.ToLower(c["app"]["syncPHPCSActive"]) == "on",
+					"all",
+				},
+				"lighthouse": {
+					conf["lighthouseCollection"],
+					strings.ToLower(c["app"]["syncLighthouseActive"]) == "on",
+					"themes",
+				},
+			},
+			providers: make(map[string]message.MessageProvider),
+		}, nil
 	default:
 		return nil, nil
 	}
@@ -370,7 +401,7 @@ func getServiceConfig() map[string]map[string]string {
 			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "300"),
 			"browseCategory":       env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated"),
 			"syncDBProvider":       env.GetEnv("SYNC_DATABASE_PROVIDER", "local"),
-			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "sqs"),
+			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "local"),
 		},
 		"message":
 		{
@@ -396,6 +427,15 @@ func getServiceConfig() map[string]map[string]string {
 			"docPath":              env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
 			"lighthouseCollection": env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
 			"phpcsCollection":      env.GetEnv("GCF_QUEUE_PHPCS", "queue-phpcs"),
+		},
+		"mongo":
+		{
+			"user":                 env.GetEnv("MONGO_DATABASE_USERNAME", ""),
+			"pass":                 env.GetEnv("MONGO_DATABASE_PASSWORD", ""),
+			"host":                 env.GetEnv("MONGO_HOST", "localhost:27017"),
+			"database":             env.GetEnv("MONGO_DATABASE_NAME", "queue"),
+			"lighthouseCollection": env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
+			"phpcsCollection":      env.GetEnv("MONGO_QUEUE_PHPCS", "phpcs"),
 		},
 		"tide":
 		{

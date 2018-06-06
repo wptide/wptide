@@ -58,23 +58,23 @@ func DoPhpcs(msg *message.Message, result *process.Result, tempFolder string, st
 	// If this is a theme or plugin then we need to tweak the incoming message
 	// to use the WordPress PHPCompatibility standards file.
 	if ok && (codeInfo.Type == "theme" || codeInfo.Type == "plugin") {
-		var newAuditsArray []message.Audit
-		for _, audit := range *msg.Audits {
+		var newAuditsArray []*message.Audit
+		for _, audit := range msg.Audits {
 			newAudit := audit
 			if audit.Type == "phpcs" && audit.Options.Standard == "phpcompatibility" {
 				newAudit.Options.StandardOverride = PHPCompatibilityWPPath
 			}
 			newAuditsArray = append(newAuditsArray, newAudit)
 		}
-		*msg.Audits = newAuditsArray
+		msg.Audits = newAuditsArray
 	}
 
 	proc.Message = *msg
 
 	errs := []string{}
-	for _, audit := range *proc.Message.Audits {
+	for _, audit := range proc.Message.Audits {
 		if audit.Type == "phpcs" {
-			if err := proc.Do(audit); err != nil {
+			if err := proc.Do(*audit); err != nil {
 				errs = append(errs, "PHPCS Error: " + err.Error())
 			}
 		}

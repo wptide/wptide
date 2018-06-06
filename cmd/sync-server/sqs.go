@@ -52,3 +52,13 @@ func (s *sqsDispatcher) Init() error {
 	}
 	return nil
 }
+
+func (s *sqsDispatcher) Close() error {
+	for queueID, _ := range s.Queues {
+		queueProvider, ok := s.providers[queueID]
+		if ok {
+			queueProvider.Close()
+		}
+	}
+	return nil
+}

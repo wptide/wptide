@@ -16,6 +16,7 @@ import (
 	commonProcess "github.com/xwp/go-tide/src/process"
 	"github.com/wptide/pkg/message/firestore"
 	"github.com/wptide/pkg/message/sqs"
+	"github.com/wptide/pkg/message/mongo"
 )
 
 var (
@@ -490,6 +491,25 @@ func Test_getMessageProvider(t *testing.T) {
 				},
 			},
 			reflect.TypeOf(&firestore.FirestoreProvider{}),
+		},
+		{
+			"Mongo Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"message_provider": "local",
+					},
+					"mongo":
+					{
+						"user": "test",
+						"pass": "test",
+						"host": "localhost:27017",
+						"database": "test-db",
+						"queue": "test-queue",
+					},
+				},
+			},
+			reflect.TypeOf(&mongo.MongoProvider{}),
 		},
 	}
 	for _, tt := range tests {

@@ -22,6 +22,7 @@ import (
 	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/message/mongo"
 )
 
 type processConfig struct {
@@ -101,6 +102,10 @@ var (
 
 func main() {
 
+	if messageProvider != nil {
+		defer messageProvider.Close()
+	}
+
 	log.Println("Starting Lighthouse audit server.")
 
 	if bParseFlags {
@@ -166,7 +171,7 @@ func main() {
 				Force:               true,
 				Visibility:          *flagVisibility,
 				RequestClient:       *flagClient,
-				Audits: &[]message.Audit{
+				Audits: []*message.Audit{
 					{
 						Type:    "lighthouse",
 						Options: &message.AuditOption{},
@@ -322,6 +327,10 @@ func getMessageProvider(config map[string]map[string]string) message.MessageProv
 		conf := config["gcp"]
 		fp, _ := firestore.New(context.Background(), conf["project"], conf["gcf_queue"])
 		return fp
+	case "local":
+		conf := config["mongo"]
+		mp, _ := mongo.New(context.Background(), conf["user"], conf["pass"], conf["host"], conf["database"], conf["queue"], nil)
+		return mp
 	default:
 		return nil
 	}
@@ -331,8 +340,8 @@ func getMessageProvider(config map[string]map[string]string) message.MessageProv
 func getServiceConfig() map[string]map[string]string {
 	return map[string]map[string]string{
 		"app": {
-			"storage_provider": env.GetEnv("LH_STORAGE_PROVIDER", ""),
-			"message_provider": env.GetEnv("LH_MESSAGE_PROVIDER", ""),
+			"storage_provider": env.GetEnv("LH_STORAGE_PROVIDER", "local"),
+			"message_provider": env.GetEnv("LH_MESSAGE_PROVIDER", "local"),
 			"temp_folder":      env.GetEnv("LH_TEMP_FOLDER", "/tmp"),
 			"server_path":      "/srv/data",
 			"local_path":       "lighthouse",
@@ -351,6 +360,14 @@ func getServiceConfig() map[string]map[string]string {
 			"project":    env.GetEnv("GCP_PROJECT", ""),
 			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
 			"gcf_queue":  env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
+		},
+		"mongo":
+		{
+			"user":     env.GetEnv("MONGO_DATABASE_USERNAME", ""),
+			"pass":     env.GetEnv("MONGO_DATABASE_PASSWORD", ""),
+			"host":     env.GetEnv("MONGO_HOST", "localhost:27017"),
+			"database": env.GetEnv("MONGO_DATABASE_NAME", "queue"),
+			"queue":    env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
 		},
 		"tide":
 		{
