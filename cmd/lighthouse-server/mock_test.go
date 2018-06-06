@@ -9,8 +9,6 @@ import (
 	"errors"
 	"context"
 	"github.com/wptide/pkg/process"
-	"github.com/wptide/pkg/payload"
-	"github.com/wptide/pkg/storage"
 )
 
 /** ----------------------------------------------
@@ -191,35 +189,29 @@ func (m mockFailedProcess) GetFilesPath() string           { return "" }
 	Mock processes
  */
 
-func mockProcResponse(pre string, msg *message.Message) error {
+func mockProcResponse(pre string, msg message.Message) error {
 	if msg.Slug == pre + "Fail" {
 		return errors.New("something went wrong")
 	}
 	return nil
 }
 
-func MockDoIngest(msg *message.Message, result *process.Result, tempFolder string) error {
-	if msg.Slug == "resultSuccess" {
-		res := *result
-		res["responseSuccess"] = true
-		res["responseMessage"] = "Success!"
-		result = &res
+func MockDoProcess(proc process.Processor, msg message.Message, result *process.Result) error {
+	switch proc.(type) {
+	case *process.Ingest:
+		if msg.Slug == "resultSuccess" {
+			res := *result
+			res["responseSuccess"] = true
+			res["responseMessage"] = "Success!"
+			result = &res
+		}
+		return mockProcResponse("ingest", msg)
+	case *process.Info:
+		return mockProcResponse("info", msg)
+	case *process.Lighthouse:
+		return mockProcResponse("lh", msg)
+	case *process.Response:
+		return mockProcResponse("res", msg)
 	}
-	return mockProcResponse("ingest", msg)
-}
-
-func MockDoInfo(msg *message.Message, result *process.Result) error {
-	return mockProcResponse("info", msg)
-}
-
-func MockDoLighthouse(msg *message.Message, result *process.Result, tempFolder string, storageProvider storage.StorageProvider) error {
-	return mockProcResponse("lh", msg)
-}
-
-func MockDoPhpcs(msg *message.Message, result *process.Result, tempFolder string, storageProvider storage.StorageProvider, config map[string]interface{}) error {
-	return mockProcResponse("phpcs", msg)
-}
-
-func MockDoResponse(msg *message.Message, result *process.Result, payloaders map[string]payload.Payloader) error {
-	return mockProcResponse("res", msg)
+	return nil
 }

@@ -12,8 +12,6 @@ import (
 	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/payload"
 	"fmt"
-	commonProcess "github.com/xwp/go-tide/src/process"
-	commonPayload "github.com/xwp/go-tide/src/payload"
 	"flag"
 	"github.com/wptide/pkg/source"
 	"sync"
@@ -49,7 +47,7 @@ var (
 		"tide": payload.TidePayload{
 			Client: TideClient,
 		},
-		"local-file": commonPayload.FilePayload{
+		"local-file": payload.FilePayload{
 			TerminateChannel: terminateChannel,
 		},
 	}
@@ -94,10 +92,7 @@ var (
 	flagOutput = &[]string{""}[0]
 
 	// Process Functions
-	doIngest     = commonProcess.DoIngest
-	doInfo       = commonProcess.DoInfo
-	doLighthouse = commonProcess.DoLighthouse
-	doResponse   = commonProcess.DoResponse
+	doProcess = executeProcessFunc
 )
 
 func main() {
@@ -219,22 +214,33 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 	results := &process.Result{}
 
 	// Ingest.
-	if err := doIngest(&msg, results, procCfg.igTempFolder); err != nil {
+	ingestProc := &process.Ingest{
+		TempFolder: procCfg.igTempFolder,
+	}
+	if err := doProcess(ingestProc, msg, results); err != nil {
 		return err
 	}
 
 	// Info.
-	if err := doInfo(&msg, results); err != nil {
+	infoProc := &process.Info{}
+	if err := doProcess(infoProc, msg, results); err != nil {
 		return err
 	}
 
 	// Lighthouse.
-	if err := doLighthouse(&msg, results, procCfg.lhTempFolder, procCfg.lhStorageProvider); err != nil {
+	lighthouseProc := &process.Lighthouse{
+		TempFolder:      procCfg.lhTempFolder,
+		StorageProvider: procCfg.lhStorageProvider,
+	}
+	if err := doProcess(lighthouseProc, msg, results); err != nil {
 		return err
 	}
 
 	// Prepare Response.
-	if err := doResponse(&msg, results, payloaders); err != nil {
+	responseProc := &process.Response{
+		Payloaders: payloaders,
+	}
+	if err := doProcess(responseProc, msg, results); err != nil {
 		return err
 	}
 
@@ -296,6 +302,14 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 			time.Sleep(time.Second * time.Duration(2))
 		}
 	}()
+}
+
+// executeProcessFunc takes the incoming process and executes it.
+// This is assigned to `doProcess` to make it testable.
+func executeProcessFunc(proc process.Processor, msg message.Message, result *process.Result) error {
+	proc.SetMessage(msg)
+	proc.SetResults(result)
+	return proc.Do()
 }
 
 // getStorageProvider returns a storage provider given the provided configurations from

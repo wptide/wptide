@@ -18,12 +18,12 @@ import (
 	"github.com/wptide/pkg/storage/gcs"
 	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/tide/api"
-	commonPayload "github.com/xwp/go-tide/src/payload"
-	commonProcess "github.com/xwp/go-tide/src/process"
 	tideApi "github.com/wptide/pkg/tide"
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/message/firestore"
+	"strings"
 	"github.com/wptide/pkg/message/mongo"
+	"errors"
 )
 
 type processConfig struct {
@@ -41,6 +41,8 @@ var (
 	// PHPCS service configuration (as var so that we can also override).
 	serviceConfig = getServiceConfig()
 
+	PHPCompatibilityWPPath = "/root/.composer/vendor/wimg/php-compatibility/framework-rulesets/wordpress.xml"
+
 	/** Initialize interface instances **/
 	// Use the interface so that we can test.
 	TideClient tideApi.ClientInterface = &api.Client{}
@@ -50,7 +52,7 @@ var (
 		"tide": payload.TidePayload{
 			Client: TideClient,
 		},
-		"local-file": commonPayload.FilePayload{
+		"local-file": payload.FilePayload{
 			TerminateChannel: terminateChannel,
 		},
 	}
@@ -98,10 +100,8 @@ var (
 	flagWPRuleset = &[]string{""}[0]
 
 	// Process Functions
-	doIngest   = commonProcess.DoIngest
-	doInfo     = commonProcess.DoInfo
-	doPhpcs    = commonProcess.DoPhpcs
-	doResponse = commonProcess.DoResponse
+	doProcess      = executeProcessFunc
+	doPHPCSProcess = executePHPCSProcessFunc
 )
 
 func main() {
@@ -206,7 +206,7 @@ func main() {
 	// If -wp-phpcompat-ruleset was provided then override the ruleset path.
 	if *flagWPRuleset != "" {
 		if _, err := os.Stat(*flagWPRuleset); err == nil {
-			commonProcess.PHPCompatibilityWPPath = *flagWPRuleset
+			PHPCompatibilityWPPath = *flagWPRuleset
 		}
 	}
 
@@ -241,12 +241,16 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 	results := &process.Result{}
 
 	// Ingest.
-	if err := doIngest(&msg, results, procCfg.igTempFolder); err != nil {
+	ingestProc := &process.Ingest{
+		TempFolder: procCfg.igTempFolder,
+	}
+	if err := doProcess(ingestProc, msg, results); err != nil {
 		return err
 	}
 
 	// Info.
-	if err := doInfo(&msg, results); err != nil {
+	infoProc := &process.Info{}
+	if err := doProcess(infoProc, msg, results); err != nil {
 		return err
 	}
 
@@ -254,12 +258,20 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 	config := map[string]interface{}{
 		"parallel": 1,
 	}
-	if err := doPhpcs(&msg, results, procCfg.phpcsTempFolder, procCfg.phpcsStorageProvider, config); err != nil {
+	phpcsProc := &process.Phpcs{
+		TempFolder:      procCfg.phpcsTempFolder,
+		Config:          config,
+		StorageProvider: procCfg.phpcsStorageProvider,
+	}
+	if err := doPHPCSProcess(phpcsProc, msg, results); err != nil {
 		return err
 	}
 
 	// Prepare Response.
-	if err := doResponse(&msg, results, payloaders); err != nil {
+	responseProc := &process.Response{
+		Payloaders: payloaders,
+	}
+	if err := doProcess(responseProc, msg, results); err != nil {
 		return err
 	}
 
@@ -322,6 +334,57 @@ func pollProvider(c chan message.Message, provider message.MessageProvider) {
 			time.Sleep(time.Second * time.Duration(2))
 		}
 	}()
+}
+
+// executeProcessFunc takes the incoming process and executes it.
+// This is assigned to `doProcess` to make it testable.
+func executeProcessFunc(proc process.Processor, msg message.Message, result *process.Result) error {
+	proc.SetMessage(msg)
+	proc.SetResults(result)
+	return proc.Do()
+}
+
+// executePHPCSProcessFunc takes the incoming PHPCS process and executes it.
+// This is assigned to `doPHPCSProcess` to make it testable.
+func executePHPCSProcessFunc(proc process.Processor, msg message.Message, result *process.Result) error {
+	proc.SetResults(result)
+	res := *result
+	codeInfo, ok := res["info"].(tideApi.CodeInfo)
+
+	// If this is a theme or plugin then we need to tweak the incoming message
+	// to use the WordPress PHPCompatibility standards file.
+	if ok && (codeInfo.Type == "theme" || codeInfo.Type == "plugin") {
+		var newAuditsArray []*message.Audit
+		for _, audit := range msg.Audits {
+			newAudit := audit
+			if audit.Type == "phpcs" && audit.Options.Standard == "phpcompatibility" {
+				newAudit.Options.StandardOverride = PHPCompatibilityWPPath
+			}
+			newAuditsArray = append(newAuditsArray, newAudit)
+		}
+		msg.Audits = newAuditsArray
+	}
+
+	proc.SetMessage(msg)
+
+	errs := []string{}
+	for _, audit := range msg.Audits {
+		if audit.Type == "phpcs" {
+			res["phpcsCurrentAudit"] = audit
+			proc.SetResults(&res)
+			if err := proc.Do(); err != nil {
+				errs = append(errs, "PHPCS Error: "+err.Error())
+			}
+		}
+	}
+
+	concatErrs := strings.Join(errs, "\n")
+
+	if concatErrs == "" {
+		return nil
+	} else {
+		return errors.New(concatErrs)
+	}
 }
 
 // getStorageProvider returns a storage provider given the provided configurations from
