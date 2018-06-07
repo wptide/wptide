@@ -74,22 +74,23 @@ great detail when it comes to deploying Tide on GCP.
 
 ### Cloning
 
-Ensure you're in the directory where you would like to install Tide:
+To ensure easy opperation, clode using Go.
 
 ```
-git clone -b develop --recursive https://github.com/xwp/go-tide.git tide
+go get github.com/xwp/go-tide
 ```
 
 Change to Tide working directory:  
 
 ```
-cd tide
+cd $GOPATH/src/github.com/xwp/go-tide
 ```
 
 Update submodules:
 
 ```
-git submodule update --init --recursive
+git submodule update --init --recursive --remote
+git pull --recurse-submodules
 ```
 
 ### Setup
