@@ -10,13 +10,15 @@ import (
 	"time"
 
 	"github.com/wptide/pkg/message"
+	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/message/mongo"
+	"github.com/wptide/pkg/message/sqs"
+	"github.com/wptide/pkg/process"
 	"github.com/wptide/pkg/storage/gcs"
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/storage/s3"
-	commonProcess "github.com/xwp/go-tide/src/process"
-	"github.com/wptide/pkg/message/sqs"
-	"github.com/wptide/pkg/message/firestore"
-	"github.com/wptide/pkg/message/mongo"
+	"github.com/wptide/pkg/tide"
+	"errors"
 )
 
 var (
@@ -314,15 +316,11 @@ func Test_pollProvider(t *testing.T) {
 
 func Test_processMessage(t *testing.T) {
 
-	doIngest = MockDoIngest
-	doInfo = MockDoInfo
-	doPhpcs = MockDoPhpcs
-	doResponse = MockDoResponse
+	doProcess = MockDoProcess
+	doPHPCSProcess = MockDoProcess
 	defer func() {
-		doIngest = commonProcess.DoIngest
-		doInfo = commonProcess.DoInfo
-		doPhpcs = commonProcess.DoPhpcs
-		doResponse = commonProcess.DoResponse
+		doProcess = executeProcessFunc
+		doPHPCSProcess = executePHPCSProcessFunc
 	}()
 
 	cMessageProvider := messageProvider
@@ -509,8 +507,7 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "sqs",
 					},
-					"aws":
-					{
+					"aws": {
 						"key":        "",
 						"secret":     "",
 						"sqs_region": "",
@@ -528,8 +525,7 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "firestore",
 					},
-					"gcp":
-					{
+					"gcp": {
 						"project":   "mock-project-id",
 						"gcf_queue": "test-queue",
 					},
@@ -544,13 +540,12 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "local",
 					},
-					"mongo":
-					{
-						"user": "test",
-						"pass": "test",
-						"host": "localhost:27017",
+					"mongo": {
+						"user":     "test",
+						"pass":     "test",
+						"host":     "localhost:27017",
 						"database": "test-db",
-						"queue": "test-queue",
+						"queue":    "test-queue",
 					},
 				},
 			},
@@ -561,6 +556,92 @@ func Test_getMessageProvider(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getMessageProvider(tt.args.config); reflect.TypeOf(got) != tt.want {
 				t.Errorf("getMessageProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
+	}
+}
+
+func Test_executePHPCSProcessFunc(t *testing.T) {
+	type args struct {
+		proc   process.Processor
+		msg    message.Message
+		result *process.Result
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			"Invalid project type",
+			args{
+				&mockPHPCSProcess{},
+				message.Message{},
+				&process.Result{
+					"info": tide.CodeInfo{
+						"invalid",
+						nil,
+						nil,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"With Standard",
+			args{
+				&mockPHPCSProcess{},
+				message.Message{
+					Audits: []*message.Audit{
+						{
+							"phpcs",
+							&message.AuditOption{
+								Standard: "phpcompatibility",
+							},
+						},
+					},
+				},
+				&process.Result{
+					"info": tide.CodeInfo{
+						"theme",
+						nil,
+						nil,
+					},
+				},
+			},
+			false,
+		},
+		{
+			"With Standard - Fail",
+			args{
+				&mockPHPCSProcess{
+					err: errors.New("something went wrong"),
+				},
+				message.Message{
+					Audits: []*message.Audit{
+						{
+							"phpcs",
+							&message.AuditOption{
+								Standard: "phpcompatibility",
+							},
+						},
+					},
+				},
+				&process.Result{
+					"info": tide.CodeInfo{
+						"theme",
+						nil,
+						nil,
+					},
+				},
+			},
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := executePHPCSProcessFunc(tt.args.proc, tt.args.msg, tt.args.result); (err != nil) != tt.wantErr {
+				t.Errorf("executePHPCSProcessFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

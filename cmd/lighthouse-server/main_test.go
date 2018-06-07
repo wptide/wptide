@@ -13,7 +13,6 @@ import (
 	"github.com/wptide/pkg/storage/gcs"
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/storage/s3"
-	commonProcess "github.com/xwp/go-tide/src/process"
 	"github.com/wptide/pkg/message/firestore"
 	"github.com/wptide/pkg/message/sqs"
 	"github.com/wptide/pkg/message/mongo"
@@ -269,15 +268,9 @@ func Test_pollProvider(t *testing.T) {
 
 func Test_processMessage(t *testing.T) {
 
-	doIngest = MockDoIngest
-	doInfo = MockDoInfo
-	doLighthouse = MockDoLighthouse
-	doResponse = MockDoResponse
+	doProcess = MockDoProcess
 	defer func() {
-		doIngest = commonProcess.DoIngest
-		doInfo = commonProcess.DoInfo
-		doLighthouse = commonProcess.DoLighthouse
-		doResponse = commonProcess.DoResponse
+		doProcess = executeProcessFunc
 	}()
 
 	cMessageProvider := messageProvider

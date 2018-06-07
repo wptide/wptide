@@ -1,5 +1,5 @@
-hash: fb5913a0ceb0d460dabb2f43d05cee6586186634adc3377d59f18454507e2f70
-updated: 2018-06-01T12:50:09.350554511+10:00
+hash: bb89f812b6d57d22230929046e40b0ee4967623c289d6e0796155ee0b4fc6187
+updated: 2018-06-06T14:53:57.85380091+10:00
 imports:
 - name: cloud.google.com/go
   version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
@@ -58,7 +58,7 @@ imports:
 - name: github.com/go-stack/stack
   version: 259ab82a6cad3992b4e21ff5cac294ccb06474bc
 - name: github.com/golang/protobuf
-  version: 3a3da3a4e26776cc22a79ef46d5d58477532dede
+  version: 64db29d85ff91ba669cfaf009d5f400a4da8a55f
   subpackages:
   - proto
   - protoc-gen-go/descriptor
@@ -112,7 +112,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 8006f2a48d79f997753f045f198b1b3e785aa080
+  version: f8c71ef7509a2536f06bb3754ff3f824a48c6d03
   subpackages:
   - env
   - log
@@ -140,9 +140,10 @@ imports:
   - wrapper/firestore
   - wrapper/mongo
 - name: go.opencensus.io
-  version: c3ed530f775d85e577ca652cb052a52c078aad26
+  version: 57c74344f14bef266fd8bae3e3b8e67920295263
   subpackages:
   - exporter/stackdriver/propagation
+  - exporterutil
   - internal
   - internal/tagencoding
   - plugin/ocgrpc
@@ -156,11 +157,11 @@ imports:
   - trace/internal
   - trace/propagation
 - name: golang.org/x/crypto
-  version: ab813273cd59e1333f7ae7bff5d027d4aadf528c
+  version: b47b1587369238182299fe4dad77d05b8b461e06
   subpackages:
   - pbkdf2
 - name: golang.org/x/net
-  version: dfa909b99c79129e1100513e5cd36307665e5723
+  version: 1e491301e022f8f977054da4c2d852decd59571f
   subpackages:
   - context
   - context/ctxhttp
@@ -171,7 +172,7 @@ imports:
   - internal/timeseries
   - trace
 - name: golang.org/x/oauth2
-  version: 770e5ebd4ab27c4d70b0983674d138217f5e2c72
+  version: 1e0a3fa8ba9a5c9eb35c271780101fdaf1b205d7
   subpackages:
   - google
   - internal
@@ -189,7 +190,7 @@ imports:
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/api
-  version: 8180fb51da879301a8ddb7e2ee122ca5862da7f5
+  version: 00e3bb8d04691e25ee2fccf98c866bcb7925c3ec
   subpackages:
   - gensupport
   - googleapi
@@ -217,7 +218,7 @@ imports:
   - socket
   - urlfetch
 - name: google.golang.org/genproto
-  version: 694d95ba50e67b2e363f3483057db5d4910c18f9
+  version: 81158efcc9f219c511e4d3c0d61a0e6e49c01a24
   subpackages:
   - googleapis/api/annotations
   - googleapis/firestore/v1beta1
@@ -226,7 +227,7 @@ imports:
   - googleapis/rpc/status
   - googleapis/type/latlng
 - name: google.golang.org/grpc
-  version: 1fa3750c9a209f5efbdc2722d40f2657885af5e5
+  version: 96cefb43cfc8b2cd3fed9f19f59830bc69e30093
   subpackages:
   - balancer
   - balancer/base
@@ -238,9 +239,9 @@ imports:
   - credentials/oauth
   - encoding
   - encoding/proto
-  - grpclb/grpc_lb_v1/messages
   - grpclog
   - internal
+  - internal/grpcrand
   - keepalive
   - metadata
   - naming
