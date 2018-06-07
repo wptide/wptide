@@ -1,6 +1,7 @@
 FROM gcr.io/google-appengine/php72:latest
 
-RUN apt-get install -y autoconf make gcc
+# Update repos & Install GCC
+RUN apt-get update && apt-get install -y autoconf make gcc
 
 # Install Xdebug
 RUN yes | pecl install xdebug \
