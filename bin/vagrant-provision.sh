@@ -51,6 +51,12 @@ fi
 # Move to the root of the project.
 cd /vagrant
 
+# Build all service Docker images.
+make build.images
+
+# Build all Go binaries
+make build.bins
+
 make api.tpl
 make api.composer
 make api.up
