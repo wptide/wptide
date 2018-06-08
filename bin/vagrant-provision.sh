@@ -12,9 +12,12 @@ REPOS=(
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
+# Add Glide for Golang
+sudo add-apt-repository ppa:masterminds/glide -y
+
 sudo apt-get update
 sudo apt-get install -y \
-	docker-ce avahi-daemon git php-cli php-xml zip golang-go
+	docker-ce avahi-daemon git php-cli php-xml zip golang-go glide
 
 # Install various binary scripts.
 for REPOSET in "${REPOS[@]}"; do
