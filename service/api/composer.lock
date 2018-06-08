@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "706752cdc77c59e4b92331f56d0e9ddc",
+    "content-hash": "fc2e085274493f2ba89d8047e7da98ed",
     "packages": [
         {
             "name": "composer/installers",
@@ -382,21 +382,21 @@
         },
         {
             "name": "google/gax",
-            "version": "0.33.0",
+            "version": "0.33.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/gax-php.git",
-                "reference": "9f975d6ebf2b7c7a064c22e3f7fc6818052fd387"
+                "reference": "9d15f56374ab3940f5f11761cfefc7dfb18ea363"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/gax-php/zipball/9f975d6ebf2b7c7a064c22e3f7fc6818052fd387",
-                "reference": "9f975d6ebf2b7c7a064c22e3f7fc6818052fd387",
+                "url": "https://api.github.com/repos/googleapis/gax-php/zipball/9d15f56374ab3940f5f11761cfefc7dfb18ea363",
+                "reference": "9d15f56374ab3940f5f11761cfefc7dfb18ea363",
                 "shasum": ""
             },
             "require": {
                 "google/auth": "^1.2.0",
-                "google/protobuf": "^3.5.1",
+                "google/protobuf": "3.5.*",
                 "grpc/grpc": "^1.4",
                 "guzzlehttp/promises": "^1.3",
                 "guzzlehttp/psr7": "^1.2",
@@ -429,7 +429,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2018-05-24T17:47:50+00:00"
+            "time": "2018-06-07T17:09:36+00:00"
         },
         {
             "name": "google/proto-client",
@@ -4552,11 +4552,13 @@
     "prefer-lowest": false,
     "platform": {
         "php": "7.2.*",
-        "ext-redis": "*"
+        "ext-redis": "*",
+        "ext-mongodb": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.2",
-        "ext-redis": "3.2"
+        "ext-redis": "3.2",
+        "ext-mongodb": "1.4.3"
     }
 }

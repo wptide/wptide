@@ -8,6 +8,7 @@
   "require": {
     "php": "7.2.*",
     "ext-redis": "*",
+    "ext-mongodb": "*",
     "google/cloud": "0.67",
     "johnpbloch/wordpress-core-installer": "^1",
     "johnpbloch/wordpress-core": "4.9.6",
@@ -43,7 +44,8 @@
   "config": {
     "platform": {
       "php": "7.2",
-      "ext-redis": "3.2"
+      "ext-redis": "3.2",
+      "ext-mongodb": "1.4.3"
     }
   }
 }
