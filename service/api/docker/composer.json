@@ -1,6 +1,7 @@
 {
   "require": {
     "php": "7.2.*",
-    "ext-redis": "*"
+    "ext-redis": "*",
+    "ext-grpc": "*"
   }
 }
