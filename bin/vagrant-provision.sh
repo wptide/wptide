@@ -59,5 +59,5 @@ make build.bins
 
 make api.tpl
 make api.composer
-make api.up
+make api.upd
 make api.setup
