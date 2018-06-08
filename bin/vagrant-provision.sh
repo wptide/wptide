@@ -33,10 +33,15 @@ for REPOSET in "${REPOS[@]}"; do
 	done <<< "$REPOSET"
 done
 
-# Add docker user group to avoid using sudo.
-sudo groupadd docker
+# Add user to docker group to avoid using sudo.
 sudo usermod -aG docker $USER
 newgrp docker
+
+# Setup Golang environment.
+mkdir -p ~/go/src
+export GOPATH=~/go
+echo "export GOPATH=~/go" >> ~/.bashrc
+echo "export PATH=\$PATH:\$GOPATH/bin" >> ~/.bashrc
 
 # Ensure we have the environment defined.
 if [ ! -f /vagrant/.env ]; then
