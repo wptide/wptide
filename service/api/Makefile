@@ -14,6 +14,10 @@ api.usage:
 api.up:
 	@docker-compose up api-php
 
+# Start the API Docker daemon.
+api.upd:
+	@docker-compose up -d api-php
+
 # Take the isolated API Docker images down.
 api.down: api.stop api.rm
 
