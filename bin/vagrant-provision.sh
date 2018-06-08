@@ -33,6 +33,7 @@ done
 # Add docker user group to avoid using sudo.
 sudo groupadd docker
 sudo usermod -aG docker $USER
+newgrp docker
 
 # Ensure we have the environment defined.
 if [ ! -f /vagrant/.env ]; then
