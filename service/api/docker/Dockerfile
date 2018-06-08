@@ -4,19 +4,10 @@ COPY composer.json ${APP_DIR}/composer.json
 
 RUN /build-scripts/composer.sh
 
-RUN apt-get update && apt-get install -y autoconf make gcc
-
-# Get and make mongodb PHP driver
-RUN yes | apt-get install libssl-dev \
-	&& git clone https://github.com/mongodb/mongo-php-driver.git --recursive \
-	&& cd mongo-php-driver \
-	&& phpize \
-	&& ./configure --with-mongodb-ssl=openssl \
-	&& make all \
-	&& make install \
-	&& echo "extension=mongodb.so" > /opt/php${SHORT_VERSION}/lib/conf.d/ext-mongodb.ini \
-	&& cd .. \
-	&& rm -rf mongo-php-driver
+RUN apt-get update && apt-get install -y \
+    autoconf \
+    make \
+    gcc
 
 # Install Xdebug
 RUN yes | pecl install xdebug \
