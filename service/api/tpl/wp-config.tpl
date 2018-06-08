@@ -155,6 +155,9 @@ if ( true === WP_CACHE ) {
  */
 define( 'WP_DEBUG', ! $is_gae );
 
+// API configuration settings.
+define( 'API_MESSAGE_PROVIDER', getenv( 'API_MESSAGE_PROVIDER' ) );
+
 // AWS API settings.
 define( 'AWS_API_KEY',         getenv( 'AWS_API_KEY' ) );
 define( 'AWS_API_SECRET',      getenv( 'AWS_API_SECRET' ) );
@@ -169,6 +172,26 @@ define( 'AWS_SQS_QUEUE_LH',    getenv( 'AWS_SQS_QUEUE_LH' ) );
 define( 'AWS_SQS_QUEUE_PHPCS', getenv( 'AWS_SQS_QUEUE_PHPCS' ) );
 define( 'AWS_SQS_REGION',      getenv( 'AWS_SQS_REGION' ) );
 define( 'AWS_SQS_VERSION',     getenv( 'AWS_SQS_VERSION' ) );
+
+// Firestore settings.
+define( 'GCF_QUEUE_LH', getenv( 'GCF_QUEUE_LH' ) );
+define( 'GCF_QUEUE_PHPCS', getenv( 'GCF_QUEUE_PHPCS' ) );
+define( 'GCP_PROJECT', getenv( 'GCP_PROJECT' ) );
+
+// MongoDB settings.
+define( 'MONGO_DATABASE_NAME', getenv( 'MONGO_DATABASE_NAME' ) );
+define( 'MONGO_DATABASE_PASSWORD', getenv( 'MONGO_DATABASE_PASSWORD' ) );
+define( 'MONGO_DATABASE_USERNAME', getenv( 'MONGO_DATABASE_USERNAME' ) );
+define( 'MONGO_QUEUE_LH', getenv( 'MONGO_QUEUE_LH' ) );
+define( 'MONGO_QUEUE_PHPCS', getenv( 'MONGO_QUEUE_PHPCS' ) );
+
+// Swap localhost:27017 (or empty) for some docker-compose magic.
+if ( ('localhost:27017' === getenv( 'MONGO_HOST' ) || empty( getenv( 'MONGO_HOST' ) ) ) && ! $is_gae ) {
+	define( 'MONGO_HOST', 'mongo:27017' );
+} else {
+	define( 'MONGO_HOST', getenv( 'MONGO_HOST' ) );
+}
+
 
 /* That's all, stop editing! Happy blogging. */
 
