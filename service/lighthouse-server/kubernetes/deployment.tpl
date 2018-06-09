@@ -30,6 +30,7 @@ spec:
       containers:
       - image: ${GCR_LH_IMAGE_TAG}
         name: ${GKE_LH_CLUSTER}
+        terminationMessagePolicy: FallbackToLogsOnError
         env:
         - name: API_AUTH_URL
           value: "${API_AUTH_URL}"
@@ -73,6 +74,18 @@ spec:
           value: "${AWS_SQS_VERSION}"
         - name: LH_CONCURRENT_AUDITS
           value: "${LH_CONCURRENT_AUDITS}"
+        - name: LH_MESSAGE_PROVIDER
+          value: "${LH_MESSAGE_PROVIDER}"
+        - name: LH_STORAGE_PROVIDER
+          value: "${LH_STORAGE_PROVIDER}"
+        - name: LH_TEMP_FOLDER
+          value: "${LH_TEMP_FOLDER}"
+        - name: GCF_QUEUE_LH
+          value: "${GCF_QUEUE_LH}"
+        - name: GCP_PROJECT
+          value: "${GCP_PROJECT}"
+        - name: GCS_BUCKET_NAME
+          value: "${GCS_BUCKET_NAME}"
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler

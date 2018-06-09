@@ -1,8 +1,23 @@
-hash: 1247cfc96c7bb10720c466f7f4140cd681441f4b68272d5c591d760c1fc83c49
-updated: 2018-03-08T21:35:55.006913468-08:00
+hash: bb89f812b6d57d22230929046e40b0ee4967623c289d6e0796155ee0b4fc6187
+updated: 2018-06-06T14:53:57.85380091+10:00
 imports:
+- name: cloud.google.com/go
+  version: 0fd7230b2a7505833d5f69b75cbd6c9582401479
+  subpackages:
+  - compute/metadata
+  - firestore
+  - firestore/apiv1beta1
+  - iam
+  - internal
+  - internal/atomiccache
+  - internal/btree
+  - internal/fields
+  - internal/optional
+  - internal/trace
+  - internal/version
+  - storage
 - name: github.com/aws/aws-sdk-go
-  version: bafcd9ccc717e9bc5406acaea370577299223873
+  version: 827e7eac8c2680d5bdea7bc3ef29c596eabe1eae
   subpackages:
   - aws
   - aws/awserr
@@ -20,6 +35,7 @@ imports:
   - aws/request
   - aws/session
   - aws/signer/v4
+  - internal/sdkio
   - internal/sdkrand
   - internal/shareddefaults
   - private/protocol
@@ -38,34 +54,207 @@ imports:
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/go-ini/ini
-  version: 6333e38ac20b8949a8dd68baa3650f4dee8f39f0
+  version: 06f5f3d67269ccec1fe5fe4134ba6e982984f7f5
+- name: github.com/go-stack/stack
+  version: 259ab82a6cad3992b4e21ff5cac294ccb06474bc
+- name: github.com/golang/protobuf
+  version: 64db29d85ff91ba669cfaf009d5f400a4da8a55f
+  subpackages:
+  - proto
+  - protoc-gen-go/descriptor
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/empty
+  - ptypes/struct
+  - ptypes/timestamp
+  - ptypes/wrappers
+- name: github.com/googleapis/gax-go
+  version: 254b60fe060127b9fd3c420fadd0906bf0382227
 - name: github.com/hhatto/gocloc
-  version: 7b315f8ae7054b69fbbe05c61fb5b2e645c368f3
+  version: 2530ab030fbe40407f12de1f90f01f277bbae0e9
 - name: github.com/jcelliott/lumber
   version: dd349441af25132d146d7095c6693a15431fc9b1
 - name: github.com/jmespath/go-jmespath
   version: c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5
+- name: github.com/mongodb/mongo-go-driver
+  version: de03a35e8661ae6df623f41ec8f616ffd8ef6131
+  subpackages:
+  - bson
+  - bson/builder
+  - bson/decimal
+  - bson/elements
+  - bson/internal/jsonparser
+  - bson/objectid
+  - bson/parser
+  - bson/parser/ast
+  - core/address
+  - core/auth
+  - core/auth/internal/gssapi
+  - core/command
+  - core/connection
+  - core/connstring
+  - core/description
+  - core/dispatch
+  - core/option
+  - core/readconcern
+  - core/readpref
+  - core/result
+  - core/tag
+  - core/topology
+  - core/version
+  - core/wiremessage
+  - core/writeconcern
+  - internal
+  - mongo
 - name: github.com/nanobox-io/golang-scribble
   version: ced58d671850da57ce8c11315424513b608083d7
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: 44de1a263a1d498882d1f37fdc41faaa0b0d6a07
+  version: 05f3be7becfadf5255fdf0f57ac678a50c5ada7b
   subpackages:
+  - env
+  - log
   - message
+  - message/firestore
+  - message/mongo
   - message/sqs
   - payload
+  - phpcompat
   - pipe
   - process
+  - process/phpcs
+  - shell
   - source
+  - source/zip
   - storage
+  - storage/gcs
+  - storage/local
   - storage/s3
   - sync
+  - sync/firestore
   - tide
   - tide/api
   - wporg
+  - wrapper/firestore
+  - wrapper/mongo
+- name: go.opencensus.io
+  version: 57c74344f14bef266fd8bae3e3b8e67920295263
+  subpackages:
+  - exporter/stackdriver/propagation
+  - exporterutil
+  - internal
+  - internal/tagencoding
+  - plugin/ocgrpc
+  - plugin/ochttp
+  - plugin/ochttp/propagation/b3
+  - stats
+  - stats/internal
+  - stats/view
+  - tag
+  - trace
+  - trace/internal
+  - trace/propagation
+- name: golang.org/x/crypto
+  version: b47b1587369238182299fe4dad77d05b8b461e06
+  subpackages:
+  - pbkdf2
+- name: golang.org/x/net
+  version: 1e491301e022f8f977054da4c2d852decd59571f
+  subpackages:
+  - context
+  - context/ctxhttp
+  - http/httpguts
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - trace
+- name: golang.org/x/oauth2
+  version: 1e0a3fa8ba9a5c9eb35c271780101fdaf1b205d7
+  subpackages:
+  - google
+  - internal
+  - jws
+  - jwt
+- name: golang.org/x/sync
+  version: 1d60e4601c6fd243af51cc01ddf169918a5407ca
+  subpackages:
+  - semaphore
+- name: golang.org/x/text
+  version: 5c1cf69b5978e5a34c5f9ba09a83e56acc4b7877
+  subpackages:
+  - secure/bidirule
+  - transform
+  - unicode/bidi
+  - unicode/norm
+- name: google.golang.org/api
+  version: 00e3bb8d04691e25ee2fccf98c866bcb7925c3ec
+  subpackages:
+  - gensupport
+  - googleapi
+  - googleapi/internal/uritemplates
+  - googleapi/transport
+  - internal
+  - iterator
+  - option
+  - storage/v1
+  - transport
+  - transport/grpc
+  - transport/http
+- name: google.golang.org/appengine
+  version: b1f26356af11148e710935ed1ac8a7f5702c7612
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
+  - internal/socket
+  - internal/urlfetch
+  - socket
+  - urlfetch
+- name: google.golang.org/genproto
+  version: 81158efcc9f219c511e4d3c0d61a0e6e49c01a24
+  subpackages:
+  - googleapis/api/annotations
+  - googleapis/firestore/v1beta1
+  - googleapis/iam/v1
+  - googleapis/rpc/code
+  - googleapis/rpc/status
+  - googleapis/type/latlng
+- name: google.golang.org/grpc
+  version: 96cefb43cfc8b2cd3fed9f19f59830bc69e30093
+  subpackages:
+  - balancer
+  - balancer/base
+  - balancer/roundrobin
+  - channelz
+  - codes
+  - connectivity
+  - credentials
+  - credentials/oauth
+  - encoding
+  - encoding/proto
+  - grpclog
+  - internal
+  - internal/grpcrand
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - resolver
+  - resolver/dns
+  - resolver/passthrough
+  - stats
+  - status
+  - tap
+  - transport
 - name: gopkg.in/src-d/enry.v1
-  version: 0db3b4b5536e6dc4d9109d42897c00a5d92af0a7
+  version: 6712d4219fb747194f38d0fc72121ca0a46ebcea
   subpackages:
   - data
   - internal/tokenizer

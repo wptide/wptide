@@ -22,34 +22,7 @@ type sqsDispatcher struct {
 
 func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {
 
-	msg := &message.Message{
-		ResponseAPIEndpoint: apiEndpoint,
-		Title:               project.Name,
-		Slug:                project.Slug,
-		SourceType:          "zip",
-		RequestClient:       apiClient,
-		Force:               forcedSync,
-		Visibility:          auditVisibility,
-		Standards:           defaultStandards(),
-		Audits:              defaultAudits(),
-		PayloadType:         "tide",
-	}
-
-	switch project.Type {
-	case "themes":
-		msg.SourceURL = "https://downloads.wordpress.org/theme/" + project.Slug + "." + project.Version + ".zip"
-		msg.ProjectType = "theme"
-		msg.Content = project.Description
-		msg.Standards = append(msg.Standards, "lighthouse")
-		*msg.Audits = append(*msg.Audits, message.Audit{
-			Type:    "lighthouse",
-			Options: &message.AuditOption{},
-		})
-	case "plugins":
-		msg.SourceURL = project.DownloadLink
-		msg.ProjectType = "plugin"
-		msg.Content = project.ShortDescription
-	}
+	msg := getDispatchMessage(project)
 
 	for queueID, queue := range s.Queues {
 
@@ -75,6 +48,16 @@ func (s *sqsDispatcher) Init() error {
 		if ! ok {
 			queueProvider = sqs.NewSqsProvider(queue.Region, queue.Key, queue.Secret, queue.Queue)
 			s.providers[queueID] = queueProvider
+		}
+	}
+	return nil
+}
+
+func (s *sqsDispatcher) Close() error {
+	for queueID, _ := range s.Queues {
+		queueProvider, ok := s.providers[queueID]
+		if ok {
+			queueProvider.Close()
 		}
 	}
 	return nil

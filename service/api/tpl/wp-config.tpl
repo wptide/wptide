@@ -18,13 +18,15 @@
  * @package WordPress
  */
 
-// Register GCS stream wrapper
-require_once( __DIR__ . '/../vendor/autoload.php' );
-$storageClient = new Google\Cloud\Storage\StorageClient();
-$storageClient->registerStreamWrapper();
-
 // $is_gae is true on Google App Engine.
 $is_gae = ( getenv( 'GAE_VERSION' ) !== false );
+
+// Register GCS stream wrapper
+if ( $is_gae || 'gcs' === getenv( 'API_UPLOAD_HANDLER' ) ) {
+    require_once( __DIR__ . '/../vendor/autoload.php' );
+    $storageClient = new Google\Cloud\Storage\StorageClient();
+    $storageClient->registerStreamWrapper();
+}
 
 // Disable pseudo cron behavior
 define( 'DISABLE_WP_CRON', true );
@@ -131,6 +133,12 @@ if ( true === WP_CACHE ) {
         'debug'               => getenv( 'API_CACHE_DEBUG' ),
         'gzip'                => true,
     );
+
+    // Cloud Memorystore does not need to authorize.
+    if ( $is_gae ) {
+        unset( $redis_server['auth'] );
+        unset( $redis_page_cache_config['redis_auth'] );
+    }
 }
 
 /**
@@ -147,6 +155,9 @@ if ( true === WP_CACHE ) {
  */
 define( 'WP_DEBUG', ! $is_gae );
 
+// API configuration settings.
+define( 'API_MESSAGE_PROVIDER', getenv( 'API_MESSAGE_PROVIDER' ) );
+
 // AWS API settings.
 define( 'AWS_API_KEY',         getenv( 'AWS_API_KEY' ) );
 define( 'AWS_API_SECRET',      getenv( 'AWS_API_SECRET' ) );
@@ -161,6 +172,21 @@ define( 'AWS_SQS_QUEUE_LH',    getenv( 'AWS_SQS_QUEUE_LH' ) );
 define( 'AWS_SQS_QUEUE_PHPCS', getenv( 'AWS_SQS_QUEUE_PHPCS' ) );
 define( 'AWS_SQS_REGION',      getenv( 'AWS_SQS_REGION' ) );
 define( 'AWS_SQS_VERSION',     getenv( 'AWS_SQS_VERSION' ) );
+
+// Cloud Firestore settings.
+define( 'GCF_QUEUE_LH',    getenv( 'GCF_QUEUE_LH' ) );
+define( 'GCF_QUEUE_PHPCS', getenv( 'GCF_QUEUE_PHPCS' ) );
+define( 'GCP_PROJECT',     getenv( 'GCP_PROJECT' ) );
+
+// MongoDB settings.
+if ( 'local' === API_MESSAGE_PROVIDER ) {
+	define( 'MONGO_DATABASE_NAME',     getenv( 'MONGO_DATABASE_NAME' ) );
+	define( 'MONGO_DATABASE_PASSWORD', getenv( 'MONGO_DATABASE_PASSWORD' ) );
+	define( 'MONGO_DATABASE_USERNAME', getenv( 'MONGO_DATABASE_USERNAME' ) );
+	define( 'MONGO_HOST',              'mongo:27017' );
+	define( 'MONGO_QUEUE_LH',          getenv( 'MONGO_QUEUE_LH' ) );
+	define( 'MONGO_QUEUE_PHPCS',       getenv( 'MONGO_QUEUE_PHPCS' ) );
+}
 
 /* That's all, stop editing! Happy blogging. */
 

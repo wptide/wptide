@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:edge
 
 MAINTAINER XWP <engage@xwp.co>
 
@@ -20,7 +20,7 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
         ttf-freefont \
         udev \
     && npm i -g npm \
-    && npm i -g lighthouse \
+    && npm i -g lighthouse@next \
     && runDeps="$( \
         scanelf --needed --nobanner --recursive /usr/local \
             | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \

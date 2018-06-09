@@ -9,8 +9,6 @@ import (
 	"errors"
 	"context"
 	"github.com/wptide/pkg/process"
-	"github.com/wptide/pkg/storage"
-	"github.com/wptide/pkg/payload"
 )
 
 /** ----------------------------------------------
@@ -118,6 +116,10 @@ func (m mockMessageProvider) DeleteMessage(ref *string) error {
 	return nil
 }
 
+func (m mockMessageProvider) Close() error {
+	return nil
+}
+
 /** ----------------------------------------------
 	Mock Tide Client
  */
@@ -151,68 +153,55 @@ var testFileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWri
 }))
 
 /** ----------------------------------------------
-	Mock failed process
+	Mock phpcs process
  */
-type mockFailedProcess struct {
-	option    string
-	shouldErr bool
+type mockPHPCSProcess struct {
+	err error
 }
 
-func (m mockFailedProcess) Run(errc *chan error) error {
+func (m mockPHPCSProcess) Run(errc *chan error) error     { return nil }
+func (m mockPHPCSProcess) SetContext(ctx context.Context) {}
+func (m mockPHPCSProcess) SetMessage(msg message.Message) {}
+func (m mockPHPCSProcess) GetMessage() message.Message    { return message.Message{} }
+func (m mockPHPCSProcess) SetResults(res *process.Result) {}
+func (m mockPHPCSProcess) GetResult() *process.Result     { return nil }
+func (m mockPHPCSProcess) SetFilesPath(path string)       {}
+func (m mockPHPCSProcess) GetFilesPath() string           { return "" }
 
-	switch m.option {
-	case "error":
-		*errc <- errors.New("something went wrong")
+func (m mockPHPCSProcess) Do() error {
+	if m.err != nil {
+		return m.err
 	}
-
-	if m.shouldErr {
-		return errors.New("something went wrong with setup")
-	}
-
 	return nil
 }
-
-func (m mockFailedProcess) SetContext(ctx context.Context) {}
-func (m mockFailedProcess) SetMessage(msg message.Message) {}
-func (m mockFailedProcess) GetMessage() message.Message    { return message.Message{} }
-func (m mockFailedProcess) SetResults(res *process.Result) {}
-func (m mockFailedProcess) GetResult() *process.Result     { return nil }
-func (m mockFailedProcess) SetFilesPath(path string)       {}
-func (m mockFailedProcess) GetFilesPath() string           { return "" }
 
 /** ----------------------------------------------
 	Mock processes
  */
 
-func mockProcResponse(pre string, msg *message.Message) error {
-	if msg.Slug == pre + "Fail" {
+func mockProcResponse(pre string, msg message.Message) error {
+	if msg.Slug == pre+"Fail" {
 		return errors.New("something went wrong")
 	}
 	return nil
 }
 
-func MockDoIngest(msg *message.Message, result *process.Result, tempFolder string) error {
-	if msg.Slug == "resultSuccess" {
-		res := *result
-		res["responseSuccess"] = true
-		res["responseMessage"] = "Success!"
-		result = &res
+func MockDoProcess(proc process.Processor, msg message.Message, result *process.Result) error {
+	switch proc.(type) {
+	case *process.Ingest:
+		if msg.Slug == "resultSuccess" {
+			res := *result
+			res["responseSuccess"] = true
+			res["responseMessage"] = "Success!"
+			result = &res
+		}
+		return mockProcResponse("ingest", msg)
+	case *process.Info:
+		return mockProcResponse("info", msg)
+	case *process.Phpcs:
+		return mockProcResponse("phpcs", msg)
+	case *process.Response:
+		return mockProcResponse("res", msg)
 	}
-	return mockProcResponse("ingest", msg)
-}
-
-func MockDoInfo(msg *message.Message, result *process.Result) error {
-	return mockProcResponse("info", msg)
-}
-
-func MockDoLighthouse(msg *message.Message, result *process.Result, tempFolder string, storageProvider storage.StorageProvider) error {
-	return mockProcResponse("lh", msg)
-}
-
-func MockDoPhpcs(msg *message.Message, result *process.Result, tempFolder string, storageProvider storage.StorageProvider, config map[string]interface{}) error {
-	return mockProcResponse("phpcs", msg)
-}
-
-func MockDoResponse(msg *message.Message, result *process.Result, payloaders map[string]payload.Payloader) error {
-	return mockProcResponse("res", msg)
+	return nil
 }

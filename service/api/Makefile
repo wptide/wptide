@@ -9,6 +9,9 @@ api.usage:
 	@echo "\tapi.tpl:\n\t\t- Generate the API templates."
 	@echo "\tapi.deploy.sql:\n\t\t- Deploy the Cloud SQL database & setup the users."
 	@echo "\tapi.deploy.app:\n\t\t- Deploy the API to Google App Engine."
+	@echo "\tapi.deploy.redis:\n\t\t- Deploy the Google Cloud Memorystore Redis instance."
+	@echo "\tapi.get.redis:\n\t\t- Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance"
+	@echo "\tapi.clean.redis:\n\t\t- Delete the Google Cloud Memorystore Redis instance."
 
 # Run the API Docker images in isolation with docker-compose up.
 api.up:
@@ -58,5 +61,22 @@ api.deploy.sql:
 	@gcloud sql users create ${GCSQL_API_DB_USER} % --instance ${GCSQL_API_INSTANCE} --password "${GCSQL_API_DB_PASSWORD}"
 
 # Deploy the API to Google App Engine.
-api.deploy.app:
+api.deploy.app: api.tpl
 	@cd service/api && gcloud app deploy --promote --stop-previous-version app.yaml cron.yaml && cd --
+
+# Deploy the Google Cloud Memorystore Redis instance.
+api.deploy.redis: config
+	@gcloud beta redis instances create ${GCM_INSTANCE_NAME} \
+	--region=${GCP_REGION} \
+	--zone=${GCP_ZONE} \
+	--size=${GCM_INSTANCE_SIZE} \
+	--tier=${GCM_INSTANCE_TIER} \
+	--redis-config=maxmemory-policy=allkeys-lru
+
+# Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance.
+api.get.redis: config
+	@gcloud beta redis instances describe ${GCM_INSTANCE_NAME} --region=${GCP_REGION}
+
+# Delete the Google Cloud Memorystore Redis instance.
+api.clean.redis: config
+	@gcloud beta redis instances delete ${GCM_INSTANCE_NAME} --region=${GCP_REGION}

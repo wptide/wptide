@@ -1,13 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"log"
 	"testing"
 
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/wporg"
-	"errors"
-	"log"
-	"bytes"
 )
 
 var (
@@ -59,26 +58,10 @@ var (
 	}
 )
 
-// Setup a mockProvider.
-type mockProvider struct{}
-
-func (m mockProvider) SendMessage(msg *message.Message) error {
-	if msg.Slug == "error" {
-		return errors.New("something went wrong")
-	}
-	return nil
-}
-func (m mockProvider) GetNextMessage() (*message.Message, error) {
-	return nil, nil
-}
-func (m mockProvider) DeleteMessage(ref *string) error {
-	return nil
-}
-
 func initMockProviders(s *sqsDispatcher) {
 	for queueID, _ := range s.Queues {
 		queueProvider, ok := s.providers[queueID]
-		if ! ok {
+		if !ok {
 			queueProvider = &mockProvider{}
 			s.providers[queueID] = queueProvider
 		}
@@ -178,7 +161,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 				providers: tt.fields.providers,
 			}
 
-			if ! tt.skipInit {
+			if !tt.skipInit {
 				initMockProviders(s)
 			}
 
@@ -224,6 +207,49 @@ func Test_sqsDispatcher_Init(t *testing.T) {
 			}
 			if err := s.Init(); (err != nil) != tt.wantErr {
 				t.Errorf("sqsDispatcher.Init() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_sqsDispatcher_Close(t *testing.T) {
+	type fields struct {
+		Queues map[string]struct {
+			Region   string
+			Key      string
+			Secret   string
+			Queue    string
+			Endpoint string
+			Active   bool
+			Accepts  string
+		}
+		providers map[string]message.MessageProvider
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			"Close with collections",
+			fields{
+				testQueues,
+				make(map[string]message.MessageProvider),
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &sqsDispatcher{
+				Queues:    tt.fields.Queues,
+				providers: tt.fields.providers,
+			}
+
+			initMockProviders(s)
+
+			if err := s.Close(); (err != nil) != tt.wantErr {
+				t.Errorf("sqsDispatcher.Close() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

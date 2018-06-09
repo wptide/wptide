@@ -17,6 +17,7 @@ sync.usage:
 	@echo "\tsync.rm:\n\t\t- Remove the isolated Sync Server Docker image with docker-compose rm."
 	@echo "\tsync.push.image:\n\t\t- Push the Sync Server Docker image to GCR."
 	@echo "\tsync.clean.image:\n\t\t- Clean the Sync Server Docker image from the host machine."
+	@echo "\tsync.build.disk:\n\t\t- Build the Sync Server GKE persistent disk."
 	@echo "\tsync.build.cluster:\n\t\t- Build the Sync Server GKE cluster."
 	@echo "\tsync.creds:\n\t\t- Get the Sync Server GKE cluster credentials."
 	@echo "\tsync.tpl:\n\t\t- Generate the Sync Server GKE YAML template."
@@ -67,6 +68,13 @@ sync.clean.image:
 	@docker rmi ${GCR_SYNC_IMAGE_TAG}
 	@docker rmi ${GKE_SYNC_IMAGE}:latest
 
+# Build the Sync Server GKE persistent disk.
+sync.build.disk: config
+	@gcloud compute --project ${GCP_PROJECT} disks create ${GKE_SYNC_CLUSTER}-disk \
+	--zone ${GCP_ZONE} \
+	--type ${GKE_SYNC_PERSISTENT_DISK_TYPE} \
+	--size ${GKE_SYNC_PERSISTENT_DISK_SIZE}
+
 # Build the Sync Server GKE cluster.
 sync.build.cluster: config
 	@gcloud container --project ${GCP_PROJECT} clusters create ${GKE_SYNC_CLUSTER} \
@@ -75,7 +83,7 @@ sync.build.cluster: config
 	--machine-type ${GKE_SYNC_MACHINE_TYPE} \
 	--image-type "COS" \
 	--disk-size ${GKE_SYNC_DISK_SIZE} \
-	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
+	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
 	--preemptible \
 	--num-nodes 1 \
 	--enable-cloud-logging \
@@ -104,3 +112,4 @@ sync.get.cluster: config sync.creds
 sync.clean.cluster: config sync.creds sync.tpl
 	@kubectl delete -f service/sync-server/kubernetes/deployment.yaml
 	@gcloud container clusters delete ${GKE_SYNC_CLUSTER} -q
+	@gcloud compute --project ${GCP_PROJECT} disks delete ${GKE_SYNC_CLUSTER}-disk

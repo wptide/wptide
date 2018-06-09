@@ -4,12 +4,18 @@ import (
 	"bytes"
 	"log"
 	"os"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
-	"github.com/wptide/pkg/env"
+
 	"github.com/wptide/pkg/message"
-	commonProcess "github.com/xwp/go-tide/src/process"
+	"github.com/wptide/pkg/storage/gcs"
+	"github.com/wptide/pkg/storage/local"
+	"github.com/wptide/pkg/storage/s3"
+	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/message/sqs"
+	"github.com/wptide/pkg/message/mongo"
 )
 
 var (
@@ -58,7 +64,7 @@ func Test_main(t *testing.T) {
 		os.Setenv(key, val)
 	}
 
-	setupConfig()
+	resetServiceConfig()
 
 	// Use the mockTide for Tide
 	currentClient := TideClient
@@ -177,10 +183,10 @@ func Test_main(t *testing.T) {
 			}
 
 			if tt.args.authError {
-				oldId := tideConfig.id
-				tideConfig.id = "error"
+				oldId := serviceConfig["tide"]["key"]
+				serviceConfig["tide"]["key"] = "error"
 				defer func() {
-					tideConfig.id = oldId
+					serviceConfig["tide"]["key"] = oldId
 				}()
 			}
 
@@ -203,47 +209,8 @@ func Test_main(t *testing.T) {
 	}
 }
 
-func setupConfig() {
-	// Setup lhConfig
-	lhConfig = struct {
-		region string
-		key    string
-		secret string
-		queue  string
-	}{
-		env.GetEnv("AWS_SQS_REGION", ""),
-		env.GetEnv("AWS_API_KEY", ""),
-		env.GetEnv("AWS_API_SECRET", ""),
-		env.GetEnv("AWS_SQS_QUEUE_LH", ""),
-	}
-
-	tideConfig = struct {
-		id           string
-		secret       string
-		authEndpoint string
-		host         string
-		protocol     string
-		version      string
-	}{
-		env.GetEnv("API_KEY", ""),
-		env.GetEnv("API_SECRET", ""),
-		env.GetEnv("API_AUTH_URL", ""),
-		env.GetEnv("API_HTTP_HOST", ""),
-		env.GetEnv("API_PROTOCOL", ""),
-		env.GetEnv("API_VERSION", ""),
-	}
-
-	lhS3Config = struct {
-		region string
-		key    string
-		secret string
-		bucket string
-	}{
-		env.GetEnv("AWS_S3_REGION", ""),
-		env.GetEnv("AWS_API_KEY", ""),
-		env.GetEnv("AWS_API_SECRET", ""),
-		env.GetEnv("AWS_S3_BUCKET_NAME", ""),
-	}
+func resetServiceConfig() {
+	serviceConfig = getServiceConfig()
 }
 
 func Test_pollProvider(t *testing.T) {
@@ -301,15 +268,9 @@ func Test_pollProvider(t *testing.T) {
 
 func Test_processMessage(t *testing.T) {
 
-	doIngest = MockDoIngest
-	doInfo = MockDoInfo
-	doLighthouse = MockDoLighthouse
-	doResponse = MockDoResponse
+	doProcess = MockDoProcess
 	defer func() {
-		doIngest = commonProcess.DoIngest
-		doInfo = commonProcess.DoInfo
-		doLighthouse = commonProcess.DoLighthouse
-		doResponse = commonProcess.DoResponse
+		doProcess = executeProcessFunc
 	}()
 
 	cMessageProvider := messageProvider
@@ -318,7 +279,7 @@ func Test_processMessage(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		msg message.Message
+		msg     message.Message
 		wantErr bool
 	}{
 		{
@@ -387,7 +348,7 @@ func Test_processMessage(t *testing.T) {
 		{
 			"Message Success - Provider Fail",
 			message.Message{
-				Slug: "resultSuccess",
+				Slug:        "resultSuccess",
 				ExternalRef: &[]string{"removeFail"}[0],
 			},
 			true,
@@ -399,6 +360,155 @@ func Test_processMessage(t *testing.T) {
 			wg.Add(1)
 			if err := processMessage(tt.msg, &wg); (err != nil) != tt.wantErr {
 				t.Errorf("processMessage() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_getStorageProvider(t *testing.T) {
+	type args struct {
+		config map[string]map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want reflect.Type
+	}{
+		{
+			"No Provider",
+			args{},
+			nil,
+		},
+		{
+			"S3 Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"storage_provider": "s3",
+					},
+					"aws": {
+						"key":       "",
+						"secret":    "",
+						"s3_region": "",
+						"s3_bucket": "",
+					},
+				},
+			},
+			reflect.TypeOf(&s3.S3Provider{}),
+		},
+		{
+			"GCS Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"storage_provider": "gcs",
+					},
+					"gcp": {
+						"project":    "",
+						"gcs_bucket": "",
+					},
+				},
+			},
+			reflect.TypeOf(&gcs.Provider{}),
+		},
+		{
+			"Local Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"storage_provider": "local",
+						"server_path":      "./testdata",
+						"local_path":       "subdir",
+					},
+				},
+			},
+			reflect.TypeOf(&local.Provider{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getStorageProvider(tt.args.config); reflect.TypeOf(got) != tt.want {
+				t.Errorf("getStorageProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
+	}
+}
+
+func Test_getMessageProvider(t *testing.T) {
+	type args struct {
+		config map[string]map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want reflect.Type
+	}{
+		{
+			"Nil Provider",
+			args{
+				make(map[string]map[string]string),
+			},
+			nil,
+		},
+		{
+			"SQS Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"message_provider": "sqs",
+					},
+					"aws":
+					{
+						"key":        "",
+						"secret":     "",
+						"sqs_region": "",
+						"sqs_queue":  "",
+						"s3_region":  "",
+					},
+				},
+			},
+			reflect.TypeOf(&sqs.SqsProvider{}),
+		},
+		{
+			"Firestore Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"message_provider": "firestore",
+					},
+					"gcp":
+					{
+						"project":   "mock-project-id",
+						"gcf_queue": "test-queue",
+					},
+				},
+			},
+			reflect.TypeOf(&firestore.FirestoreProvider{}),
+		},
+		{
+			"Mongo Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"message_provider": "local",
+					},
+					"mongo":
+					{
+						"user": "test",
+						"pass": "test",
+						"host": "localhost:27017",
+						"database": "test-db",
+						"queue": "test-queue",
+					},
+				},
+			},
+			reflect.TypeOf(&mongo.MongoProvider{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getMessageProvider(tt.args.config); reflect.TypeOf(got) != tt.want {
+				t.Errorf("getMessageProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
 			}
 		})
 	}
