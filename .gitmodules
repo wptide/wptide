@@ -3,5 +3,5 @@
 	url = https://github.com/wptide/wp-tide-api.git
 [submodule "service/api/wp-content/plugins/wporg-tide-api"]
 	path = service/api/wp-content/plugins/wporg-tide-api
-	url = git@github.com:wptide/wporg-tide-api.git
+	url = https://github.com/wptide/wporg-tide-api.git
 	branch = master
