@@ -35,6 +35,7 @@ services:
             API_DB_USER: ${API_DB_USER}
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_KEY: ${API_KEY}
+            API_MESSAGE_PROVIDER: ${API_MESSAGE_PROVIDER}
             API_REDIS_AUTH: ${API_REDIS_AUTH}
             API_REDIS_DATABASE: ${API_REDIS_DATABASE}
             API_REDIS_HOST: ${API_REDIS_HOST}
