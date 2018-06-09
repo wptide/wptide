@@ -267,6 +267,7 @@ from the `audit-server` user profile.
 | `API_DB_USER` | Username used to access the local database. Default is `wordpress`. |
 | `API_HTTP_HOST` | The API domain name, used both locally and on GCP. Default is `tide.local`. |
 | `API_KEY` | The API key used locally to authenticate the `audit-server` user. |
+| `API_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
 | `API_PROTOCOL` | The API protocol, used both locally and on GCP Default is `http`. |
 | `API_REDIS_AUTH` | The Redis database password. Default is `redis`. |
 | `API_REDIS_DATABASE` | Use a specific numeric Redis database. Default is `0`. |
@@ -281,7 +282,7 @@ from the `audit-server` user profile.
 
 ### MongoDB
 
-By default MongoDB is used as the local message provider for the Lighthouse/PHPCS Servers. In order for these services to use MongoDB you'll need to ensure the following settings are in you `.env`. The only setting that you should **not** change is `MONGO_HOST`.
+By default MongoDB is used as the local message provider for the Lighthouse/PHPCS Servers and will not be supported for production use. In order for the services to use MongoDB you'll need to ensure the following settings are in you `.env`.
 
 #### MongoDB Settings
 
@@ -290,7 +291,6 @@ By default MongoDB is used as the local message provider for the Lighthouse/PHPC
 | `MONGO_DATABASE_NAME` | The name of the database. Default is `queue`. |
 | `MONGO_DATABASE_PASSWORD` | The database root password. Default is `root`. |
 | `MONGO_DATABASE_USERNAME` | The database root username. Default is `root`. |
-| `MONGO_HOST` | The MongoDB database host and port. Default is `localhost:27017`. |
 | `MONGO_QUEUE_LH` | Specifies which collection in MongoDB to use for the Lighthouse message queue. Default is `lighthouse`. |
 | `MONGO_QUEUE_PHPCS` | Specifies which collection in MongoDB to use for the PHPCS message queue. Default is `phpcs`. |
 

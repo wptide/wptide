@@ -432,7 +432,7 @@ func getServiceConfig() map[string]map[string]string {
 		{
 			"user":                 env.GetEnv("MONGO_DATABASE_USERNAME", ""),
 			"pass":                 env.GetEnv("MONGO_DATABASE_PASSWORD", ""),
-			"host":                 env.GetEnv("MONGO_HOST", "localhost:27017"),
+			"host":                 "localhost:27017",
 			"database":             env.GetEnv("MONGO_DATABASE_NAME", "queue"),
 			"lighthouseCollection": env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
 			"phpcsCollection":      env.GetEnv("MONGO_QUEUE_PHPCS", "phpcs"),
