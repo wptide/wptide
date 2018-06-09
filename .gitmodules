@@ -4,4 +4,3 @@
 [submodule "service/api/wp-content/plugins/wporg-tide-api"]
 	path = service/api/wp-content/plugins/wporg-tide-api
 	url = https://github.com/wptide/wporg-tide-api.git
-	branch = master
