@@ -734,13 +734,13 @@ a chat service, sometimes it takes several hours for community members to respon
 — please be patient.
 
 ### Credits
-Props: [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp), 
+Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM), [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp), 
 [Daniel Louw (@danlouw)](https://github.com/danlouw), 
 [David Cramer (@davidcramer)](https://github.com/davidcramer), 
 [David Lonjon (@davidlonjon)](https://github.com/davidlonjon), 
 [Derek Herman (@valendesigns)](https://github.com/valendesigns), 
 [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul), 
-[Justin Kopepasah (@kopepasah)](https://github.com/kopepasah), 
+[Justin Kopepasah (@kopepasah)](https://github.com/kopepasah), [Leo Postovoit (@postphotos)](https://github.com/postphotos), [Lubos Kmetko (@luboskmetko)](https://github.com/luboskmetko), 
 [Luke Carbis (@lukecarbis)](https://github.com/lukecarbis), 
 [Miina Sikk (@miina)](https://github.com/miina), 
 [Mike Crantea (@mehigh)](https://github.com/mehigh), 
