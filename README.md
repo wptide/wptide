@@ -22,11 +22,13 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
        - [Environment Variables](#environment-variables)
        - [Google Cloud SDK](#google-cloud-sdk)
        - [Google App Engine](#google-app-engine)
-       - [Google Cloud Storage](#google-cloud-storage)
+       - [Google Cloud Storage for App Engine](#google-cloud-storage-for-app-engine)
        - [Service Account](#service-account)
    + [API](#api)
        - [API Notes](#api-notes)
        - [API Settings](#api-settings)
+   * [MongoDB](#mongodb)
+       - [MongoDB Settings](#mongodb-settings)
    + [Lighthouse Server](#lighthouse-server)
        - [Lighthouse Server Notes](#lighthouse-server-notes)
        - [Lighthouse Server Settings](#lighthouse-server-settings)
@@ -47,7 +49,12 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
            * [GKE Lighthouse Server Settings](#gke-lighthouse-server-settings)
            * [GKE PHPCS Server Settings](#gke-phpcs-server-settings)
            * [GKE Sync Server Settings](#gke-sync-server-settings)
-   + [AWS](#aws)
+           * [GKE Redis Settings](#gke-redis-settings)
+   + [Google Cloud Storage (GCS)](#google-cloud-storage-gcs)
+       - [GCS Settings](#gcs-settings)
+   + [Google Cloud Firestore (GCF)](#google-cloud-firestore-gcf)
+       - [GCF Settings](#gcf-settings)
+   + [Amazon Web Services (AWS)](#amazon-web-services-aws)
        - [AWS Settings](#aws-settings)
    + [Contributing](#contributing)
    + [Contact Us](#contact-us)
@@ -144,7 +151,7 @@ Create an App Engine application within your new project:
 $ gcloud app create
 ```
 
-#### Google Cloud Storage
+#### Google Cloud Storage for App Engine
 
 Configure the App Engine default GCS bucket for later use. The default App Engine 
 bucket is named YOUR_PROJECT_ID.appspot.com. Change the default Access Control 
@@ -177,8 +184,8 @@ Finally, go to the [the Credentials section][credentials-section] of your projec
 in the Console. Click 'Create credentials' and then click 'Service account key.' 
 For the Service account, select 'App Engine app default service account.' Then 
 click 'Create' to create and download the JSON service account key to your local 
-machine. Save it as `service-account.json` in the `service/api` directory for use 
-with connecting to both Cloud Storage and Cloud SQL.
+machine. Save it as `service-account.json` in the the projects root directory for 
+use with connecting to both Cloud Storage and Cloud SQL.
 
 ---
 
@@ -244,10 +251,10 @@ from the `audit-server` user profile.
 
 | Variable | Description |
 | :--- | :--- |
-| `API_ADMIN_EMAIL` | The email associated with the local admin account |
-| `API_ADMIN_PASSWORD` | The password associated with the local admin account |
-| `API_ADMIN_USER` | The username associated with the local admin account |
-| `API_AUTH_URL` | The [`wp-tide-api`][wp-tide-api] authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth` |
+| `API_ADMIN_EMAIL` | The email associated with the local admin account. |
+| `API_ADMIN_PASSWORD` | The password associated with the local admin account. |
+| `API_ADMIN_USER` | The username associated with the local admin account. |
+| `API_AUTH_URL` | The [`wp-tide-api`][wp-tide-api] authentication REST endpoint, used both locally and on GCP. Default is `http://tide.local/api/tide/v1/auth`. |
 | `API_BLOG_DESCRIPTION` | Site tagline (set in Settings > General). Default is `Automated insight into your WordPress code`. |
 | `API_BLOG_NAME` | Site title (set in Settings > General). Default is `Tide`. |
 | `API_CACHE` | Whether caching should be active or not. Must be one of: `true`, `false`. Default is `true`. |
@@ -260,6 +267,7 @@ from the `audit-server` user profile.
 | `API_DB_USER` | Username used to access the local database. Default is `wordpress`. |
 | `API_HTTP_HOST` | The API domain name, used both locally and on GCP. Default is `tide.local`. |
 | `API_KEY` | The API key used locally to authenticate the `audit-server` user. |
+| `API_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
 | `API_PROTOCOL` | The API protocol, used both locally and on GCP Default is `http`. |
 | `API_REDIS_AUTH` | The Redis database password. Default is `redis`. |
 | `API_REDIS_DATABASE` | Use a specific numeric Redis database. Default is `0`. |
@@ -269,6 +277,22 @@ from the `audit-server` user profile.
 | `API_THEME` | The slug of the local WordPress theme. Default is `twentyseventeen`. |
 | `API_UPLOAD_HANDLER` | Tells WordPress how media upload is handled. Uses either the local file system or Google Cloud Storage. Must be one of: `local`, `gcs`. Default is `local`. |
 | `API_VERSION` | The API version found in the Tide API REST url, used both locally and on GCP. Default is `v1`. |
+
+---
+
+### MongoDB
+
+By default MongoDB is used as the local message provider for the Lighthouse/PHPCS Servers and will not be supported for production use. In order for the services to use MongoDB you'll need to ensure the following settings are in you `.env`.
+
+#### MongoDB Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `MONGO_DATABASE_NAME` | The name of the database. Default is `queue`. |
+| `MONGO_DATABASE_PASSWORD` | The database root password. Default is `root`. |
+| `MONGO_DATABASE_USERNAME` | The database root username. Default is `root`. |
+| `MONGO_QUEUE_LH` | Specifies which collection in MongoDB to use for the Lighthouse message queue. Default is `lighthouse`. |
+| `MONGO_QUEUE_PHPCS` | Specifies which collection in MongoDB to use for the PHPCS message queue. Default is `phpcs`. |
 
 ---
 
@@ -307,8 +331,10 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 
 | Variable | Description |
 | :--- | :--- |
-| `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
-| `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+| `LH_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5`. |
+| `LH_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
+| `LH_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
+| `LH_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp`. |
 
 #### Running Lighthouse audits
 
@@ -351,8 +377,10 @@ reports against both plugins and themes, then sends the results back to the Tide
 
 | Variable | Description |
 | :--- | :--- |
-| `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5` |
-| `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp` |
+| `PHPCS_CONCURRENT_AUDITS` | Sets the number of goroutines the server will perform concurrently. Default is `5`. |
+| `PHPCS_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
+| `PHPCS_STORAGE_PROVIDER` | Upload reports to the local file system, Google Cloud Storage, or AWS S3. Must be one of: `local`, `gcs`, `s3`. Default is `local`. |
+| `PHPCS_TEMP_FOLDER` | Sets the temporary folder inside the container used to store downloaded files. Default is `/tmp`. |
 
 ---
 
@@ -391,17 +419,20 @@ plugins to process and writes them to a queue.
 
 | Variable | Description |
 | :--- | :--- |
-| `SYNC_ACTIVE` | Whether the Sync Server is active or not. Must be one of: `on`, `off`. Default is `off` |
-| `SYNC_API_BROWSE_CATEGORY` | The API category used to ingest the wp.org themes and plugins. Must be one of: `popular`, `featured`, `updated`, `new`. Default is `updated` |
-| `SYNC_DATA` | Where the data is stored relative to the `/srv/data` directory. Default is `./db` |
-| `SYNC_DEFAULT_CLIENT` | The API client used to make requests by the audit servers; also associated with the key and secret those server use. Default is `wporg` |
-| `SYNC_DEFAULT_VISIBILITY` | The audit and report visibility. Must be one of: `public`, `private`. Default is `public` |
-| `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no` |
-| `SYNC_ITEMS_PER_PAGE` | The number of plugins or themes per page in the API request. Default is `250` |
-| `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on` |
-| `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on` |
-| `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600` |
-| `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125` |
+| `SYNC_ACTIVE` | Whether the Sync Server is active or not. Must be one of: `on`, `off`. Default is `off`. |
+| `SYNC_API_BROWSE_CATEGORY` | The API category used to ingest the wp.org themes and plugins. Must be one of: `popular`, `featured`, `updated`, `new`. Default is `updated`. |
+| `SYNC_DATA` | When the database provider is set to `local` this will be where the data is stored relative to the `/srv/data` working directory. Default is `./db`. |
+| `SYNC_DATABASE_DOCUMENT_PATH` |  When the database provider is set to `firestore` this value is the path to the document in Cloud Firestore. Must be in the form of `<collection>/<document>`. Default is `sync-server/wporg`. |
+| `SYNC_DATABASE_PROVIDER` | Tells the Sync Server which database provider to use; either the local file system or Google Cloud Firestore. Must be one of: `local`, `firestore`. Default is `local`. |
+| `SYNC_DEFAULT_CLIENT` | The API client used to make requests by the audit servers; also associated with the key and secret those server use. Default is `wporg`. |
+| `SYNC_DEFAULT_VISIBILITY` | The audit and report visibility. Must be one of: `public`, `private`. Default is `public`. |
+| `SYNC_FORCE_AUDITS` | Forces audit reports to be generated even if a report exists for the checksum and standard. Must be one of: `yes`, `no`. Default is `no`. |
+| `SYNC_ITEMS_PER_PAGE` | The number of plugins or themes per page in the API request. Default is `250`. |
+| `SYNC_LH_ACTIVE` | Send messages to the Lighthouse SQS queue. Must be one of: `on`, `off`. Default is `on`. |
+| `SYNC_MESSAGE_PROVIDER` | Queue audit messages using the local MongoDB, Google Cloud Firestore, or AWS SQS. Must be one of: `local`, `firestore`, `sqs`. Default is `local`. |
+| `SYNC_PHPCS_ACTIVE` | Send messages to the PHPCS SQS queue. Must be one of: `on`, `off`. Default is `on`. |
+| `SYNC_POOL_DELAY` | The wait time in seconds between the wp.org theme and plugin ingests. Default is `600`. |
+| `SYNC_POOL_WORKERS` | The number of workers (concurrent goroutines) the server will create to ingest the wp.org API. Default is `125`. |
 
 ---
 
@@ -420,7 +451,7 @@ GCP. Be sure to use the same region you chose during the earlier
 | :--- | :--- |
 | `GCP_PROJECT` | The unique ID of you Google project. |
 | `GCP_REGION` | The [region][regions-and-zones] where all your resources will be created. For example, `us-west1`. |
-| `GCP_ZONE` | The preferred [zone][regions-and-zones] in your region that resources will be created, For example, `us-west1-a` |
+| `GCP_ZONE` | The preferred [zone][regions-and-zones] in your region that resources will be created, For example, `us-west1-a`. |
 
 #### Google Cloud SQL (GCSQL)
 
@@ -454,6 +485,37 @@ database._
 | `GCSQL_API_MAINTENANCE_WINDOW_DAY` | Day of week for maintenance window, in UTC time zone. Must be one of: `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT`. |
 | `GCSQL_API_MAINTENANCE_WINDOW_HOUR` | Hour of day - `0` to `23`. Determines a one-hour window when Cloud SQL can perform disruptive maintenance on your instance. |
 | `GCSQL_API_STORAGE_SIZE` | Amount of storage allocated to the instance. Must be an integer number of `GB` between `10GB` and `10230GB` inclusive. |
+
+#### Google Cloud Memorystore (GCM)
+
+Deploying a Redis instance to Cloud Memory for the WordPress API only requires a bit of 
+configuration to the environment variable and then to run a single `make` command.
+
+Deploy the Google Cloud Memorystore Redis instance:
+
+```
+make api.deploy.redis
+```
+
+Get metadata, including the internal VPC IP address, for the Google Cloud Memorystore Redis instance:
+
+```
+make api.get.redis
+```
+
+Delete the Google Cloud Memorystore Redis instance:
+
+```
+make api.clean.redis
+```
+
+##### GCM API Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCM_INSTANCE_NAME` | The name of the Redis instance. |
+| `GCM_INSTANCE_SIZE` | The memory size of the instance in GiB. Must be an integer number between `1-300`. This setting dramatically changes costs, do your research before deploying an instance. |
+| `GCM_INSTANCE_TIER` | The service tier of the instance. Must be one of: `basic`, `standard`. Basic means the Redis instance will not have replication. Standard is a high-availability Redis instance with replication for failover. |
 
 #### Google App Engine (GAE)
 
@@ -545,7 +607,7 @@ make phpcs.clean.cluster
 | `GKE_LH_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
 | `GKE_LH_CPU_PERCENT` | The average percent CPU utilization across all pods. Must be a range of `1-100`. |
-| `GKE_LH_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_LH_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_LH_IMAGE` | The name of the Docker image. Default is`lighthouse-server`. |
 | `GKE_LH_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
 | `GKE_LH_MAX_NODES` | Maximum number of nodes to which the node pool can scale. |
@@ -563,7 +625,7 @@ make phpcs.clean.cluster
 | `GKE_PHPCS_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
 | `GKE_PHPCS_CPU_PERCENT` | The average percent CPU utilization across all pods. Must be a range of `1-100`. |
-| `GKE_PHPCS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_PHPCS_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_PHPCS_IMAGE` | The name of the Docker image. Default is `phpcs-server`. |
 | `GKE_PHPCS_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
 | `GKE_PHPCS_MAX_NODES` | Maximum number of nodes to which the node pool can scale. |
@@ -580,15 +642,70 @@ make phpcs.clean.cluster
 | `GKE_SYNC_CLUSTER` | The name of the cluster. Default is `sync-server`. |
 | `GKE_SYNC_CLUSTER_VERSION` | The Kubernetes version to use for the master and nodes. You can check which Kubernetes versions are default and available in a given zone by running the following command: |
 | | `gcloud container get-server-config --zone [COMPUTE-ZONE]` |
-| `GKE_SYNC_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100GB`. |
+| `GKE_SYNC_DISK_SIZE` | Size in GB for node VM boot disks. An example value is `100`. |
 | `GKE_SYNC_IMAGE` | The name of the Docker image. Default is `sync-server`. |
 | `GKE_SYNC_MACHINE_TYPE` | The type of machine to use for nodes. An example value is `n1-standard-1`. |
+| `GKE_SYNC_PERSISTENT_DISK_TYPE` | Type of persistent disk. Must be one of: `pd-standard`, `pd-ssd`. |
+| `GKE_SYNC_PERSISTENT_DISK_SIZE` | Size in GB for the persistent disk. An example value is `100GB`. |
 
 ---
 
-### AWS
+### Google Cloud Storage (GCS)
 
-@todo Remove the dependency on AWS.
+If you want to upload Tide audit reports to Google Cloud Storage then you'll need 
+to create a bucket for those reports. Open the [Cloud Storage Browser][cloud-storage-browser] 
+and click **Create Bucket**.
+
+#### GCS Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCS_BUCKET_NAME` | The name of the GCS bucket. |
+
+---
+
+### Google Cloud Firestore (GCF)
+
+If you want to use Cloud Firestore as the database provider for the Sync Server or as the message provider for the Lighthouse/PHPCS Server you'll need to setup Cloud Firestore for your project by following these steps.
+
+1. If you don't already have a Firebase project, add one in the [Firebase console](https://console.firebase.google.com/u/0/project/_/database/firestore/data). The **Add project** dialog also gives you the option to add Firebase to an existing Google Cloud Platform project.
+
+1. Allow read/write access on all documents to any user signed in to the application by replacing the previous [security rules](https://console.firebase.google.com/u/0/project/_/database/firestore/rules) with the following in the Cloud Firestore console.
+
+    ```
+    service cloud.firestore {
+        match /databases/{database}/documents {
+            match /{document=**} {
+                allow read, write: if request.auth.uid != null;
+            }
+        }
+    }
+    ```
+
+1. In order for the message queue to be queryable by the Go servers you will need to add composite indexes for both the `GCF_QUEUE_LH` and `GCF_QUEUE_PHPCS` message queues. The following directions are going to be for `GCF_QUEUE_PHPCS`, but must be repeated for the `GCF_QUEUE_LH` queue. It's assumed you are using the default `queue-phpcs` value for `GCF_QUEUE_PHPCS`.
+
+    1. Open the [composite indexes](https://console.firebase.google.com/u/0/project/_/database/firestore/indexes) tab in the Firebase console.
+    1. Click `Add index manually` or the `Add Index` button if you already have created a composite index.
+    1. Add `queue-phpcs` as the collection name.
+    1. Add a new field named `retry_available` and set sort to ascending.
+    1. Add a new field named `lock` and set sort to ascending.
+    1. Add a new field named `created` and set sort to ascending.
+    1. Click `Create Index` and repeat for `queue-lighthouse`.
+
+_Note: If you change the setting values below in your `.env` then the collection names in the third step should be the same as those values._
+
+#### GCF Settings
+
+| Variable | Description |
+| :--- | :--- |
+| `GCF_QUEUE_LH` | Specifies which collection in Cloud Firestore to use for the Lighthouse message queue. This is a Firestore collection **path**. Default is `queue-lighthouse`. |
+| `GCF_QUEUE_PHPCS` | Specifies which collection in CLoud Firestore to use for the PHPCS message queue. This is a Firestore collection **path**. Default is `queue-phpcs`. |
+
+---
+
+### Amazon Web Services (AWS)
+
+@todo add docs for AWS.
 
 #### AWS Settings
 
@@ -598,11 +715,11 @@ make phpcs.clean.cluster
 | `AWS_API_SECRET` | The AWS API secret. |
 | `AWS_S3_BUCKET_NAME` | The name of the S3 bucket.  |
 | `AWS_S3_REGION` | The region of the S3 bucket. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][s3-region].  |
-| `AWS_S3_VERSION` | The S3 API version. Default is `2006-03-01` |
+| `AWS_S3_VERSION` | The S3 API version. Default is `2006-03-01`. |
 | `AWS_SQS_QUEUE_LH` | The name of the SQS queue for the Lighthouse Server. |
 | `AWS_SQS_QUEUE_PHPCS` | The name of the SQS queue for the PHPCS Server. |
 | `AWS_SQS_REGION` | The region of the SQS queue. Default is `us-west-2`. See a list of available [AWS Regions and Enpoints][sqs-region].  |
-| `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05` |
+| `AWS_SQS_VERSION` | The SQS API version. Default is `2012-11-05`. |
 
 ---
 

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+while IFS= read -r line
+do
+    export $(echo -e "$line" | sed -e 's/[[:space:]]*$//')
+done < <(cat .env | grep API_)
+
+RESPONSE=$(curl -s -X POST -F "api_key=${API_KEY}" -F "api_secret=${API_SECRET}" "${API_AUTH_URL}")
+TOKEN=$(echo "$RESPONSE" | grep -o '"access_token":"[^"]*"' | sed s/\"//g | sed s/access_token://)
+
+echo "${TOKEN}"

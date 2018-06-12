@@ -2,7 +2,7 @@
 -include .env
 
 # Binary settings.
-VERSION=0.1.0
+VERSION=1.0.0-beta
 BUILD=`git rev-parse HEAD`
 
 # GO settings.
@@ -46,6 +46,7 @@ deps:
 # Set GCP configurations.
 config:
 	@gcloud config set project ${GCP_PROJECT}
+	@gcloud config set compute/region ${GCP_REGION}
 	@gcloud config set compute/zone ${GCP_ZONE}
 	@gcloud config set container/new_scopes_behavior true
 

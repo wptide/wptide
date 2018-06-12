@@ -5,15 +5,19 @@ services:
 ### API #########################################################
     api-php:
         build:
-            context: ./service/api
+            context: ./service/api/docker
         volumes:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
             - ./service/api/php.ini:/opt/php72/lib/php.ini
-            - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads:ro
+            - ./service/api/wp-content/uploads:/app/wordpress/wp-content/uploads
+            - ./service-account.json:/srv/service-account.json:ro
+            - ./data/lighthouse-server:/app/wordpress/wp-content/uploads/lighthouse:ro
+            - ./data/phpcs-server:/app/wordpress/wp-content/uploads/phpcs:ro
         depends_on:
             - api-mysql
             - api-redis
+            - mongo
         ports:
             - 80:8080
         environment:
@@ -31,6 +35,7 @@ services:
             API_DB_USER: ${API_DB_USER}
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_KEY: ${API_KEY}
+            API_MESSAGE_PROVIDER: ${API_MESSAGE_PROVIDER}
             API_REDIS_AUTH: ${API_REDIS_AUTH}
             API_REDIS_DATABASE: ${API_REDIS_DATABASE}
             API_REDIS_HOST: ${API_REDIS_HOST}
@@ -48,7 +53,15 @@ services:
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
             DOCUMENT_ROOT: /app/wordpress
-            GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
+            GCF_QUEUE_LH: ${GCF_QUEUE_LH}
+            GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
+            MONGO_DATABASE_NAME: ${MONGO_DATABASE_NAME}
+            MONGO_DATABASE_PASSWORD: ${MONGO_DATABASE_PASSWORD}
+            MONGO_DATABASE_USERNAME: ${MONGO_DATABASE_USERNAME}
+            MONGO_QUEUE_LH: ${MONGO_QUEUE_LH}
+            MONGO_QUEUE_PHPCS: ${MONGO_QUEUE_PHPCS}
 
     api-mysql:
         image: mariadb:10.3
@@ -70,11 +83,27 @@ services:
         volumes:
             - ./data/api/redis:/data
 
+### MongoDB #####################################################
+    mongo:
+        image: mongo
+        restart: always
+        volumes:
+            - ./data/mongo:/data/db
+        ports:
+            - 27017:27017
+        environment:
+            MONGO_INITDB_DATABASE: ${MONGO_DATABASE_NAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DATABASE_PASSWORD}
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_DATABASE_USERNAME}
+
 ### Lighthouse Server ###########################################
     lighthouse-server:
         image: ${GKE_LH_IMAGE}:latest
         volumes:
             - ./data/lighthouse-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
+        depends_on:
+            - mongo
         environment:
             API_AUTH_URL: ${API_AUTH_URL}
             API_HTTP_HOST: ${API_HTTP_HOST}
@@ -90,7 +119,18 @@ services:
             AWS_SQS_QUEUE_LH: ${AWS_SQS_QUEUE_LH}
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
+            GCF_QUEUE_LH: ${GCF_QUEUE_LH}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
             LH_CONCURRENT_AUDITS: ${LH_CONCURRENT_AUDITS}
+            LH_MESSAGE_PROVIDER: ${LH_MESSAGE_PROVIDER}
+            LH_STORAGE_PROVIDER: ${LH_STORAGE_PROVIDER}
+            LH_TEMP_FOLDER: ${LH_TEMP_FOLDER}
+            MONGO_DATABASE_NAME: ${MONGO_DATABASE_NAME}
+            MONGO_DATABASE_PASSWORD: ${MONGO_DATABASE_PASSWORD}
+            MONGO_DATABASE_USERNAME: ${MONGO_DATABASE_USERNAME}
+            MONGO_QUEUE_LH: ${MONGO_QUEUE_LH}
         network_mode: host
 
 ### PHPCS Server ################################################
@@ -98,6 +138,9 @@ services:
         image: ${GKE_PHPCS_IMAGE}:latest
         volumes:
             - ./data/phpcs-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
+        depends_on:
+            - mongo
         environment:
             API_AUTH_URL: ${API_AUTH_URL}
             API_HTTP_HOST: ${API_HTTP_HOST}
@@ -113,7 +156,17 @@ services:
             AWS_SQS_QUEUE_PHPCS: ${AWS_SQS_QUEUE_PHPCS}
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
+            GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GCS_BUCKET_NAME: ${GCS_BUCKET_NAME}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
+            MONGO_DATABASE_NAME: ${MONGO_DATABASE_NAME}
+            MONGO_DATABASE_PASSWORD: ${MONGO_DATABASE_PASSWORD}
+            MONGO_DATABASE_USERNAME: ${MONGO_DATABASE_USERNAME}
+            MONGO_QUEUE_PHPCS: ${MONGO_QUEUE_PHPCS}
             PHPCS_CONCURRENT_AUDITS: ${PHPCS_CONCURRENT_AUDITS}
+            PHPCS_MESSAGE_PROVIDER: ${PHPCS_MESSAGE_PROVIDER}
+            PHPCS_STORAGE_PROVIDER: ${PHPCS_STORAGE_PROVIDER}
             PHPCS_TEMP_FOLDER: ${PHPCS_TEMP_FOLDER}
         network_mode: host
 
@@ -122,6 +175,9 @@ services:
         image: ${GKE_SYNC_IMAGE}:latest
         volumes:
             - ./data/sync-server:/srv/data
+            - ./service-account.json:/srv/service-account.json:ro
+        depends_on:
+            - mongo
         environment:
             API_HTTP_HOST: ${API_HTTP_HOST}
             API_PROTOCOL: ${API_PROTOCOL}
@@ -132,14 +188,26 @@ services:
             AWS_SQS_QUEUE_PHPCS: ${AWS_SQS_QUEUE_PHPCS}
             AWS_SQS_REGION: ${AWS_SQS_REGION}
             AWS_SQS_VERSION: ${AWS_SQS_VERSION}
+            GCF_QUEUE_LH: ${GCF_QUEUE_LH}
+            GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
+            GCP_PROJECT: ${GCP_PROJECT}
+            GOOGLE_APPLICATION_CREDENTIALS: /srv/service-account.json
+            MONGO_DATABASE_NAME: ${MONGO_DATABASE_NAME}
+            MONGO_DATABASE_PASSWORD: ${MONGO_DATABASE_PASSWORD}
+            MONGO_DATABASE_USERNAME: ${MONGO_DATABASE_USERNAME}
+            MONGO_QUEUE_LH: ${MONGO_QUEUE_LH}
+            MONGO_QUEUE_PHPCS: ${MONGO_QUEUE_PHPCS}
             SYNC_ACTIVE: ${SYNC_ACTIVE}
             SYNC_API_BROWSE_CATEGORY: ${SYNC_API_BROWSE_CATEGORY}
             SYNC_DATA: ${SYNC_DATA}
+            SYNC_DATABASE_DOCUMENT_PATH: ${SYNC_DATABASE_DOCUMENT_PATH}
+            SYNC_DATABASE_PROVIDER: ${SYNC_DATABASE_PROVIDER}
             SYNC_DEFAULT_CLIENT: ${SYNC_DEFAULT_CLIENT}
             SYNC_DEFAULT_VISIBILITY: ${SYNC_DEFAULT_VISIBILITY}
             SYNC_FORCE_AUDITS: ${SYNC_FORCE_AUDITS}
             SYNC_ITEMS_PER_PAGE: ${SYNC_ITEMS_PER_PAGE}
             SYNC_LH_ACTIVE: ${SYNC_LH_ACTIVE}
+            SYNC_MESSAGE_PROVIDER: ${SYNC_MESSAGE_PROVIDER}
             SYNC_PHPCS_ACTIVE: ${SYNC_PHPCS_ACTIVE}
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}

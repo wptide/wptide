@@ -2,21 +2,23 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
-	"errors"
+
 	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/sync"
+	"github.com/wptide/pkg/sync/firestore"
 	"github.com/wptide/pkg/wporg"
-	"os"
 )
 
 var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -91,12 +93,30 @@ func (m mockDispatcher) Dispatch(project wporg.RepoProject) error {
 
 func (m mockDispatcher) Init() error { return nil }
 
-type mockChecker struct{}
+func (m mockDispatcher) Close() error { return nil }
 
-func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool   { return true }
-func (m mockChecker) RecordUpdate(project wporg.RepoProject) error { return nil }
+type mockChecker struct {
+	LastSync *time.Time
+}
+
+func (m mockChecker) UpdateCheck(project wporg.RepoProject) bool         { return true }
+func (m mockChecker) RecordUpdate(project wporg.RepoProject) error       { return nil }
+func (m mockChecker) SetSyncTime(event, projectType string, t time.Time) {}
+func (m mockChecker) GetSyncTime(event, projectType string) time.Time {
+	if m.LastSync != nil {
+		return *m.LastSync
+	}
+	return time.Now().AddDate(-10, 0, 0)
+}
 
 func Test_fetcher(t *testing.T) {
+
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+		defer os.RemoveAll("./db")
+	}()
 
 	b := bytes.Buffer{}
 	log.SetOutput(&b)
@@ -121,6 +141,7 @@ func Test_fetcher(t *testing.T) {
 		args    args
 		sources sources
 		want    reflect.Type
+		checker sync.UpdateSyncChecker
 	}{
 		{
 			"Themes",
@@ -136,6 +157,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			mockChecker{},
 		},
 		{
 			"Plugins - All",
@@ -151,6 +173,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			mockChecker{},
 		},
 		{
 			"Plugins - Max Pages 2",
@@ -166,6 +189,7 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			mockChecker{},
 		},
 		{
 			"Themes - Fail",
@@ -181,14 +205,46 @@ func Test_fetcher(t *testing.T) {
 				mockThemesApi.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			mockChecker{},
+		},
+		{
+			"Themes - Old",
+			args{
+				"themes",
+				"updated",
+				testBufferSize,
+				token,
+				-1,
+			},
+			sources{
+				mockPluginsApi.URL,
+				mockThemesApi.URL,
+			},
+			reflect.TypeOf(make(<-chan wporg.RepoProject)),
+			nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			// Set mock sources.
 			client.SetPluginApiSource(tt.sources.plugins)
 			client.SetThemeApiSource(tt.sources.themes)
+
+			if tt.checker != nil {
+				oldChecker := checker
+				checker = tt.checker
+				defer func() {
+					checker = oldChecker
+				}()
+			} else {
+				oldChecker := checker
+				checker = &mockChecker{
+					LastSync: &[]time.Time{time.Now()}[0],
+				}
+				defer func() {
+					checker = oldChecker
+				}()
+			}
 
 			// Initialise a token.
 			go func() { token <- struct{}{} }()
@@ -210,14 +266,27 @@ func Test_fetcher(t *testing.T) {
 			if tt.args.maxPages > -1 && tt.args.maxPages < 4 {
 				expected = tt.args.maxPages * testBufferSize
 			}
+
+			if tt.checker == nil {
+				expected = 0
+			}
+
 			for i := 0; i < expected; i++ {
 				<-projects
 			}
+
+			time.Sleep(time.Millisecond * 10)
 		})
 	}
 }
 
 func Test_infoWorker(t *testing.T) {
+
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+	}()
 
 	// Don't send log to os.Stdout.
 	b := bytes.Buffer{}
@@ -266,6 +335,12 @@ func Test_infoWorker(t *testing.T) {
 
 func Test_pool(t *testing.T) {
 
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+	}()
+
 	// Basic test here, the tests for infoWorker will have
 	// the bulk of the testing.
 
@@ -302,6 +377,13 @@ func Test_pool(t *testing.T) {
 
 func Test_main(t *testing.T) {
 
+	oldChecker := checker
+	checker = mockChecker{}
+	defer func() {
+		checker = oldChecker
+		defer os.RemoveAll("./db")
+	}()
+
 	// Don't log to os.Stdout.
 	b := bytes.Buffer{}
 	log.SetOutput(&b)
@@ -312,6 +394,7 @@ func Test_main(t *testing.T) {
 		browseCategory string
 		poolSize       int
 		quit           chan struct{}
+		checkerError   error
 	}
 
 	tests := []struct {
@@ -326,6 +409,7 @@ func Test_main(t *testing.T) {
 				"updated",
 				5,
 				make(chan struct{}, 1),
+				nil,
 			},
 		},
 		{
@@ -336,6 +420,7 @@ func Test_main(t *testing.T) {
 				"updated",
 				5,
 				make(chan struct{}, 1),
+				nil,
 			},
 		},
 	}
@@ -351,6 +436,8 @@ func Test_main(t *testing.T) {
 		poolSize = tt.serverConfig.poolSize
 		quitOld := quit
 		quit = tt.serverConfig.quit
+		checkerOld := checker
+		checker = &mockChecker{}
 
 		go func() {
 			time.Sleep(time.Second)
@@ -366,5 +453,174 @@ func Test_main(t *testing.T) {
 		browseCategory = browseCategoryOld
 		poolSize = poolSizeOld
 		quit = quitOld
+		checker = checkerOld
+	}
+}
+
+func Test_mainCheckerError(t *testing.T) {
+	oldServerActive := serverActive
+	serverActive = true
+	oldCheckerError := checkerError
+	checkerError = errors.New("error")
+	defer func() {
+		serverActive = oldServerActive
+		checkerError = oldCheckerError
+	}()
+
+	go func() {
+		time.Sleep(time.Second)
+		quit <- struct{}{}
+	}()
+
+	t.Run("Checker Fail Test", func(t *testing.T) {
+		main()
+	})
+}
+
+func Test_getSyncProvider(t *testing.T) {
+	type args struct {
+		c map[string]map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want reflect.Type
+	}{
+		{
+			"No Provider",
+			args{},
+			nil,
+		},
+		{
+			"Local Provider",
+			args{
+				map[string]map[string]string{
+					"app": {"syncDBProvider": "local"},
+					"local": {
+						"dbPath": "./testdata/testdb",
+					},
+				},
+			},
+			reflect.TypeOf(&scribbleChecker{}),
+		},
+		{
+			"Firestore Provider",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncDBProvider": "firestore",
+					},
+					"gcp": {
+						"projectID": "fake-project-id-12345",
+						"docPath":   "sync-server/wporg",
+					},
+				},
+			},
+			reflect.TypeOf(&firestore.FirestoreSync{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, _ := getSyncProvider(tt.args.c); reflect.TypeOf(got) != tt.want {
+				t.Errorf("getSyncProvider() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
+	}
+}
+
+func Test_getDispatcher(t *testing.T) {
+	type args struct {
+		c map[string]map[string]string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    reflect.Type
+		wantErr bool
+	}{
+		{
+			"Firestore Dispatcher",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncPHPCSActive":      "on",
+						"syncLighthouseActive": "on",
+						"messageProvider":      "firestore",
+					},
+					"gcp":
+					{
+						"projectID":            "fake-id",
+						"docPath":              "doc",
+						"lighthouseCollection": "fake-lh",
+						"phpcsCollection":      "fake-phpcs",
+					},
+				},
+			},
+			reflect.TypeOf(&firestoreDispatcher{}),
+			false,
+		},
+		{
+			"SQS Dispatcher",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncPHPCSActive":      "on",
+						"syncLighthouseActive": "on",
+						"messageProvider":      "sqs",
+					},
+					"aws":
+					{
+						"key":             "abc",
+						"secret":          "def",
+						"sqs_region":      "us-west-2",
+						"sqs_lh_queue":    "fake-lh",
+						"sqs_phpcs_queue": "fake-phpcs",
+					},
+				},
+			},
+			reflect.TypeOf(&sqsDispatcher{}),
+			false,
+		},
+		{
+			"MongoDB Dispatcher",
+			args{
+				map[string]map[string]string{
+					"app": {
+						"syncPHPCSActive":      "on",
+						"syncLighthouseActive": "on",
+						"messageProvider":      "local",
+					},
+					"mongo":
+					{
+						"user": "",
+						"pass": "",
+						"host": "localhost:12345",
+						"database": "queue",
+						"lighthouseCollection": "fake-lh",
+						"phpcsCollection":      "fake-phpcs",
+					},
+				},
+			},
+			reflect.TypeOf(&mongoDispatcher{}),
+			false,
+		},
+		{
+			"Nil Dispatcher",
+			args{},
+			nil,
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getDispatcher(tt.args.c)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getDispatcher() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if reflect.TypeOf(got) != tt.want {
+				t.Errorf("getDispatcher() = %v, want %v", reflect.TypeOf(got), tt.want)
+			}
+		})
 	}
 }
