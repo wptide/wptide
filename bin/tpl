@@ -100,7 +100,6 @@ uniqueKeys=(
     SECURE_AUTH_SALT
     LOGGED_IN_SALT
     NONCE_SALT
-    CACHE_KEY_SALT
 )
 
 ## Export the unique Keys and Salts.
