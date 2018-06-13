@@ -112,7 +112,7 @@ imports:
 - name: github.com/toqueteos/trie
   version: 56fed4a05683322f125e2d78ee269bb102280392
 - name: github.com/wptide/pkg
-  version: aebc2f7c0993d9f1c105eed4a343d7965da377da
+  version: 016dfcb8675051b3f6794de764f7abedfe6a4f36
   subpackages:
   - env
   - log
