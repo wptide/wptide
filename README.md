@@ -275,7 +275,7 @@ from the `audit-server` user profile.
 | `API_REDIS_HOST` | The host where the Redis database can be reached. Default is `api-redis`. |
 | `API_REDIS_PORT` | The port where the Redis database can be reached. Default is `6379`. |
 | `API_SECRET` | The API secret used locally to authenticate the `audit-server` user. Default is `rVvUWQlPQr8trSEd2qdwmE4Eiua$MjLX`. Change this in production. |
-| `API_THEME` | The slug of the local WordPress theme. Default is `twentyseventeen`. |
+| `API_THEME` | The slug of the local WordPress theme. Default is `docs`. |
 | `API_UPLOAD_HANDLER` | Tells WordPress how media upload is handled. Uses either the local file system or Google Cloud Storage. Must be one of: `local`, `gcs`. Default is `local`. |
 | `API_VERSION` | The API version found in the Tide API REST url, used both locally and on GCP. Default is `v1`. |
 
