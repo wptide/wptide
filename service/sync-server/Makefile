@@ -48,6 +48,10 @@ sync.build.up: sync.build.image sync.up
 sync.up:
 	@docker-compose up sync-server
 
+# Start the Sync Server Docker daemon in isolation with docker-compose up.
+sync.upd:
+	@docker-compose up -d sync-server
+
 # Take the isolated Sync Server Docker image down.
 sync.down: sync.stop sync.rm
 

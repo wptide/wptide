@@ -47,6 +47,10 @@ phpcs.build.up: phpcs.build.image phpcs.up
 phpcs.up:
 	@docker-compose up phpcs-server
 
+# Start the PHPCS Server Docker daemon in isolation with docker-compose up.
+phpcs.upd:
+	@docker-compose up -d phpcs-server
+
 # Take the isolated PHPCS Server Docker image down.
 phpcs.down: phpcs.stop phpcs.rm
 

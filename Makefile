@@ -66,6 +66,10 @@ build.up: build.images up
 up:
 	@docker-compose up
 
+# Start the Docker daemon with docker-compose up.
+upd:
+	@docker-compose -d up
+
 # Stop the Docker images with docker-compose down.
 down:
 	@docker-compose down

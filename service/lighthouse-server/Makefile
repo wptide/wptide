@@ -47,6 +47,10 @@ lighthouse.build.up: lighthouse.build.image lighthouse.up
 lighthouse.up:
 	@docker-compose up lighthouse-server
 
+# Start the Lighthouse Server Docker daemon in isolation with docker-compose up.
+lighthouse.upd:
+	@docker-compose up -d lighthouse-server
+
 # Take the isolated Lighthouse Server Docker image down.
 lighthouse.down: lighthouse.stop lighthouse.rm
 
