@@ -27,6 +27,7 @@ services:
             API_BLOG_DESCRIPTION: ${API_BLOG_DESCRIPTION}
             API_BLOG_NAME: ${API_BLOG_NAME}
             API_CACHE_DEBUG: ${API_CACHE_DEBUG}
+            API_CACHE_KEY_SALT: ${API_CACHE_KEY_SALT}
             API_CACHE_TTL: ${API_CACHE_TTL}
             API_DB_HOST: ${API_DB_HOST}
             API_DB_NAME: ${API_DB_NAME}
