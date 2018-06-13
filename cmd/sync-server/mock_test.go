@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+
 	"github.com/wptide/pkg/message"
 )
 

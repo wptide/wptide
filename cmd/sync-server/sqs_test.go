@@ -59,7 +59,7 @@ var (
 )
 
 func initMockProviders(s *sqsDispatcher) {
-	for queueID, _ := range s.Queues {
+	for queueID := range s.Queues {
 		queueProvider, ok := s.providers[queueID]
 		if !ok {
 			queueProvider = &mockProvider{}
@@ -84,7 +84,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 			Active   bool
 			Accepts  string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	type args struct {
 		project wporg.RepoProject
@@ -100,7 +100,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 			"Theme Project",
 			fields{
 				testQueues,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -114,7 +114,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 			"Plugin Project",
 			fields{
 				testQueues,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -128,7 +128,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 			"Theme Project - No Init()",
 			fields{
 				testQueues,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -142,7 +142,7 @@ func Test_sqsDispatcher_Dispatch(t *testing.T) {
 			"Theme Project - Provider Fail",
 			fields{
 				testQueues,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -183,7 +183,7 @@ func Test_sqsDispatcher_Init(t *testing.T) {
 			Active   bool
 			Accepts  string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	tests := []struct {
 		name    string
@@ -194,7 +194,7 @@ func Test_sqsDispatcher_Init(t *testing.T) {
 			"Init Providers",
 			fields{
 				testQueues,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			false,
 		},
@@ -223,7 +223,7 @@ func Test_sqsDispatcher_Close(t *testing.T) {
 			Active   bool
 			Accepts  string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	tests := []struct {
 		name    string
@@ -234,7 +234,7 @@ func Test_sqsDispatcher_Close(t *testing.T) {
 			"Close with collections",
 			fields{
 				testQueues,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			false,
 		},

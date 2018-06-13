@@ -38,7 +38,7 @@ var (
 )
 
 func initMockMongoProviders(m mongoDispatcher) {
-	for collectionID, _ := range m.Collections {
+	for collectionID := range m.Collections {
 		queueProvider, ok := m.providers[collectionID]
 		if !ok {
 			queueProvider = &mockProvider{}
@@ -59,7 +59,7 @@ func Test_mongoDispatcher_Dispatch(t *testing.T) {
 			Active     bool
 			Accepts    string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	type args struct {
 		project wporg.RepoProject
@@ -80,7 +80,7 @@ func Test_mongoDispatcher_Dispatch(t *testing.T) {
 				"mock-host:1234",
 				"test-queue",
 				mongoCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -99,7 +99,7 @@ func Test_mongoDispatcher_Dispatch(t *testing.T) {
 				"mock-host:1234",
 				"test-queue",
 				mongoCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -118,7 +118,7 @@ func Test_mongoDispatcher_Dispatch(t *testing.T) {
 				"mock-host:1234",
 				"test-queue",
 				mongoCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -137,7 +137,7 @@ func Test_mongoDispatcher_Dispatch(t *testing.T) {
 				"mock-host:1234",
 				"test-queue",
 				mongoCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -184,7 +184,7 @@ func Test_mongoDispatcher_Init(t *testing.T) {
 			Active     bool
 			Accepts    string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	tests := []struct {
 		name    string
@@ -200,7 +200,7 @@ func Test_mongoDispatcher_Init(t *testing.T) {
 				"mock-host:1234",
 				"test-queue",
 				mongoCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			false,
 		}}
@@ -234,7 +234,7 @@ func Test_mongoDispatcher_Close(t *testing.T) {
 			Active     bool
 			Accepts    string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	tests := []struct {
 		name    string
@@ -250,7 +250,7 @@ func Test_mongoDispatcher_Close(t *testing.T) {
 				"localhost:27017",
 				"mock-db",
 				mongoCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			false,
 		},

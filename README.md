@@ -449,7 +449,7 @@ GCP. Be sure to use the same region you chose during the earlier
 
 | Variable | Description |
 | :--- | :--- |
-| `GCP_PROJECT` | The unique ID of you Google project. |
+| `GCP_PROJECT` | The unique ID of you Google project. Default is `tide-local`. Note: you must update this value if you plan to use **any** GCP resources, for purely local development the default value will work as-is. |
 | `GCP_REGION` | The [region][regions-and-zones] where all your resources will be created. For example, `us-west1`. |
 | `GCP_ZONE` | The preferred [zone][regions-and-zones] in your region that resources will be created, For example, `us-west1-a`. |
 

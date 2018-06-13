@@ -21,7 +21,7 @@ import (
 	"github.com/wptide/pkg/wporg"
 )
 
-var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+var mockThemesAPI = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	bodyByte, _ := ioutil.ReadAll(r.Body)
 	parts := strings.Split(string(bodyByte), "&")
 
@@ -47,13 +47,12 @@ var mockThemesApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWrit
 			return
 		case "request[browse]=fail":
 			panic("failed!")
-			return
 		}
 	}
 	fmt.Fprintln(w, `invalid`)
 }))
 
-var mockPluginsApi = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+var mockPluginsAPI = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	bodyByte, _ := ioutil.ReadAll(r.Body)
 	parts := strings.Split(string(bodyByte), "&")
 
@@ -141,7 +140,7 @@ func Test_fetcher(t *testing.T) {
 		args    args
 		sources sources
 		want    reflect.Type
-		checker sync.UpdateSyncChecker
+		checker sync.UpdateChecker
 	}{
 		{
 			"Themes",
@@ -153,8 +152,8 @@ func Test_fetcher(t *testing.T) {
 				-1,
 			},
 			sources{
-				mockPluginsApi.URL,
-				mockThemesApi.URL,
+				mockPluginsAPI.URL,
+				mockThemesAPI.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
 			mockChecker{},
@@ -169,8 +168,8 @@ func Test_fetcher(t *testing.T) {
 				-1,
 			},
 			sources{
-				mockPluginsApi.URL,
-				mockThemesApi.URL,
+				mockPluginsAPI.URL,
+				mockThemesAPI.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
 			mockChecker{},
@@ -185,8 +184,8 @@ func Test_fetcher(t *testing.T) {
 				2,
 			},
 			sources{
-				mockPluginsApi.URL,
-				mockThemesApi.URL,
+				mockPluginsAPI.URL,
+				mockThemesAPI.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
 			mockChecker{},
@@ -201,8 +200,8 @@ func Test_fetcher(t *testing.T) {
 				-1,
 			},
 			sources{
-				mockPluginsApi.URL,
-				mockThemesApi.URL,
+				mockPluginsAPI.URL,
+				mockThemesAPI.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
 			mockChecker{},
@@ -217,8 +216,8 @@ func Test_fetcher(t *testing.T) {
 				-1,
 			},
 			sources{
-				mockPluginsApi.URL,
-				mockThemesApi.URL,
+				mockPluginsAPI.URL,
+				mockThemesAPI.URL,
 			},
 			reflect.TypeOf(make(<-chan wporg.RepoProject)),
 			nil,
@@ -227,8 +226,8 @@ func Test_fetcher(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set mock sources.
-			client.SetPluginApiSource(tt.sources.plugins)
-			client.SetThemeApiSource(tt.sources.themes)
+			client.SetPluginAPISource(tt.sources.plugins)
+			client.SetThemeAPISource(tt.sources.themes)
 
 			if tt.checker != nil {
 				oldChecker := checker
@@ -294,7 +293,7 @@ func Test_infoWorker(t *testing.T) {
 
 	type args struct {
 		project    wporg.RepoProject
-		checker    sync.UpdateChecker
+		checker    sync.Updater
 		dispatcher sync.Dispatcher
 		messages   chan *message.Message
 	}
@@ -347,7 +346,7 @@ func Test_pool(t *testing.T) {
 	type args struct {
 		workers    int
 		project    wporg.RepoProject
-		checker    sync.UpdateChecker
+		checker    sync.Updater
 		dispatcher sync.Dispatcher
 		messages   chan *message.Message
 	}
@@ -516,7 +515,7 @@ func Test_getSyncProvider(t *testing.T) {
 					},
 				},
 			},
-			reflect.TypeOf(&firestore.FirestoreSync{}),
+			reflect.TypeOf(&firestore.Sync{}),
 		},
 	}
 	for _, tt := range tests {
@@ -547,8 +546,7 @@ func Test_getDispatcher(t *testing.T) {
 						"syncLighthouseActive": "on",
 						"messageProvider":      "firestore",
 					},
-					"gcp":
-					{
+					"gcp": {
 						"projectID":            "fake-id",
 						"docPath":              "doc",
 						"lighthouseCollection": "fake-lh",
@@ -568,8 +566,7 @@ func Test_getDispatcher(t *testing.T) {
 						"syncLighthouseActive": "on",
 						"messageProvider":      "sqs",
 					},
-					"aws":
-					{
+					"aws": {
 						"key":             "abc",
 						"secret":          "def",
 						"sqs_region":      "us-west-2",
@@ -590,12 +587,11 @@ func Test_getDispatcher(t *testing.T) {
 						"syncLighthouseActive": "on",
 						"messageProvider":      "local",
 					},
-					"mongo":
-					{
-						"user": "",
-						"pass": "",
-						"host": "localhost:12345",
-						"database": "queue",
+					"mongo": {
+						"user":                 "",
+						"pass":                 "",
+						"host":                 "localhost:12345",
+						"database":             "queue",
 						"lighthouseCollection": "fake-lh",
 						"phpcsCollection":      "fake-phpcs",
 					},
