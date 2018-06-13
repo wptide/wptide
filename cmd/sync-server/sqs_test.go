@@ -59,7 +59,7 @@ var (
 )
 
 func initMockProviders(s *sqsDispatcher) {
-	for queueID, _ := range s.Queues {
+	for queueID := range s.Queues {
 		queueProvider, ok := s.providers[queueID]
 		if !ok {
 			queueProvider = &mockProvider{}

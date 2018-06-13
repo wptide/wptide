@@ -37,7 +37,7 @@ var (
 )
 
 func initMockFSProviders(fs *firestoreDispatcher) {
-	for collectionID, _ := range fs.Collections {
+	for collectionID := range fs.Collections {
 		queueProvider, ok := fs.providers[collectionID]
 		if !ok {
 			queueProvider = &mockProvider{}

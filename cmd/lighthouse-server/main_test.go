@@ -10,12 +10,12 @@ import (
 	"time"
 
 	"github.com/wptide/pkg/message"
+	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/message/mongo"
+	"github.com/wptide/pkg/message/sqs"
 	"github.com/wptide/pkg/storage/gcs"
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/storage/s3"
-	"github.com/wptide/pkg/message/firestore"
-	"github.com/wptide/pkg/message/sqs"
-	"github.com/wptide/pkg/message/mongo"
 )
 
 var (
@@ -82,7 +82,7 @@ func Test_main(t *testing.T) {
 		parseFlags     bool
 		version        bool
 		authError      bool
-		flagUrl        *string
+		flagURL        *string
 		flagOutput     *string
 		flagVisibility *string
 		altConfig      *processConfig
@@ -141,7 +141,7 @@ func Test_main(t *testing.T) {
 			"Run Main - URL and Visibility Flag set",
 			args{
 				timeOut:        1,
-				flagUrl:        &[]string{testFileServer.URL + "/test.zip"}[0],
+				flagURL:        &[]string{testFileServer.URL + "/test.zip"}[0],
 				flagVisibility: &[]string{"public"}[0],
 			},
 		},
@@ -167,8 +167,8 @@ func Test_main(t *testing.T) {
 			}
 
 			// -url
-			if tt.args.flagUrl != nil && *tt.args.flagUrl != "" {
-				flagUrl = tt.args.flagUrl
+			if tt.args.flagURL != nil && *tt.args.flagURL != "" {
+				flagURL = tt.args.flagURL
 			}
 
 			// -visibility
@@ -183,10 +183,10 @@ func Test_main(t *testing.T) {
 			}
 
 			if tt.args.authError {
-				oldId := serviceConfig["tide"]["key"]
+				oldID := serviceConfig["tide"]["key"]
 				serviceConfig["tide"]["key"] = "error"
 				defer func() {
-					serviceConfig["tide"]["key"] = oldId
+					serviceConfig["tide"]["key"] = oldID
 				}()
 			}
 
@@ -457,8 +457,7 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "sqs",
 					},
-					"aws":
-					{
+					"aws": {
 						"key":        "",
 						"secret":     "",
 						"sqs_region": "",
@@ -476,8 +475,7 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "firestore",
 					},
-					"gcp":
-					{
+					"gcp": {
 						"project":   "mock-project-id",
 						"gcf_queue": "test-queue",
 					},
@@ -492,13 +490,12 @@ func Test_getMessageProvider(t *testing.T) {
 					"app": {
 						"message_provider": "local",
 					},
-					"mongo":
-					{
-						"user": "test",
-						"pass": "test",
-						"host": "localhost:27017",
+					"mongo": {
+						"user":     "test",
+						"pass":     "test",
+						"host":     "localhost:27017",
 						"database": "test-db",
-						"queue": "test-queue",
+						"queue":    "test-queue",
 					},
 				},
 			},

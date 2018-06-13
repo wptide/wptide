@@ -38,7 +38,7 @@ var (
 )
 
 func initMockMongoProviders(m mongoDispatcher) {
-	for collectionID, _ := range m.Collections {
+	for collectionID := range m.Collections {
 		queueProvider, ok := m.providers[collectionID]
 		if !ok {
 			queueProvider = &mockProvider{}

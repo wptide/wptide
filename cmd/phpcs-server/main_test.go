@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"log"
 	"os"
 	"reflect"
@@ -18,7 +19,6 @@ import (
 	"github.com/wptide/pkg/storage/local"
 	"github.com/wptide/pkg/storage/s3"
 	"github.com/wptide/pkg/tide"
-	"errors"
 )
 
 var (
@@ -85,7 +85,7 @@ func Test_main(t *testing.T) {
 		parseFlags     bool
 		version        bool
 		authError      bool
-		flagUrl        *string
+		flagURL        *string
 		flagOutput     *string
 		flagVisibility *string
 		flagWPRuleset  *string
@@ -141,7 +141,7 @@ func Test_main(t *testing.T) {
 			args{
 				messageChannel: make(chan message.Message, 1),
 				timeOut:        1,
-				flagUrl:        &[]string{testFileServer.URL + "/test.zip"}[0],
+				flagURL:        &[]string{testFileServer.URL + "/test.zip"}[0],
 				flagVisibility: &[]string{"public"}[0],
 			},
 		},
@@ -200,10 +200,10 @@ func Test_main(t *testing.T) {
 			}
 
 			// -url
-			if tt.args.flagUrl != nil && *tt.args.flagUrl != "" {
-				flagUrl = tt.args.flagUrl
+			if tt.args.flagURL != nil && *tt.args.flagURL != "" {
+				flagURL = tt.args.flagURL
 				defer func() {
-					flagUrl = &[]string{""}[0]
+					flagURL = &[]string{""}[0]
 				}()
 			}
 
@@ -231,10 +231,10 @@ func Test_main(t *testing.T) {
 			}
 
 			if tt.args.authError {
-				oldId := serviceConfig["tide"]["key"]
+				oldID := serviceConfig["tide"]["key"]
 				serviceConfig["tide"]["key"] = "error"
 				defer func() {
-					serviceConfig["tide"]["key"] = oldId
+					serviceConfig["tide"]["key"] = oldID
 				}()
 			}
 

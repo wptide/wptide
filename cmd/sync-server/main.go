@@ -1,17 +1,18 @@
 package main
 
 import (
-	"github.com/wptide/pkg/sync"
-	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/wporg"
-	"time"
+	"context"
 	"fmt"
-	"strings"
-	"github.com/wptide/pkg/env"
 	"log"
 	"strconv"
-	"context"
+	"strings"
+	"time"
+
+	"github.com/wptide/pkg/env"
+	"github.com/wptide/pkg/message"
+	"github.com/wptide/pkg/sync"
 	"github.com/wptide/pkg/sync/firestore"
+	"github.com/wptide/pkg/wporg"
 )
 
 var (
@@ -105,7 +106,7 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 					// If the latest item's update time is less than the recorded last updated item
 					// then set pages out of bounds to break the next loop.
 					// We won't `continue` yet and might as well continue looping the items we have.
-					if ! timeAfterEqual(*mostRecent, lastSync, timeFormat) {
+					if !timeAfterEqual(*mostRecent, lastSync, timeFormat) {
 						page = pages
 						pages = 0
 					}
@@ -128,7 +129,7 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 					}
 				}
 
-				page += 1
+				page++
 			}
 
 			// Set sync stop time for projectType.
@@ -233,15 +234,15 @@ func main() {
 
 	// SYNC_ACTIVE must be set to "on". This is to ensure you know what you are
 	// doing and not flooding message queues.
-	if ! serverActive {
+	if !serverActive {
 		log.Println("Sync Server not active. Please set ENV variable `SYNC_ACTIVE=on`.")
-		return;
+		return
 	}
 
 	// If sync client doesn't exist then exit.
 	if checkerError != nil {
 		log.Println("Sync client failed to initialize.")
-		return;
+		return
 	}
 
 	// Message channel.
@@ -403,33 +404,28 @@ func getServiceConfig() map[string]map[string]string {
 			"syncDBProvider":       env.GetEnv("SYNC_DATABASE_PROVIDER", "local"),
 			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "local"),
 		},
-		"message":
-		{
+		"message": {
 			"forceSync":  strings.ToLower(env.GetEnv("SYNC_FORCE_AUDITS", "no")),
 			"apiClient":  env.GetEnv("SYNC_DEFAULT_CLIENT", "wporg"),
 			"visibility": env.GetEnv("SYNC_DEFAULT_VISIBILITY", "public"),
 		},
-		"local":
-		{
+		"local": {
 			"dbPath": env.GetEnv("SYNC_DATA", "./db"),
 		},
-		"aws":
-		{
+		"aws": {
 			"key":             env.GetEnv("AWS_API_KEY", ""),
 			"secret":          env.GetEnv("AWS_API_SECRET", ""),
 			"sqs_region":      env.GetEnv("AWS_SQS_REGION", ""),
 			"sqs_lh_queue":    env.GetEnv("AWS_SQS_QUEUE_LH", ""),
 			"sqs_phpcs_queue": env.GetEnv("AWS_SQS_QUEUE_PHPCS", ""),
 		},
-		"gcp":
-		{
+		"gcp": {
 			"projectID":            env.GetEnv("GCP_PROJECT", ""),
 			"docPath":              env.GetEnv("SYNC_DATABASE_DOCUMENT_PATH", "sync-server/wporg"),
 			"lighthouseCollection": env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
 			"phpcsCollection":      env.GetEnv("GCF_QUEUE_PHPCS", "queue-phpcs"),
 		},
-		"mongo":
-		{
+		"mongo": {
 			"user":                 env.GetEnv("MONGO_DATABASE_USERNAME", ""),
 			"pass":                 env.GetEnv("MONGO_DATABASE_PASSWORD", ""),
 			"host":                 "localhost:27017",
@@ -437,8 +433,7 @@ func getServiceConfig() map[string]map[string]string {
 			"lighthouseCollection": env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
 			"phpcsCollection":      env.GetEnv("MONGO_QUEUE_PHPCS", "phpcs"),
 		},
-		"tide":
-		{
+		"tide": {
 			"host":     env.GetEnv("API_HTTP_HOST", "wptide.org"),
 			"protocol": env.GetEnv("API_PROTOCOL", "https"),
 			"version":  env.GetEnv("API_VERSION", "v1"),
