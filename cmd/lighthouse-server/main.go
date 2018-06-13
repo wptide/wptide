@@ -27,7 +27,7 @@ import (
 type processConfig struct {
 	igTempFolder      string
 	lhTempFolder      string
-	lhStorageProvider storage.StorageProvider
+	lhStorageProvider storage.Provider
 	resPayloaders     map[string]payload.Payloader
 }
 
@@ -266,7 +266,7 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 
 // pollProvider polls the message provider for
 // the next message and upon success it gets added to the channel.
-func pollProvider(c chan message.Message, provider message.MessageProvider) {
+func pollProvider(c chan message.Message, provider message.Provider) {
 
 	// Run this concurrently.
 	go func() {
@@ -316,7 +316,7 @@ func executeProcessFunc(proc process.Processor, msg message.Message, result *pro
 
 // getStorageProvider returns a storage provider given the provided configurations from
 // the environment variables.
-func getStorageProvider(config map[string]map[string]string) storage.StorageProvider {
+func getStorageProvider(config map[string]map[string]string) storage.Provider {
 	switch config["app"]["storage_provider"] {
 	case "s3":
 		conf := config["aws"]
@@ -333,7 +333,7 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 
 // getStorageProvider returns a message/queue provider given the provided configurations
 // from the environment variables.
-func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
+func getMessageProvider(config map[string]map[string]string) message.Provider {
 
 	switch config["app"]["message_provider"] {
 	case "sqs":

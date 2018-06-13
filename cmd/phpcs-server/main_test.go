@@ -264,7 +264,7 @@ func resetServiceConfig() {
 func Test_pollProvider(t *testing.T) {
 	type args struct {
 		c        chan message.Message
-		provider message.MessageProvider
+		provider message.Provider
 	}
 	tests := []struct {
 		name string
@@ -444,7 +444,7 @@ func Test_getStorageProvider(t *testing.T) {
 					},
 				},
 			},
-			reflect.TypeOf(&s3.S3Provider{}),
+			reflect.TypeOf(&s3.Provider{}),
 		},
 		{
 			"GCS Provider",
@@ -516,7 +516,7 @@ func Test_getMessageProvider(t *testing.T) {
 					},
 				},
 			},
-			reflect.TypeOf(&sqs.SqsProvider{}),
+			reflect.TypeOf(&sqs.Provider{}),
 		},
 		{
 			"Firestore Provider",
@@ -531,7 +531,7 @@ func Test_getMessageProvider(t *testing.T) {
 					},
 				},
 			},
-			reflect.TypeOf(&firestore.FirestoreProvider{}),
+			reflect.TypeOf(&firestore.Provider{}),
 		},
 		{
 			"Mongo Provider",
@@ -549,7 +549,7 @@ func Test_getMessageProvider(t *testing.T) {
 					},
 				},
 			},
-			reflect.TypeOf(&mongo.MongoProvider{}),
+			reflect.TypeOf(&mongo.Provider{}),
 		},
 	}
 	for _, tt := range tests {

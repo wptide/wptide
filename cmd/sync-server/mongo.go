@@ -21,7 +21,7 @@ type mongoDispatcher struct {
 		Active     bool
 		Accepts    string // "all" or "themes" or "plugins"
 	}
-	providers map[string]message.MessageProvider
+	providers map[string]message.Provider
 }
 
 func (m mongoDispatcher) Dispatch(project wporg.RepoProject) error {

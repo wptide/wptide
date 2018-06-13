@@ -59,7 +59,7 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 		// Don't do anything until a token is available.
 		<-token
 
-		var response *wporg.ApiResponse
+		var response *wporg.APIResponse
 		var err error
 
 		for {
@@ -151,7 +151,7 @@ func fetcher(projectType, category string, bufferSize int, token chan struct{}, 
 
 // pool starts a number of infoWorkers. This uses a "worker" pattern where each worker will
 // read from a projects channel to process the results.
-func pool(workers int, projects <-chan wporg.RepoProject, checker sync.UpdateChecker, dispatcher sync.Dispatcher, messages chan *message.Message) {
+func pool(workers int, projects <-chan wporg.RepoProject, checker sync.Updater, dispatcher sync.Dispatcher, messages chan *message.Message) {
 	for i := 0; i < workers; i++ {
 		go infoWorker(projects, checker, dispatcher, messages)
 	}
@@ -159,7 +159,7 @@ func pool(workers int, projects <-chan wporg.RepoProject, checker sync.UpdateChe
 
 // infoWorker reads a project from the projects channel, runs it through the update check
 // and (conditionally) sends it to the dispatcher which loads up the job queue.
-func infoWorker(projects <-chan wporg.RepoProject, checker sync.UpdateChecker, dispatcher sync.Dispatcher, messages chan *message.Message) {
+func infoWorker(projects <-chan wporg.RepoProject, checker sync.Updater, dispatcher sync.Dispatcher, messages chan *message.Message) {
 	for {
 		select {
 		case project := <-projects:
@@ -216,7 +216,7 @@ func timeAfterEqual(project wporg.RepoProject, t time.Time, format string) bool 
 }
 
 // mostRecentFromResponse returns the most recent project from the response.
-func mostRecentFromResponse(response *wporg.ApiResponse) *wporg.RepoProject {
+func mostRecentFromResponse(response *wporg.APIResponse) *wporg.RepoProject {
 	var mostRecent *wporg.RepoProject
 
 	if len(response.Themes) > 0 {
@@ -316,7 +316,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 					"themes",
 				},
 			},
-			providers: make(map[string]message.MessageProvider),
+			providers: make(map[string]message.Provider),
 		}, nil
 	case "firestore":
 		conf := c["gcp"]
@@ -339,7 +339,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 					"themes",
 				},
 			},
-			providers: make(map[string]message.MessageProvider),
+			providers: make(map[string]message.Provider),
 		}, nil
 	case "local":
 		conf := c["mongo"]
@@ -367,14 +367,14 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 					"themes",
 				},
 			},
-			providers: make(map[string]message.MessageProvider),
+			providers: make(map[string]message.Provider),
 		}, nil
 	default:
 		return nil, nil
 	}
 }
 
-func getSyncProvider(c map[string]map[string]string) (sync.UpdateSyncChecker, error) {
+func getSyncProvider(c map[string]map[string]string) (sync.UpdateChecker, error) {
 	switch c["app"]["syncDBProvider"] {
 	case "local":
 		conf := c["local"]

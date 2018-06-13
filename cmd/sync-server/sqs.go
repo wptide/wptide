@@ -18,7 +18,7 @@ type sqsDispatcher struct {
 		Active   bool
 		Accepts  string // "all" or "themes" or "plugins"
 	}
-	providers map[string]message.MessageProvider
+	providers map[string]message.Provider
 }
 
 func (s sqsDispatcher) Dispatch(project wporg.RepoProject) error {

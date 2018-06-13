@@ -54,7 +54,7 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 			Active     bool
 			Accepts    string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	type args struct {
 		project wporg.RepoProject
@@ -71,7 +71,7 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 			fields{
 				"fake-id",
 				testCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -86,7 +86,7 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 			fields{
 				"fake-id",
 				testCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -101,7 +101,7 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 			fields{
 				"fake-id",
 				testCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -116,7 +116,7 @@ func Test_firestoreDispatcher_Dispatch(t *testing.T) {
 			fields{
 				"fake-id",
 				testCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			args{
 				wporg.RepoProject{
@@ -154,7 +154,7 @@ func Test_firestoreDispatcher_Init(t *testing.T) {
 			Active     bool
 			Accepts    string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	tests := []struct {
 		name    string
@@ -166,7 +166,7 @@ func Test_firestoreDispatcher_Init(t *testing.T) {
 			fields{
 				"fake-id",
 				testCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			false,
 		}}
@@ -192,7 +192,7 @@ func Test_firestoreDispatcher_Close(t *testing.T) {
 			Active     bool
 			Accepts    string
 		}
-		providers map[string]message.MessageProvider
+		providers map[string]message.Provider
 	}
 	tests := []struct {
 		name    string
@@ -204,7 +204,7 @@ func Test_firestoreDispatcher_Close(t *testing.T) {
 			fields{
 				"abc",
 				testCollections,
-				make(map[string]message.MessageProvider),
+				make(map[string]message.Provider),
 			},
 			false,
 		},

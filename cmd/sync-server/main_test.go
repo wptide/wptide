@@ -140,7 +140,7 @@ func Test_fetcher(t *testing.T) {
 		args    args
 		sources sources
 		want    reflect.Type
-		checker sync.UpdateSyncChecker
+		checker sync.UpdateChecker
 	}{
 		{
 			"Themes",
@@ -226,8 +226,8 @@ func Test_fetcher(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set mock sources.
-			client.SetPluginApiSource(tt.sources.plugins)
-			client.SetThemeApiSource(tt.sources.themes)
+			client.SetPluginAPISource(tt.sources.plugins)
+			client.SetThemeAPISource(tt.sources.themes)
 
 			if tt.checker != nil {
 				oldChecker := checker
@@ -293,7 +293,7 @@ func Test_infoWorker(t *testing.T) {
 
 	type args struct {
 		project    wporg.RepoProject
-		checker    sync.UpdateChecker
+		checker    sync.Updater
 		dispatcher sync.Dispatcher
 		messages   chan *message.Message
 	}
@@ -346,7 +346,7 @@ func Test_pool(t *testing.T) {
 	type args struct {
 		workers    int
 		project    wporg.RepoProject
-		checker    sync.UpdateChecker
+		checker    sync.Updater
 		dispatcher sync.Dispatcher
 		messages   chan *message.Message
 	}
@@ -515,7 +515,7 @@ func Test_getSyncProvider(t *testing.T) {
 					},
 				},
 			},
-			reflect.TypeOf(&firestore.FirestoreSync{}),
+			reflect.TypeOf(&firestore.Sync{}),
 		},
 	}
 	for _, tt := range tests {

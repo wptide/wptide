@@ -16,7 +16,7 @@ type firestoreDispatcher struct {
 		Active     bool
 		Accepts    string // "all" or "themes" or "plugins"
 	}
-	providers map[string]message.MessageProvider
+	providers map[string]message.Provider
 }
 
 func (fs firestoreDispatcher) Dispatch(project wporg.RepoProject) error {
