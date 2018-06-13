@@ -1,19 +1,20 @@
 package main
 
 import (
-	"os"
-	"io"
-	"github.com/wptide/pkg/message"
-	"net/http/httptest"
-	"net/http"
-	"errors"
 	"context"
+	"errors"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"os"
+
+	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/process"
 )
 
 /** ----------------------------------------------
-	Mock Storage Provider
- */
+Mock Storage Provider
+*/
 
 type mockStorage struct{}
 
@@ -81,8 +82,8 @@ func (m mockPayloader) SendPayload(destination string, payload []byte) ([]byte, 
 }
 
 /** ----------------------------------------------
-	Mock Message Provider
- */
+Mock Message Provider
+*/
 
 type mockMessageProvider struct {
 	Type string
@@ -124,15 +125,15 @@ func (m mockMessageProvider) Close() error {
 }
 
 /** ----------------------------------------------
-	Mock Tide Client
- */
+Mock Tide Client
+*/
 
 type mockTide struct {
 	apiError bool
 }
 
-func (m mockTide) Authenticate(clientId, clientSecret, authEndpoint string) error {
-	if clientId == "error" {
+func (m mockTide) Authenticate(clientID, clientSecret, authEndpoint string) error {
+	if clientID == "error" {
 		return errors.New("something went wrong")
 	}
 
@@ -149,15 +150,15 @@ func (m mockTide) SendPayload(method, endpoint, data string) (string, error) {
 }
 
 /** ----------------------------------------------
-	Mock file server
- */
+Mock file server
+*/
 
 var testFileServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 }))
 
 /** ----------------------------------------------
-	Mock failed process
- */
+Mock failed process
+*/
 type mockFailedProcess struct {
 	option    string
 	shouldErr bool
@@ -186,11 +187,11 @@ func (m mockFailedProcess) SetFilesPath(path string)       {}
 func (m mockFailedProcess) GetFilesPath() string           { return "" }
 
 /** ----------------------------------------------
-	Mock processes
- */
+Mock processes
+*/
 
 func mockProcResponse(pre string, msg message.Message) error {
-	if msg.Slug == pre + "Fail" {
+	if msg.Slug == pre+"Fail" {
 		return errors.New("something went wrong")
 	}
 	return nil
