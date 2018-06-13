@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/wptide/pkg/wporg"
-	"github.com/nanobox-io/golang-scribble"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
-	"fmt"
+
+	"github.com/nanobox-io/golang-scribble"
+	"github.com/wptide/pkg/wporg"
 )
 
 var mutex = sync.Mutex{}

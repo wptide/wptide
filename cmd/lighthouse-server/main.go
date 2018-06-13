@@ -1,45 +1,47 @@
 package main
 
 import (
-	"github.com/wptide/pkg/message"
-	tideApi "github.com/wptide/pkg/tide"
-	"github.com/wptide/pkg/tide/api"
-	"github.com/wptide/pkg/message/sqs"
-	"time"
-	"log"
-	"github.com/wptide/pkg/env"
-	"github.com/wptide/pkg/storage"
-	"github.com/wptide/pkg/process"
-	"github.com/wptide/pkg/payload"
-	"fmt"
-	"flag"
-	"github.com/wptide/pkg/source"
-	"sync"
-	"github.com/wptide/pkg/storage/gcs"
 	"context"
-	"github.com/wptide/pkg/storage/s3"
-	"github.com/wptide/pkg/storage/local"
+	"flag"
+	"fmt"
+	"log"
+	"sync"
+	"time"
+
+	"github.com/wptide/pkg/env"
+	"github.com/wptide/pkg/message"
 	"github.com/wptide/pkg/message/firestore"
 	"github.com/wptide/pkg/message/mongo"
+	"github.com/wptide/pkg/message/sqs"
+	"github.com/wptide/pkg/payload"
+	"github.com/wptide/pkg/process"
+	"github.com/wptide/pkg/source"
+	"github.com/wptide/pkg/storage"
+	"github.com/wptide/pkg/storage/gcs"
+	"github.com/wptide/pkg/storage/local"
+	"github.com/wptide/pkg/storage/s3"
+	tideApi "github.com/wptide/pkg/tide"
+	"github.com/wptide/pkg/tide/api"
 )
 
 type processConfig struct {
 	igTempFolder      string
 	lhTempFolder      string
-	lhStorageProvider storage.StorageProvider
+	lhStorageProvider storage.Provider
 	resPayloaders     map[string]payload.Payloader
 }
 
 var (
-	/** Compile time variables. **/
-	Version string // Set during build.
-	Build   string // Set during build.
+	// Version is the binary version set during build.
+	Version string
+
+	// Build is the binary build number set during build.
+	Build string
 
 	// Lighthouse service configuration (as var so that we can also override).
 	serviceConfig = getServiceConfig()
 
-	/** Initialize interface instances **/
-	// Use the interface so that we can test.
+	// TideClient represents the instance that will write to the Tide API.
 	TideClient tideApi.ClientInterface = &api.Client{}
 
 	// Specify the payloads to be used for this service.
@@ -80,7 +82,7 @@ var (
 	bVersion = &[]bool{false}[0]
 
 	// A single URL to process. Will not poll queue.
-	flagUrl = &[]string{""}[0]
+	flagURL = &[]string{""}[0]
 
 	// Project visibility for URL. "private" or "public"
 	flagVisibility = &[]string{"private"}[0]
@@ -111,7 +113,7 @@ func main() {
 		flagOutput = flag.String("output", "", "send results to output file (json format)")
 
 		// A -url to run a single audit. Will not poll a queue.
-		flagUrl = flag.String("url", "", "audit single message from url")
+		flagURL = flag.String("url", "", "audit single message from url")
 
 		// A -visibility to run a single audit. Will not poll a queue.
 		flagVisibility = flag.String("visibility", "public", `"private" or "public" - default "pubic"`)
@@ -143,7 +145,7 @@ func main() {
 	}
 
 	// If -url is set then send a message using the URL.
-	if *flagUrl != "" {
+	if *flagURL != "" {
 
 		singleMessageType := "tide"
 		conf := serviceConfig["tide"]
@@ -161,8 +163,8 @@ func main() {
 				Title:               "Single Project",
 				Content:             "Single project URL provided.",
 				PayloadType:         singleMessageType,
-				SourceURL:           *flagUrl,
-				SourceType:          source.GetKind(*flagUrl),
+				SourceURL:           *flagURL,
+				SourceType:          source.GetKind(*flagURL),
 				Force:               true,
 				Visibility:          *flagVisibility,
 				RequestClient:       *flagClient,
@@ -178,7 +180,7 @@ func main() {
 
 	// Start polling the messageProvider if we didn't provide a url.
 	// Other processes can also queue the channel.
-	if *flagUrl == "" {
+	if *flagURL == "" {
 		log.Println("Polling message provider.")
 		pollProvider(cMessage, messageProvider)
 	}
@@ -254,9 +256,9 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 		err := messageProvider.DeleteMessage(msg.ExternalRef)
 		if err != nil {
 			return err
-		} else {
-			log.Println("'" + msg.Title + "' removed from message queue.")
 		}
+
+		log.Println("'" + msg.Title + "' removed from message queue.")
 	}
 
 	return nil
@@ -264,7 +266,7 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 
 // pollProvider polls the message provider for
 // the next message and upon success it gets added to the channel.
-func pollProvider(c chan message.Message, provider message.MessageProvider) {
+func pollProvider(c chan message.Message, provider message.Provider) {
 
 	// Run this concurrently.
 	go func() {
@@ -314,7 +316,7 @@ func executeProcessFunc(proc process.Processor, msg message.Message, result *pro
 
 // getStorageProvider returns a storage provider given the provided configurations from
 // the environment variables.
-func getStorageProvider(config map[string]map[string]string) storage.StorageProvider {
+func getStorageProvider(config map[string]map[string]string) storage.Provider {
 	switch config["app"]["storage_provider"] {
 	case "s3":
 		conf := config["aws"]
@@ -331,7 +333,7 @@ func getStorageProvider(config map[string]map[string]string) storage.StorageProv
 
 // getStorageProvider returns a message/queue provider given the provided configurations
 // from the environment variables.
-func getMessageProvider(config map[string]map[string]string) message.MessageProvider {
+func getMessageProvider(config map[string]map[string]string) message.Provider {
 
 	switch config["app"]["message_provider"] {
 	case "sqs":
@@ -360,8 +362,7 @@ func getServiceConfig() map[string]map[string]string {
 			"server_path":      "/srv/data",
 			"local_path":       "lighthouse",
 		},
-		"aws":
-		{
+		"aws": {
 			"key":        env.GetEnv("AWS_API_KEY", ""),
 			"secret":     env.GetEnv("AWS_API_SECRET", ""),
 			"sqs_region": env.GetEnv("AWS_SQS_REGION", ""),
@@ -369,22 +370,19 @@ func getServiceConfig() map[string]map[string]string {
 			"s3_region":  env.GetEnv("AWS_S3_REGION", ""),
 			"s3_bucket":  env.GetEnv("AWS_S3_BUCKET_NAME", ""),
 		},
-		"gcp":
-		{
+		"gcp": {
 			"project":    env.GetEnv("GCP_PROJECT", ""),
 			"gcs_bucket": env.GetEnv("GCS_BUCKET_NAME", ""),
 			"gcf_queue":  env.GetEnv("GCF_QUEUE_LH", "queue-lighthouse"),
 		},
-		"mongo":
-		{
+		"mongo": {
 			"user":     env.GetEnv("MONGO_DATABASE_USERNAME", ""),
 			"pass":     env.GetEnv("MONGO_DATABASE_PASSWORD", ""),
 			"host":     "localhost:27017",
 			"database": env.GetEnv("MONGO_DATABASE_NAME", "queue"),
 			"queue":    env.GetEnv("MONGO_QUEUE_LH", "lighthouse"),
 		},
-		"tide":
-		{
+		"tide": {
 			"key":      env.GetEnv("API_KEY", ""),
 			"secret":   env.GetEnv("API_SECRET", ""),
 			"auth":     env.GetEnv("API_AUTH_URL", ""),

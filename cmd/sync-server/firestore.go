@@ -1,21 +1,22 @@
 package main
 
 import (
-	"github.com/wptide/pkg/wporg"
-	"github.com/wptide/pkg/message"
-	"github.com/wptide/pkg/message/firestore"
 	"context"
 	"errors"
+
+	"github.com/wptide/pkg/message"
+	"github.com/wptide/pkg/message/firestore"
+	"github.com/wptide/pkg/wporg"
 )
 
 type firestoreDispatcher struct {
-	ProjectID  string
+	ProjectID   string
 	Collections map[string]struct {
 		Collection string
 		Active     bool
 		Accepts    string // "all" or "themes" or "plugins"
 	}
-	providers map[string]message.MessageProvider
+	providers map[string]message.Provider
 }
 
 func (fs firestoreDispatcher) Dispatch(project wporg.RepoProject) error {
@@ -24,8 +25,8 @@ func (fs firestoreDispatcher) Dispatch(project wporg.RepoProject) error {
 
 	for collectionID, collection := range fs.Collections {
 		queueProvider, ok := fs.providers[collectionID]
-		if ! ok {
-			return errors.New("Could not access queue. Make sure the dispatcher is initialised.")
+		if !ok {
+			return errors.New("could not access queue: make sure the dispatcher is initialised")
 		}
 		if collection.Active && (collection.Accepts == project.Type || collection.Accepts == "all") {
 			err := queueProvider.SendMessage(msg)
@@ -35,12 +36,13 @@ func (fs firestoreDispatcher) Dispatch(project wporg.RepoProject) error {
 		}
 	}
 
-	return nil}
+	return nil
+}
 
 func (fs *firestoreDispatcher) Init() error {
 	for collectionID, collection := range fs.Collections {
 		messageProvider, ok := fs.providers[collectionID]
-		if ! ok {
+		if !ok {
 			messageProvider, _ = firestore.New(context.Background(), fs.ProjectID, collection.Collection)
 			fs.providers[collectionID] = messageProvider
 		}
@@ -49,7 +51,7 @@ func (fs *firestoreDispatcher) Init() error {
 }
 
 func (fs *firestoreDispatcher) Close() error {
-	for collectionID, _ := range fs.Collections {
+	for collectionID := range fs.Collections {
 		if messageProvider, ok := fs.providers[collectionID]; ok {
 			messageProvider.Close()
 		}

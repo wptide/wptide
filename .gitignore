@@ -33,7 +33,7 @@ service/api/wp-content/plugins/gmail-smtp
 service/api/wp-content/plugins/pj-page-cache-red
 service/api/wp-content/plugins/wp-redis
 service/api/wp-content/themes
-!service/api/wp-content/themes/tide
+!service/api/wp-content/themes/docs
 service/api/wp-content/uploads
 service/api/wp-content/upgrade
 service/api/app.yaml

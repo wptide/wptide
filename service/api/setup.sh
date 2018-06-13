@@ -37,7 +37,7 @@ if [ "${API_BLOG_DESCRIPTION}" ]; then
 fi
 
 # Checking out .org theme
-if [ "tide" != "${API_THEME}" ] && [ "twentyseventeen" != "${API_THEME}" ]; then
+if [ "docs" != "${API_THEME}" ] && [ "twentyseventeen" != "${API_THEME}" ]; then
     echo
     echo "Checking out theme ..."
     vendor/bin/wp theme install ${API_THEME} --path=wordpress --allow-root
