@@ -95,6 +95,6 @@ echo
 echo "Be sure to add '${BOLD}127.0.0.1 ${API_HTTP_HOST}${RESET}' to your hosts file."
 echo "Use the following command (${RED}with caution${RESET}):"
 echo
-echo "${YELLOW}sudo echo \"127.0.0.1 ${API_HTTP_HOST}\" >> /private/etc/hosts${RESET}"
+echo "${YELLOW}echo \"127.0.0.1 ${API_HTTP_HOST}\" | sudo tee -a /private/etc/hosts${RESET}"
 echo
 exit 0
