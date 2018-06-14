@@ -10,10 +10,10 @@ services:
             - ./service/api:/app
             - ./service/api/nginx-app.conf:/etc/nginx/conf.d/nginx-app.conf
             - ./service/api/php.ini:/opt/php72/lib/php.ini
-            - ./service/api/wp-content:/app/wordpress/wp-content:ro
+            - ./service/api/wp-content:/app/wordpress/wp-content
             - ./service-account.json:/srv/service-account.json:ro
-            - ./data/lighthouse-server:/app/wordpress/wp-content/uploads/lighthouse:ro
-            - ./data/phpcs-server:/app/wordpress/wp-content/uploads/phpcs:ro
+            - ./data/lighthouse-server:/app/wordpress/wp-content/uploads/lighthouse
+            - ./data/phpcs-server:/app/wordpress/wp-content/uploads/phpcs
         depends_on:
             - api-mysql
             - api-redis
