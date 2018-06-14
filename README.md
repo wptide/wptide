@@ -1,6 +1,6 @@
 # Tide
 
-[![Build Status](https://travis-ci.org/xwp/go-tide.svg?branch=develop)](https://travis-ci.org/xwp/go-tide) [![Coverage Status](https://coveralls.io/repos/github/xwp/go-tide/badge.svg?branch=develop)](https://coveralls.io/github/xwp/go-tide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md) [![Shipping faster with ZenHub.io](https://img.shields.io/badge/Shipping_faster_with-ZenHub.io-6567bd.svg?style=flat)](https://www.zenhub.com/)
+[![Build Status](https://travis-ci.org/wptide/wptide.svg?branch=develop)](https://travis-ci.org/wptide/wptide) [![Coverage Status](https://coveralls.io/repos/github/wptide/wptide/badge.svg?branch=develop)](https://coveralls.io/github/wptide/wptide?branch=develop) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](CONTRIBUTING.md) [![Shipping faster with ZenHub.io](https://img.shields.io/badge/Shipping_faster_with-ZenHub.io-6567bd.svg?style=flat)](https://www.zenhub.com/)
 
 > A rising tide lifts all boats.
 > -- United States President, John F. Kennedy (borrowed from the New England Council)
@@ -84,7 +84,7 @@ great detail when it comes to deploying Tide on GCP.
 Ensure you're in the directory where you would like to install Tide:
 
 ```
-git clone -b develop --recursive https://github.com/xwp/go-tide.git tide
+git clone -b develop --recursive https://github.com/wptide/wptide.git tide
 ```
 
 Change to Tide working directory:  
@@ -339,7 +339,7 @@ Lighthouse reports against themes, then sends the results back to the Tide API.
 
 #### Running Lighthouse audits
 
-Details on running Lighthouse audits are [available in the Tide wiki](https://github.com/xwp/go-tide/wiki/Running-Lighthouse-audits).
+Details on running Lighthouse audits are [available in the Tide wiki](https://github.com/wptide/wptide/wiki/Running-Lighthouse-audits).
 
 ---
 

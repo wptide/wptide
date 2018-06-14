@@ -1,4 +1,4 @@
-package: github.com/xwp/go-tide
+package: github.com/wptide/wptide
 import:
 - package: github.com/nanobox-io/golang-scribble
 - package: github.com/wptide/pkg
