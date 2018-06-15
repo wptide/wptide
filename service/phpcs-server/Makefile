@@ -75,14 +75,16 @@ phpcs.build.cluster: config
 	--machine-type ${GKE_PHPCS_MACHINE_TYPE} \
 	--image-type "COS" \
 	--disk-size ${GKE_PHPCS_DISK_SIZE} \
-	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
+	--scopes "https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
 	--preemptible \
 	--num-nodes ${GKE_PHPCS_NUM_NODES} \
 	--enable-cloud-logging \
 	--enable-cloud-monitoring \
 	--enable-autoscaling \
 	--min-nodes ${GKE_PHPCS_MIN_NODES} \
-	--max-nodes ${GKE_PHPCS_MAX_NODES}
+	--max-nodes ${GKE_PHPCS_MAX_NODES} \
+	--addons HorizontalPodAutoscaling,KubernetesDashboard \
+	--no-enable-autorepair
 
 # Get the PHPCS Server GKE cluster credentials.
 phpcs.creds:

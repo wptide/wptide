@@ -75,14 +75,16 @@ lighthouse.build.cluster: config
 	--machine-type ${GKE_LH_MACHINE_TYPE} \
 	--image-type "COS" \
 	--disk-size ${GKE_LH_DISK_SIZE} \
-	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
+	--scopes "https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
 	--preemptible \
 	--num-nodes ${GKE_LH_NUM_NODES} \
 	--enable-cloud-logging \
 	--enable-cloud-monitoring \
 	--enable-autoscaling \
 	--min-nodes ${GKE_LH_MIN_NODES} \
-	--max-nodes ${GKE_LH_MAX_NODES}
+	--max-nodes ${GKE_LH_MAX_NODES} \
+	--addons HorizontalPodAutoscaling,KubernetesDashboard \
+	--no-enable-autorepair
 
 # Get the Lighthouse Server GKE cluster credentials.
 lighthouse.creds:

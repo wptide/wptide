@@ -39,7 +39,8 @@
     "wordpress-install-dir": "wordpress",
     "copy-file": {
       "wp-config.php": "wordpress/wp-config.php",
-      "health-check.php": "wordpress/health-check.php"
+      "health-check.php": "wordpress/health-check.php",
+      "wp-content/themes/docs/": "wordpress/wp-content/themes/docs/"
     }
   },
   "config": {
