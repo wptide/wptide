@@ -36,6 +36,7 @@ service/api/wp-content/themes
 !service/api/wp-content/themes/docs
 service/api/wp-content/uploads
 service/api/wp-content/upgrade
+service/api/wp-content/debug.log
 service/api/app.yaml
 service/api/cron.yaml
 service/api/wp-config.php
