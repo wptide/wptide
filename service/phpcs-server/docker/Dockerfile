@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.7
 
 MAINTAINER XWP <engage@xwp.co>
 
@@ -20,12 +20,13 @@ RUN set -x \
         php7-phar \
     && curl -Lo /usr/local/bin/composer https://getcomposer.org/composer.phar \
     && chmod +x /usr/local/bin/composer \
-    && composer global require squizlabs/php_codesniffer:3.2.3 \
-    && composer global require wp-coding-standards/wpcs:0.14.1 \
-    && composer global require wimg/php-compatibility:dev-master \
+    && composer global require squizlabs/php_codesniffer:3.3.1 \
+    && composer global require wp-coding-standards/wpcs:1.0.0 \
+    && composer global require phpcompatibility/php-compatibility:8.2.0 \
+    && composer global require phpcompatibility/phpcompatibility-wp:1.0.0 \
     && $VENDOR/bin/phpcs --config-set show_progress 1 \
     && $VENDOR/bin/phpcs --config-set colors 1 \
-    && $VENDOR/bin/phpcs --config-set installed_paths $VENDOR/wp-coding-standards/wpcs,$VENDOR/wimg/php-compatibility \
+    && $VENDOR/bin/phpcs --config-set installed_paths $VENDOR/wp-coding-standards/wpcs,$VENDOR/phpcompatibility/php-compatibility,$VENDOR/phpcompatibility/phpcompatibility-wp \
     && rm /usr/local/bin/composer \
     && apk del --purge .build-deps \
     && mkdir -p /srv/data
