@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.8
 
 MAINTAINER XWP <engage@xwp.co>
 
@@ -20,7 +20,7 @@ RUN set -x \
         php7-phar \
     && curl -Lo /usr/local/bin/composer https://getcomposer.org/composer.phar \
     && chmod +x /usr/local/bin/composer \
-    && composer global require squizlabs/php_codesniffer:3.3.1 \
+    && composer global require squizlabs/php_codesniffer:3.2.3 \
     && composer global require wp-coding-standards/wpcs:1.0.0 \
     && composer global require phpcompatibility/php-compatibility:8.2.0 \
     && composer global require phpcompatibility/phpcompatibility-wp:1.0.0 \
