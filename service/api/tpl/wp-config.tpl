@@ -154,7 +154,7 @@ if ( true === WP_CACHE ) {
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
 define( 'WP_DEBUG', ! $is_gae );
-define( 'WP_DEBUG_LOG', true );
+define( 'WP_DEBUG_LOG', ! $is_gae );
 
 // API configuration settings.
 define( 'API_MESSAGE_PROVIDER', getenv( 'API_MESSAGE_PROVIDER' ) );
