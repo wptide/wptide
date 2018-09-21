@@ -18,7 +18,7 @@ quality in the developer consciousness. **Because a rising Tide lifts all boats.
    + [Introduction](#introduction)
    + [Dependencies](#dependencies)
    + [Cloning](#cloning)
-   + [Setup]($setup)
+   + [Setup](#setup)
        - [Environment Variables](#environment-variables)
        - [Google Cloud SDK](#google-cloud-sdk)
        - [Google App Engine](#google-app-engine)
