@@ -20,5 +20,5 @@ install:
   - glide install
 
 script:
-  - overalls -project=github.com/wptide/wptide -covermode=count -ignore=[.git,.glide,bin,data,service,vendor] -debug
+  - overalls -project=github.com/wptide/wptide -covermode=count -ignore='.git,.glide,bin,data,service,vendor' -debug
   - goveralls -coverprofile=overalls.coverprofile -service=travis-ci -repotoken=$COVERALLS_TOKEN
