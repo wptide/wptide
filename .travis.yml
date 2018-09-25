@@ -21,4 +21,4 @@ install:
 
 script:
   - overalls -project=github.com/wptide/wptide -covermode=count -ignore='.git,.glide,bin,data,service,vendor' -debug
-  - goveralls -coverprofile=overalls.coverprofile -service=travis-ci -repotoken=$COVERALLS_TOKEN
+  - goveralls -coverprofile=overalls.coverprofile -service=travis-ci
