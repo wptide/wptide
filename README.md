@@ -26,32 +26,32 @@ and the process for submitting pull requests to us.
 
 ---
 
+### Maintainers
+Tide has three project maintainers:
+<!-- ALL-MAINTAINERS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore -->
+| [<img src="https://avatars0.githubusercontent.com/u/62798?v=4" width="100px;"/><br /><sub><b>Derek Herman</b></sub>](https://github.com/valendesigns)<br /> | [<img src="https://avatars2.githubusercontent.com/u/2818133?v=4" width="100px;"/><br /><sub><b>Jeffrey Paul</b></sub>](https://github.com/jeffpaul)<br /> | [<img src="https://avatars1.githubusercontent.com/u/2127835?v=4" width="100px;"/><br /><sub><b>Rheinard Korf</b></sub>](https://github.com/rheinardkorf)<br /> |
+| :---: | :---: | :---: |
+<!-- ALL-MAINTAINERS-LIST:END -->
+
+---
+
+### Contributors
+Thanks goes to these wonderful people:
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore -->
+| [<img src="https://avatars3.githubusercontent.com/u/4959890?v=4" width="100px;"/><br /><sub><b>Bartek Makoś</b></sub>](https://github.com/MakiBM)<br /> | [<img src="https://avatars2.githubusercontent.com/u/29114690?v=4" width="100px;"/><br /><sub><b>Brendan Woods</b></sub>](https://github.com/brendan-woods)<br /> | [<img src="https://avatars0.githubusercontent.com/u/8947225?v=4" width="100px;"/><br /><sub><b>Daniel Louw</b></sub>](https://github.com/danlouw)<br /> | [<img src="https://avatars3.githubusercontent.com/u/307466?v=4" width="100px;"/><br /><sub><b>David Cramer</b></sub>](https://github.com/davidcramer)<br /> | [<img src="https://avatars2.githubusercontent.com/u/927932?v=4" width="100px;"/><br /><sub><b>David Lonjon</b></sub>](https://github.com/davidlonjon)<br /> | [<img src="https://avatars0.githubusercontent.com/u/911283?v=4" width="100px;"/><br /><sub><b>Justin Kopepasah</b></sub>](https://github.com/kopepasah)<br /> | [<img src="https://avatars0.githubusercontent.com/u/963672?v=4" width="100px;"/><br /><sub><b>Leo Postovoit</b></sub>](https://github.com/postphotos)<br /> |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| [<img src="https://avatars3.githubusercontent.com/u/176712?v=4" width="100px;"/><br /><sub><b>Lubos Kmetko</b></sub>](https://github.com/luboskmetko)<br /> | [<img src="https://avatars3.githubusercontent.com/u/1097667?v=4" width="100px;"/><br /><sub><b>Luke Carbis</b></sub>](https://github.com/lukecarbis)<br /> | [<img src="https://avatars3.githubusercontent.com/u/3294597?v=4" width="100px;"/><br /><sub><b>Miina Sikk</b></sub>](https://github.com/miina)<br /> | [<img src="https://avatars3.githubusercontent.com/u/367593?v=4" width="100px;"/><br /><sub><b>Mike Crantea</b></sub>](https://github.com/mehigh)<br /> | [<img src="https://avatars3.githubusercontent.com/u/1578148?v=4" width="100px;"/><br /><sub><b>Rob Stinson</b></sub>](https://github.com/robstino)<br /> | [<img src="https://avatars0.githubusercontent.com/u/6297436?v=4" width="100px;"/><br /><sub><b>Sayed Taqui</b></sub>](https://github.com/sayedtaqui)<br /> | [<img src="https://avatars1.githubusercontent.com/u/5015489?v=4" width="100px;"/><br /><sub><b>Utkarsh Patel</b></sub>](https://github.com/PatelUtkarsh)<br /> |
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+---
+
 ### Contact Us
 Have questions? Don't open an Issue, come join us in the 
 [`#tide` channel][tide-slack] in [WordPress Slack][wp-slack]. Even though Slack is 
 a chat service, sometimes it takes several hours for community members to respond 
 — please be patient.
-
----
-
-### Credits
-Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM), 
-[Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp), 
-[Daniel Louw (@danlouw)](https://github.com/danlouw), 
-[David Cramer (@davidcramer)](https://github.com/davidcramer), 
-[David Lonjon (@davidlonjon)](https://github.com/davidlonjon), 
-[Derek Herman (@valendesigns)](https://github.com/valendesigns), 
-[Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul), 
-[Justin Kopepasah (@kopepasah)](https://github.com/kopepasah), 
-[Leo Postovoit (@postphotos)](https://github.com/postphotos), 
-[Lubos Kmetko (@luboskmetko)](https://github.com/luboskmetko), 
-[Luke Carbis (@lukecarbis)](https://github.com/lukecarbis), 
-[Miina Sikk (@miina)](https://github.com/miina), 
-[Mike Crantea (@mehigh)](https://github.com/mehigh), 
-[Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf), 
-[Rob Stinson (@robstino)](https://github.com/robstino), 
-[Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui), 
-[Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ---
 
