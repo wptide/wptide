@@ -39,9 +39,12 @@ api.setup:
 
 # Generate the API templates.
 api.tpl:
-	@./bin/tpl -t=service/api/tpl/app.tpl -d=service/api/app.yaml -e=.env.gcp
-	@./bin/tpl -t=service/api/tpl/cron.tpl -d=service/api/cron.yaml -e=.env.gcp
-	@./bin/tpl -t=service/api/tpl/wp-config.tpl -d=service/api/wp-config.php -e=.env.gcp
+	@docker-compose run --rm tpl -t=/srv/service/api/tpl/app.tpl -d=/srv/data/api/app.yaml \
+		&& cp data/tpl/api/app.yaml service/api/app.yaml
+	@docker-compose run --rm tpl -t=/srv/service/api/tpl/cron.tpl -d=/srv/data/api/cron.yaml \
+		&& cp data/tpl/api/cron.yaml service/api/cron.yaml
+	@docker-compose run --rm tpl -t=/srv/service/api/tpl/wp-config.tpl -d=/srv/data/api/wp-config.php \
+		&& cp data/tpl/api/wp-config.php service/api/wp-config.php
 
 # Deploy the Cloud SQL database & setup the users.
 api.deploy.sql:

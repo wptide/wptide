@@ -119,21 +119,17 @@ _Update the value for each environment variable in your custom `.env` file.
 The variables and their descriptions can be found at the end of each relevant 
 section. You must do this before setting up any of the services._
 
-Additionally, you can create an `.env.gcp` file in the project root. This will make 
-deploying services to GCP a bit easier since the `.env.gcp` file will override 
-values in the `.env` file. The `.env.gcp` is optional for local development. If 
-you see warnings in the console about the file missing when running certain `make` 
-commands, that's ok. The `.env.gcp` file will only affect the `.tpl` files and you 
-should only add overrides for GCP specific resources. 
+Additionally, you must create an empty `.env.gcp` file in the project root. 
+This will make deploying services to GCP a bit easier since the `.env.gcp` file 
+will override values in the `.env` file. The `.env.gcp` file will only affect the 
+`.tpl` files and you should only add overrides for GCP specific resources.
 
-The `.tpl` files are template files that through variable interpolation are 
-converted and used to deploy your project to GCP and even setup the local API. So 
-these files play a critical role in getting Tide setup. If these files are not 
-generating the correct output, please [contact us](#contact-us) to troubleshoot and 
-figure out a solution for your OS.
+Create an empty `.env.gcp` file.
 
-So far we've only tested on OS X with and without the `envsubst` command available. 
-Other systems may not work correctly and we want to resolve that quickly.
+```
+touch .env.gcp
+
+```
 
 #### Google Cloud SDK 
 

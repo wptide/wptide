@@ -97,10 +97,12 @@ sync.creds:
 
 # Generate the Sync Server GKE YAML template.
 sync.tpl:
-	@./bin/tpl \
-	-t=service/sync-server/kubernetes/deployment.tpl \
-	-d=service/sync-server/kubernetes/deployment.yaml \
-	-e=.env.gcp
+	@docker-compose run --rm tpl \
+		-t=/srv/service/sync-server/kubernetes/deployment.tpl \
+		-d=/srv/data/sync-server/deployment.yaml \
+	&& cp \
+		data/tpl/sync-server/deployment.yaml \
+		service/sync-server/kubernetes/deployment.yaml
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds sync.tpl
