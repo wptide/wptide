@@ -4,7 +4,7 @@ COPY composer.json ${APP_DIR}/composer.json
 
 RUN /build-scripts/composer.sh
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update -y && apt-get install -y \
     autoconf \
     make \
     gcc
