@@ -2,7 +2,7 @@
 -include .env
 
 # Binary settings.
-VERSION=1.0.0-beta
+VERSION=1.0.0-beta-2
 BUILD=`git rev-parse HEAD`
 
 # GO settings.

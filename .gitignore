@@ -20,7 +20,16 @@ report.json
 *.coverprofile
 
 # Server data
-data
+data/api/*
+data/lighthouse-server/*
+data/mongo
+data/phpcs-server/*
+data/sync-server/*
+data/tpl/api/*
+data/tpl/lighthouse-server/*
+data/tpl/phpcs-server/*
+data/tpl/sync-server/*
+!**/.gitkeep
 
 # GKE YAML Configurations
 **/*.yaml

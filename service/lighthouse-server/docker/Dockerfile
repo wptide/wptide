@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.8
 
 MAINTAINER XWP <engage@xwp.co>
 
@@ -9,18 +9,18 @@ ENV CI true
 COPY bin/lh /usr/bin/lh
 
 # Install software.
-RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
     && apk add --no-cache --upgrade --virtual .build-deps \
         apk-tools \
         nodejs-npm \
     && apk add --no-cache --update --virtual .persistent-deps \
-        chromium@community \
+        chromium \
         grep \
         nodejs \
         ttf-freefont \
         udev \
     && npm i -g npm \
-    && npm i -g lighthouse@next \
+    && npm i -g lighthouse@latest \
     && runDeps="$( \
         scanelf --needed --nobanner --recursive /usr/local \
             | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
