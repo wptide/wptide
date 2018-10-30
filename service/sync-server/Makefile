@@ -83,11 +83,13 @@ sync.build.cluster: config
 	--machine-type ${GKE_SYNC_MACHINE_TYPE} \
 	--image-type "COS" \
 	--disk-size ${GKE_SYNC_DISK_SIZE} \
-	--scopes "https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/pubsub","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
+	--scopes "https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/compute","https://www.googleapis.com/auth/devstorage.full_control","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
 	--preemptible \
 	--num-nodes 1 \
 	--enable-cloud-logging \
-	--enable-cloud-monitoring
+	--enable-cloud-monitoring \
+	--addons KubernetesDashboard \
+	--no-enable-autorepair
 
 # Get the Sync Server GKE cluster credentials.
 sync.creds:
@@ -95,10 +97,12 @@ sync.creds:
 
 # Generate the Sync Server GKE YAML template.
 sync.tpl:
-	@./bin/tpl \
-	-t=service/sync-server/kubernetes/deployment.tpl \
-	-d=service/sync-server/kubernetes/deployment.yaml \
-	-e=.env.gcp
+	@docker-compose run --rm tpl \
+		-t=/srv/service/sync-server/kubernetes/deployment.tpl \
+		-d=/srv/data/sync-server/deployment.yaml \
+	&& cp \
+		data/tpl/sync-server/deployment.yaml \
+		service/sync-server/kubernetes/deployment.yaml
 
 # Deploy the Sync Server GKE cluster.
 sync.deploy.cluster: config sync.creds sync.tpl

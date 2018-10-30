@@ -13,9 +13,7 @@ USAGE="usage: $0 [<options>]
     -h, --help          help with script usage
     -t, --template      path to the template file (${RED}required${RESET})
     -d, --destination   path to the destination file (${RED}required${RESET})
-    -e, --env           environment file used to source custom environment variables (${YELLOW}optional${RESET})
 
-${CYAN}The ${RESET}${BOLD}.env${RESET}${CYAN} file is sourced even if a custom environment file is used.
 All paths are relative to the project ${RESET}${BOLD}root${RESET}${CYAN}.${RESET}"
 
 ## Handle cli parameters.
@@ -32,34 +30,8 @@ do
     -d=*|--destination=*)
         DEST_FILE="${p#*=}"
         ;;
-    -e=*|--env=*)
-        ENV_FILE="${p#*=}"
-        ;;
     esac
 done
-
-## Check for envsubst command.
-if ! command -v envsubst >/dev/null 2>&1; then
-    echo "${YELLOW}warning${RESET}: Variable Interpolation failure. The ${CYAN}envsubst${RESET} command is not installed on your OS. Using a less safe fallback method with the eval command."
-
-    envsubst(){
-        local line lineEscaped
-
-        while IFS= read -r line || [[ -n $line ]]; do
-
-            # Escape ALL chars. that could trigger an expansion.
-            IFS= read -r -d '' lineEscaped < <(printf %s "$line" | tr '`([$' '\1\2\3\4')
-
-            # ... then selectively re-enable ${ references
-            lineEscaped=${lineEscaped//$'\4'{/\${}
-
-            # Finally, escape embedded double quotes to preserve them.
-            lineEscaped=${lineEscaped//\"/\\\"}
-
-            eval "printf '%s\n' \"$lineEscaped\"" | tr '\1\2\3\4' '`([$'
-        done
-    }
-fi
 
 ## Validate cli arguments.
 if [ "$#" -eq 0 ]; then
@@ -76,20 +48,6 @@ elif [ ! -e ${TEMP_FILE} ]; then
     exit 1
 fi
 
-# Source .env file.
-if [ -e .env ]; then
-    export $(cat .env | grep -v ^# | xargs)
-fi
-
-## Source custom environment file.
-if [ ! -z ${ENV_FILE} ]; then
-    if [ -e ${ENV_FILE} ]; then
-        export $(cat ${ENV_FILE} | grep -v ^# | xargs)
-    else
-        echo "${YELLOW}warning${RESET}: The custom environment file [${CYAN}${ENV_FILE}${RESET}] does not exist at the location provided."
-    fi
-fi
-
 ## WordPress unique Keys and Salts.
 uniqueKeys=(
     AUTH_KEY
@@ -104,7 +62,9 @@ uniqueKeys=(
 
 ## Export the unique Keys and Salts.
 for unique in "${uniqueKeys[@]}"; do
-    export "${unique}=`LC_CTYPE=C; cat /dev/urandom | tr -dc [:print:] | tr -d '[:space:]\042\047\134' | head -c 64`"
+    if [ -z ${!unique+x} ]; then
+        export "${unique}=`LC_CTYPE=C; cat /dev/urandom | tr -dc [:print:] | tr -d '[:space:]\042\047\134' | head -c 64`"
+    fi
 done
 
 ## Substitute environment variables and generate destination file.

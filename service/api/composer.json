@@ -12,7 +12,7 @@
     "ext-grpc": "*",
     "google/cloud": "0.67",
     "johnpbloch/wordpress-core-installer": "^1",
-    "johnpbloch/wordpress-core": "4.9.6",
+    "johnpbloch/wordpress-core": "4.9.8",
     "slowprog/composer-copy-file": "0.2.1",
     "wpackagist-theme/twentyseventeen": "1.6",
     "wpackagist-plugin/flush-opcache": "2.4.2",
@@ -39,7 +39,8 @@
     "wordpress-install-dir": "wordpress",
     "copy-file": {
       "wp-config.php": "wordpress/wp-config.php",
-      "health-check.php": "wordpress/health-check.php"
+      "health-check.php": "wordpress/health-check.php",
+      "wp-content/themes/docs/": "wordpress/wp-content/themes/docs/"
     }
   },
   "config": {
