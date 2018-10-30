@@ -50,6 +50,5 @@ skip_files:
 - vendor/
 - wordpress/
 - Makefile
-- redis.yaml
 - setup.sh
 - wptests.sql

@@ -45,7 +45,7 @@ var (
 	serviceConfig = getServiceConfig()
 
 	// PHPCompatibilityWPPath is the path to the WordPress specific php-compatibility ruleset.
-	PHPCompatibilityWPPath = "/root/.composer/vendor/wimg/php-compatibility/framework-rulesets/wordpress.xml"
+	PHPCompatibilityWPPath = "/root/.composer/vendor/phpcompatibility/phpcompatibility-wp/PHPCompatibilityWP/ruleset.xml"
 
 	// TideClient represents the instance that will write to the Tide API.
 	TideClient tideApi.ClientInterface = &api.Client{}
