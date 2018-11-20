@@ -213,3 +213,17 @@ services:
             SYNC_POOL_DELAY: ${SYNC_POOL_DELAY}
             SYNC_POOL_WORKERS: ${SYNC_POOL_WORKERS}
         network_mode: host
+
+### Template Builder ############################################
+    tpl:
+        build:
+            context: service/tpl
+        env_file:
+          - ./.env
+          - ./.env.gcp
+        volumes:
+            - ./data/tpl:/srv/data
+            - ./service/api/tpl:/srv/service/api/tpl:ro
+            - ./service/lighthouse-server/kubernetes:/srv/service/lighthouse-server/kubernetes:ro
+            - ./service/phpcs-server/kubernetes:/srv/service/phpcs-server/kubernetes:ro
+            - ./service/sync-server/kubernetes:/srv/service/sync-server/kubernetes:ro
