@@ -66,6 +66,7 @@ echo "Activating plugins ..."
 vendor/bin/wp plugin activate \
     flush-opcache \
     wp-tide-api \
+    wporg-tide-api \
     --path=wordpress \
     --allow-root
 
