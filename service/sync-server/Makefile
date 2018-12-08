@@ -97,7 +97,7 @@ sync.creds:
 
 # Generate the Sync Server GKE YAML template.
 sync.tpl:
-	@docker-compose run --rm tpl \
+	@docker-compose run -e GCR_SYNC_IMAGE_TAG=${GCR_SYNC_IMAGE_TAG} --rm tpl \
 		-t=/srv/service/sync-server/kubernetes/deployment.tpl \
 		-d=/srv/data/sync-server/deployment.yaml \
 	&& cp \

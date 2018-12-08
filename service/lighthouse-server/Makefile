@@ -92,7 +92,7 @@ lighthouse.creds:
 
 # Generate the Lighthouse Server GKE YAML template.
 lighthouse.tpl:
-	@docker-compose run --rm tpl \
+	@docker-compose run -e GCR_LH_IMAGE_TAG=${GCR_LH_IMAGE_TAG} --rm tpl \
 		-t=/srv/service/lighthouse-server/kubernetes/deployment.tpl \
 		-d=/srv/data/lighthouse-server/deployment.yaml \
 	&& cp \
