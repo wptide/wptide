@@ -92,7 +92,7 @@ phpcs.creds:
 
 # Generate the PHPCS Server GKE YAML template.
 phpcs.tpl:
-	@docker-compose run --rm tpl \
+	@docker-compose run -e GCR_PHPCS_IMAGE_TAG=${GCR_PHPCS_IMAGE_TAG} --rm tpl \
 		-t=/srv/service/phpcs-server/kubernetes/deployment.tpl \
 		-d=/srv/data/phpcs-server/deployment.yaml \
 	&& cp \
