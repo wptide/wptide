@@ -30,9 +30,9 @@ The main focus of this documentation is to setup a local development environment
 
 ### Dependencies
 
-* Install [Composer][https://getcomposer.org/] and test if it works by running `composer --version`.
-* Install [Docker][https://docs.docker.com/install/]. _Note: you may not be able to setup and run Tide properly with legacy Docker Toolbox._
-* Install [Go][https://golang.org/doc/install] and test if your installation works by following the instructions on the installation page.
+* Install [Composer](https://getcomposer.org/) and test if it works by running `composer --version`.
+* Install [Docker](https://docs.docker.com/install/). _Note: you may not be able to setup and run Tide properly with legacy Docker Toolbox._
+* Install [Go](https://golang.org/doc/install) and test if your installation works by following the instructions on the installation page.
 * Install [Glide](https://glide.readthedocs.io/en/latest/#installing-glide), a package manager for Go. There are a few ways to install Glide:
   - Use the shell script to try an automatically install it. `curl https://glide.sh/get | sh`
   - Download a [versioned release](https://github.com/Masterminds/glide/releases). Glide releases are semantically versioned.
@@ -183,7 +183,7 @@ For a full list of API Endpoints that can be used with Tide, see the [API Endpoi
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Contact Us
-Have questions? Don't open an Issue, come join us in the [`#tide` channel][https://wordpress.slack.com/messages/C7TK8FBUJ/] in [WordPress Slack][https://make.wordpress.org/chat/]. Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
+Have questions? Don't open an Issue, come join us in the [`#tide` channel](https://wordpress.slack.com/messages/C7TK8FBUJ/) in [WordPress Slack](https://make.wordpress.org/chat/). Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
 
 ### Credits
 Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM), 
