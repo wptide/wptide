@@ -21,6 +21,7 @@ We believe the web can be better. With Tide, the code which underpins every webs
 * [Running Audits](#running-audits)
 * [Contributing](#contributing)
 * [Contact Us](#contact-us)
+* [Maintainers](#maintainers)
 * [Credits](#credits)
 * [License](#license)
 
@@ -180,12 +181,20 @@ If the audit is pending, your shell should have some output to indicate that the
 For a full list of API Endpoints that can be used with Tide, see the [API Endpoints section](https://www.wptide.org/services/api#endpoints) of the documentation.
 
 ### Contributing
+
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Contact Us
+
 Have questions? Don't open an Issue, come join us in the [`#tide` channel](https://wordpress.slack.com/messages/C7TK8FBUJ/) in [WordPress Slack](https://make.wordpress.org/chat/). Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
 
+### Maintainers
+
+[Derek Herman (@valendesigns)](https://github.com/valendesigns), and
+[Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul)
+
 ### Credits
+
 Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM), 
 [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp), 
 [Daniel Louw (@danlouw)](https://github.com/danlouw), 
@@ -193,7 +202,8 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [David Lonjon (@davidlonjon)](https://github.com/davidlonjon), 
 [Derek Herman (@valendesigns)](https://github.com/valendesigns), 
 [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul), 
-[Justin Kopepasah (@kopepasah)](https://github.com/kopepasah), 
+[Justin Kopepasah (@kopepasah)](https://github.com/kopepasah),
+[Keanan Koppenhaver (@kkoppenhaver)](https://github.com/kkoppenhaver),
 [Leo Postovoit (@postphotos)](https://github.com/postphotos), 
 [Lubos Kmetko (@luboskmetko)](https://github.com/luboskmetko), 
 [Luke Carbis (@lukecarbis)](https://github.com/lukecarbis), 
@@ -205,4 +215,5 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ### License
+
 Tide utilizes an [MIT license](LICENSE).
