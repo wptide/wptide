@@ -5,62 +5,66 @@
 > A rising tide lifts all boats.
 > -- United States President, John F. Kennedy (borrowed from the New England Council)
 
-Tide is an automated tool to provide insight into WordPress code and highlight areas 
-to improve the quality of plugins and themes.
+Tide is an automated tool to provide insight into WordPress code and highlight areas to improve the quality of plugins and themes.
 
-We believe the web can be better. With Tide, the code which underpins every website 
-can be more standardized, faster, and more secure. Tide is focused on WordPress, 
-because no other platform has as large an impact on the state of the web. Tide raises 
-the quality of code one plugin or theme at a time, by elevating the importance of code 
-quality in the developer consciousness. **Because a rising Tide lifts all boats.**
+We believe the web can be better. With Tide, the code which underpins every website can be more standardized, faster, and more secure. Tide is focused on WordPress, because no other platform has as large an impact on the state of the web. Tide raises the quality of code one plugin or theme at a time, by elevating the importance of code quality in the developer consciousness. **Because a rising Tide lifts all boats.**
 
-## [Table of Contents](#table-of-contents)
-   + [Introduction](#introduction)
-   + [Dependencies](#dependencies)
-   + [Cloning](#cloning)
-   + [Environment Variables](#environment-variables)
-   + [API](#api)
-   + [Running Audits](#running-audits)
-   + [Contributing](#contributing)
-   + [Contact Us](#contact-us)
-   + [Credits](#credits)
-   + [License](#license)
+## Table of Contents
+
+* [Introduction](#introduction)
+* [Dependencies](#dependencies)
+* [Cloning](#cloning)
+* [Environment Variables](#environment-variables)
+* [API](#api)
+* [Build Images](#build-images)
+* [Start Servers](#start-servers)
+* [Running Audits](#running-audits)
+* [Contributing](#contributing)
+* [Contact Us](#contact-us)
+* [Credits](#credits)
+* [License](#license)
 
 ### Introduction
 
-The main focus of this documentation is to setup a local development environment. If you want to deploy to a cloud environment, please read our [full documentation](https://github.com/wptide/docs/).
+The main focus of this documentation is to setup a local development environment. If you want to deploy to a cloud environment, please read our [full documentation](https://www.wptide.org/).
 
 ### Dependencies
 
-* Install [Composer][composer] and test if it works by running `composer --version`.
-* Install [Docker][docker]. _Note: you may not be able to setup and run Tide properly with legacy Docker Toolbox._
-* Install [Go][go] and test if your installation works by following the instructions on the [installation page][go].
+* Install [Composer][https://getcomposer.org/] and test if it works by running `composer --version`.
+* Install [Docker][https://docs.docker.com/install/]. _Note: you may not be able to setup and run Tide properly with legacy Docker Toolbox._
+* Install [Go][https://golang.org/doc/install] and test if your installation works by following the instructions on the installation page.
 * Install [Glide](https://glide.readthedocs.io/en/latest/#installing-glide), a package manager for Go. There are a few ways to install Glide:
-   - Use the shell script to try an automatically install it. `curl https://glide.sh/get | sh`
+  - Use the shell script to try an automatically install it. `curl https://glide.sh/get | sh`
   - Download a [versioned release](https://github.com/Masterminds/glide/releases). Glide releases are semantically versioned.
   - Use a system package manager to install Glide. For example, `brew install glide` can be used if you're using [Homebrew](http://brew.sh/) on Mac.
   - The latest development snapshot can be installed with go get. For example, `go get -u github.com/Masterminds/glide`. This is not a release version.
 
 ### Cloning
 
-Tide needs to be cloned to a directory inside Go workspace specified by [GOPATH](https://golang.org/doc/code#GOPATH) environment variable. It defaults to a directory named go inside your home directory, so `$HOME/go` on Mac/Unix and `%USERPROFILE%\go` (usually `C:\Users\YourName\go`) on Windows.
+Tide needs to be cloned to a directory inside your Go workspace specified by the [`$GOPATH`](https://golang.org/doc/code#GOPATH) environment variable. Your `$GOPATH` defaults to a directory named `go` inside your home directory, so `$HOME/go` on Mac/Unix and `%USERPROFILE%\go` (usually `C:\Users\YourName\go`) on Windows.
 
-Create the following directory `src/github.com/xwp` inside your Go workspace and change to that directory:
-
-```
-cd src/github.com/xwp
-```
-
-Now clone Tide:
+Create the following directory inside your Go workspace:
 
 ```
-git clone -b develop --recursive https://github.com/xwp/go-tide.git
+src/github.com/xwp
+```
+
+Open a shell and change into the directory:
+
+```
+cd $GOPATH/src/github.com/wptide
+```
+
+Clone Tide:
+
+```
+git clone -b develop --recursive https://github.com/wptide/wptide.git
 ```
 
 Change to Tide working directory:  
 
 ```
-cd tide
+cd wptide
 ```
 
 Update submodules:
@@ -88,16 +92,7 @@ touch .env.gcp
 
 ### API
 
-First generate the API templates:
-
-```
-$ make api.tpl
-```
-
-_Technically this first step can be skipped since the second command will 
-automatically run the first command before installing Composer dependencies._
-
-Next install the dependencies as follows:
+Install the dependencies as follows:
 
 ```
 $ make api.composer
@@ -109,17 +104,15 @@ Then start the API Docker images in isolation:
 make api.up
 ```
 
-Last run the setup script:
+Open a new shell and run the setup script:
 
 ```
 make api.setup
 ```
 
-Run the setup script to initialize WordPress for the first time or if you would 
-like a convenient way to update the default values when you change relevant 
-environment variables.
+_You can run the setup script to initialize WordPress for the first time or if you would like a convenient way to update the default values when you change relevant environment variables._
 
-### Build images
+### Build Images
 
 Install Glide dependencies and build images:
 
@@ -129,10 +122,30 @@ make build.images
 
 ### Start Servers
 
-Start the servers (Lighthouse Server, PHPCS Server, Sync Server):
+It is recommended that you run these Docker containers separately and start the servers in new shells in order to isolate the output. However, you can start all services (API, Lighthouse Server, PHPCS Server, Sync Server) with the following command:
 
 ```
 make up
+```
+
+#### Isolated Start
+
+Lighthouse Server:
+
+```
+make lighthouse.up
+```
+
+PHPCS Server:
+
+```
+make phpcs.up
+```
+
+Sync Server:
+
+```
+make sync.up
 ```
 
 ### Hosts File
@@ -142,31 +155,35 @@ Add the following entry to your hosts file to make sure `tide.local` is pointed 
 ```
 127.0.0.1 tide.local
 ```
+_You can change the `tide.local` URL to some other value by modifying the `API_AUTH_URL` and `API_HTTP_HOST` variables inside the `.env` file._
 
 ---
 
 ### Running Audits
 
-Now that all the Tide services are up and running, you can run audits locally. If we want to run an audit against the twentyseventeen theme for example, we would use the endpoint:
+Now that all the Tide services are up and running, you can run audits locally. If we want to run an audit against the `twentyseventeen` theme for example, we would use this endpoint:
 
 ```
-http://tide.local/api/tide/v1/audit/wporg/themes/twentyseventeen
+http://tide.local/api/tide/v1/audit/wporg/theme/twentyseventeen/2.1
 ```
-When you run that request, you will get a JSON blob back with either the contents of the audit (if it has previously been run) or a blob indicating the audit is pending.
 
-If the audit is pending, your terminal should have some output to indicate that the audit is running. Once this output stops and all your services go back to `polling` status, you can refresh the API request in the browser and you should see the completed Tide report for twentyseventeen.
+Or for the `akismet` plugin:
+
+```
+http://tide.local/api/tide/v1/audit/wporg/plugin/akismet/4.1.1
+```
+
+When you request an audit you will receive a JSON object back that indicated the audit is pending. If the audit has previously been requested and is complete then you will receive a JSON object with information about the theme/plugin and summary reports with links to the full report.
+
+If the audit is pending, your shell should have some output to indicate that the audit is running. Once this output stops and all your services go back to the `polling` status, you can refresh the API request in the browser and you should see the updated JSON object with completed Tide reports.
 
 For a full list of API Endpoints that can be used with Tide, see the [API Endpoints section](https://www.wptide.org/services/api#endpoints) of the documentation.
 
 ### Contributing
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, 
-and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### Contact Us
-Have questions? Don't open an Issue, come join us in the 
-[`#tide` channel][tide-slack] in [WordPress Slack][wp-slack]. Even though Slack is 
-a chat service, sometimes it takes several hours for community members to respond 
-— please be patient.
+Have questions? Don't open an Issue, come join us in the [`#tide` channel][https://wordpress.slack.com/messages/C7TK8FBUJ/] in [WordPress Slack][https://make.wordpress.org/chat/]. Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
 
 ### Credits
 Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM), 
@@ -189,10 +206,3 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 
 ### License
 Tide utilizes an [MIT license](LICENSE).
-
-[composer]: https://getcomposer.org/
-[docker]: https://docs.docker.com/install/
-[go]: https://golang.org/doc/install
-[wp-tide-api]: https://github.com/wptide/wp-tide-api
-[tide-slack]: https://wordpress.slack.com/messages/C7TK8FBUJ/
-[wp-slack]: https://make.wordpress.org/chat/
