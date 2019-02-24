@@ -50,7 +50,7 @@ Tide needs to be cloned to a directory inside your Go workspace specified by the
 Create the following directory inside your Go workspace:
 
 ```
-src/github.com/xwp
+src/github.com/wptide
 ```
 
 Open a shell and change into the directory:
