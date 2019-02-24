@@ -116,12 +116,41 @@ make api.setup
 
 _You can run the setup script to initialize WordPress for the first time or if you would like a convenient way to update the default values when you change relevant environment variables._
 
+#### Hosts File
+
+Add the following entry to your hosts file to make sure `tide.local` is pointed at your local Tide instance:
+
+```
+127.0.0.1 tide.local
+```
+_You can change the `tide.local` URL to some other value by modifying the `API_AUTH_URL` and `API_HTTP_HOST` variables inside the `.env` file._
+
 ### Build Images
 
-Install Glide dependencies and build images:
+Installs the Glide dependencies, creates the Go binaries, and builds all the Docker images:
 
 ```
 make build.images
+```
+
+#### Isolated Build
+
+Lighthouse Image:
+
+```
+make lighthouse.build.image
+```
+
+PHPCS Image:
+
+```
+make phpcs.build.image
+```
+
+Sync Image:
+
+```
+make sync.build.image
 ```
 
 ### Start Servers
@@ -151,15 +180,6 @@ Sync Server:
 ```
 make sync.up
 ```
-
-### Hosts File
-
-Add the following entry to your hosts file to make sure `tide.local` is pointed at your local Tide instance:
-
-```
-127.0.0.1 tide.local
-```
-_You can change the `tide.local` URL to some other value by modifying the `API_AUTH_URL` and `API_HTTP_HOST` variables inside the `.env` file._
 
 ---
 
