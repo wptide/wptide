@@ -39,6 +39,9 @@ The main focus of this documentation is to setup a local development environment
   - Download a [versioned release](https://github.com/Masterminds/glide/releases). Glide releases are semantically versioned.
   - Use a system package manager to install Glide. For example, `brew install glide` can be used if you're using [Homebrew](http://brew.sh/) on Mac.
   - The latest development snapshot can be installed with go get. For example, `go get -u github.com/Masterminds/glide`. This is not a release version.
+* Install [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) _(Windows only)_
+  - The `make` command is not available on Windows by default and you must install it to be able to use the Tide `make` commands.
+  - Add `C:\zlib\bin` to your `$PATH` once you've install the package.
 
 ### Cloning
 
