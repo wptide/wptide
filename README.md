@@ -99,7 +99,7 @@ touch .env.gcp
 Install the dependencies as follows:
 
 ```
-$ make api.composer
+make api.composer
 ```
 
 Then start the API Docker images in isolation:
