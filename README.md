@@ -18,7 +18,7 @@ We believe the web can be better. With Tide, the code which underpins every webs
 * [API](#api)
 * [Build Images](#build-images)
 * [Start Servers](#start-servers)
-* [Running Audits](#running-audits)
+* [Run Audits](#run-audits)
 * [Contributing](#contributing)
 * [Contact Us](#contact-us)
 * [Maintainers](#maintainers)
@@ -92,9 +92,29 @@ Create an empty `.env.gcp` file.
 touch .env.gcp
 ```
 
+The `.env.gcp` file overwrites the `.env` file values and can be left blank if you are running Tide locally. These files are used to store custom values of environment variables for various services. Before setting up any of the services, update the values according to the instructions for each service. The variables and their descriptions can be found at the end of each relevant section in our [full documentation](https://www.wptide.org/).
+
 ---
 
 ### API
+
+We typically update at minimum the following environment variables in the `.env` file:
+
+| Variable | Description |
+| :--- | :--- |
+| `API_ADMIN_EMAIL` | The email associated with the local admin account. Default is `admin@tide.local`. _Note: unless you setup the Gmail SMTP plugin, any generated emails will not get sent by WordPress._ |
+| `API_ADMIN_PASSWORD` | The password associated with the local admin account. Default is `wordpress`. |
+| `API_ADMIN_USER` | The username associated with the local admin account. Default is `admin`. |
+| `API_KEY` | The API key used both locally and on GCP to authenticate the `audit-server` user. Default is `uRhZgeYt$v5u0vR5fpcDSWcZU`. |
+| `API_SECRET` | The API secret used both locally and on GCP to authenticate the `audit-server` user. Default is `rVvUWQlPQr8trSEd2qdwmE4Eiua$MjLX`. |
+
+To make local development simple we have added default values for the `API_KEY` and `API_SECRET` associated with the `audit-server` user, which will automatically update the user meta values when `make api.setup` is ran. However, you are free to change these values and we encourage you to, especially if you plan on deploying to the cloud — in that case you should overwrite these values in the `.env.gcp` file.
+
+If you are running Tide in production, then you can access the auto generated key and secret from the `audit-server` user's profile after you setup the API and before you deploy the Kubernetes clusters.
+
+#### Initialize WordPress
+
+From the project root directory run the following `make` commands to initialize and setup WordPress.
 
 Install the dependencies as follows:
 
@@ -183,25 +203,27 @@ make sync.up
 
 ---
 
-### Running Audits
+### Run Audits
 
-Now that all the Tide services are up and running, you can run audits locally. If we want to run an audit against the `twentyseventeen` theme for example, we would use this endpoint:
+Now that all the Tide services are up and running, you can run audits on themes and plugins by doing a `GET` request to a special endpoint either in your browser or with an app like Postman. This endpoint only initiates an audit for the `wporg` Tide user and for WordPress.org hosted themes and plugins.
+
+If we want to run an audit against the `twentyseventeen` theme version `2.1` for example, we would use this endpoint:
 
 ```
 http://tide.local/api/tide/v1/audit/wporg/theme/twentyseventeen/2.1
 ```
 
-Or for the `akismet` plugin:
+Or for the `akismet` plugin version `4.1.1`:
 
 ```
 http://tide.local/api/tide/v1/audit/wporg/plugin/akismet/4.1.1
 ```
 
-When you request an audit you will receive a JSON object back that indicated the audit is pending. If the audit has previously been requested and is complete then you will receive a JSON object with information about the theme/plugin and summary reports with links to the full report.
+When you request an audit you will receive a JSON object back that indicates the audit is pending. If the audit has previously been requested and is complete then you will receive a JSON object with information about the theme/plugin and summary reports with links to the full report.
 
 If the audit is pending, your shell should have some output to indicate that the audit is running. Once this output stops and all your services go back to the `polling` status, you can refresh the API request in the browser and you should see the updated JSON object with completed Tide reports.
 
-For a full list of API Endpoints that can be used with Tide, see the [API Endpoints section](https://www.wptide.org/services/api#endpoints) of the documentation.
+For a full list of API Endpoints that can be used with Tide, see the [API Endpoints](https://wptide.org/services/api#endpoints) section.
 
 ### Contributing
 

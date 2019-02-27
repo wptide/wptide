@@ -396,10 +396,10 @@ func getServiceConfig() map[string]map[string]string {
 		"app": {
 			"syncActive":           env.GetEnv("SYNC_ACTIVE", "off"),
 			"syncPHPCSActive":      env.GetEnv("SYNC_PHPCS_ACTIVE", "on"),
-			"syncLighthouseActive": env.GetEnv("SYNC_LH_ACTIVE", "off"),
+			"syncLighthouseActive": env.GetEnv("SYNC_LH_ACTIVE", "on"),
 			"perPage":              env.GetEnv("SYNC_ITEMS_PER_PAGE", "250"),
-			"poolSize":             env.GetEnv("SYNC_POOL_WORKERS", "250"),
-			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "300"),
+			"poolSize":             env.GetEnv("SYNC_POOL_WORKERS", "125"),
+			"poolDelay":            env.GetEnv("SYNC_POOL_DELAY", "600"),
 			"browseCategory":       env.GetEnv("SYNC_API_BROWSE_CATEGORY", "updated"),
 			"syncDBProvider":       env.GetEnv("SYNC_DATABASE_PROVIDER", "local"),
 			"messageProvider":      env.GetEnv("SYNC_MESSAGE_PROVIDER", "local"),

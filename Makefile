@@ -18,15 +18,15 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 # Show available make commands.
 usage:
 	@echo "Please supply one of:"
-	@echo "\tdeps:\n\t\t- Install dependencies."
+	@echo "\tdeps:\n\t\t- Install Glide dependencies."
 	@echo "\tconfig:\n\t\t- Set GCP configurations."
 	@echo "\tbuild.bins:\n\t\t- Build all the GO binaries."
 	@echo "\tclean.bins:\n\t\t- Clean all the GO binaries."
 	@echo "\tbuild.images:\n\t\t- Build all the Docker images."
-	@echo "\tbuild.up:\n\t\t- Rebuild & run the Docker images with docker-compose up."
-	@echo "\tup:\n\t\t- Run the Docker images with docker-compose up."
-	@echo "\tdown:\n\t\t- Stop the Docker images with docker-compose down."
-	@echo "\ttest:\n\t\t- Run the GO test suite."
+	@echo "\tbuild.up:\n\t\t- Rebuild the Docker images & run the containers with docker-compose up."
+	@echo "\tup:\n\t\t- Run the Docker containers with docker-compose up."
+	@echo "\tdown:\n\t\t- Stop the Docker containers with docker-compose down."
+	@echo "\ttest:\n\t\t- Run the Go test suite."
 	@make api.usage
 	@make lighthouse.usage
 	@make phpcs.usage
