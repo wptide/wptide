@@ -9,7 +9,7 @@ ENV CI true
 COPY bin/lh /usr/bin/lh
 
 # Install software.
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
     && apk add --no-cache --upgrade --virtual .build-deps \
         apk-tools \
         nodejs-npm \
@@ -20,7 +20,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repos
         ttf-freefont \
         udev \
     && npm i -g npm \
-    && npm i -g lighthouse@latest \
+    && npm i -g lighthouse \
     && runDeps="$( \
         scanelf --needed --nobanner --recursive /usr/local \
             | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
