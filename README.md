@@ -242,6 +242,7 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [David Cramer (@davidcramer)](https://github.com/davidcramer),
 [David Lonjon (@davidlonjon)](https://github.com/davidlonjon),
 [Derek Herman (@valendesigns)](https://github.com/valendesigns),
+[Dušan D. Majkić (@dmajkic)](https://github.com/dmajkic),
 [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul),
 [Jonathan Wold (@sirjonathan)](https://github.com/sirjonathan),
 [Joshua Wold (@jwold)](https://github.com/jwold),
@@ -255,6 +256,7 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf),
 [Rob Stinson (@robstino)](https://github.com/robstino),
 [Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui),
+[Ulrich Pogson (@grappler)](https://github.com/grappler),
 [Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ### Contact Us
