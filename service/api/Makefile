@@ -1,12 +1,12 @@
 # Show available make commands.
 api.usage:
-	@echo "\tapi.up:\n\t\t- Run the API Docker images in isolation with docker-compose up."
-	@echo "\tapi.down:\n\t\t- Take the isolated API Docker images down."
-	@echo "\tapi.stop:\n\t\t- Stop the isolated API Docker images with docker-compose stop."
-	@echo "\tapi.rm:\n\t\t- Remove the isolated API Docker images with docker-compose rm."
-	@echo "\tapi.composer:\n\t\t- Install the Composer dependencies."
+	@echo "\tapi.up:\n\t\t- Run the API Docker containers in isolation with docker-compose up."
+	@echo "\tapi.down:\n\t\t- Take the isolated API Docker containers down."
+	@echo "\tapi.stop:\n\t\t- Stop the isolated API Docker containers with docker-compose stop."
+	@echo "\tapi.rm:\n\t\t- Remove the stopped API Docker containers with docker-compose rm."
+	@echo "\tapi.composer:\n\t\t- Install the Composer dependencies. Runs make api.tpl automatically before installing the dependencies."
 	@echo "\tapi.setup:\n\t\t- Run the setup script; API containers must be running to exec into."
-	@echo "\tapi.tpl:\n\t\t- Generate the API templates."
+	@echo "\tapi.tpl:\n\t\t- Generate the API YAML & PHP templates."
 	@echo "\tapi.deploy.sql:\n\t\t- Deploy the Cloud SQL database & setup the users."
 	@echo "\tapi.deploy.app:\n\t\t- Deploy the API to Google App Engine."
 	@echo "\tapi.deploy.redis:\n\t\t- Deploy the Google Cloud Memorystore Redis instance."

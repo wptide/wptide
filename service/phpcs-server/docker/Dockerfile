@@ -3,18 +3,19 @@ FROM alpine:3.8
 MAINTAINER XWP <engage@xwp.co>
 
 ENV VENDOR                   /root/.composer/vendor
-ENV PHPCS                    3.2.3
-ENV WPCS                     1.1.0
-ENV PHPCOMPAT                9.0.0
+ENV PHPCS                    3.4.0
+ENV WPCS                     2.0.0
+ENV PHPCOMPAT                9.1.1
 ENV PHPCOMPAT_WP             2.0.0
 ENV PHPCOMPAT_PASSWORDCOMPAT 1.0.0
-ENV PHPCOMPAT_PARAGONIE      1.0.0
+ENV PHPCOMPAT_PARAGONIE      1.0.1
 ENV PHPCOMPAT_SYMFONY        1.0.0
 
 RUN set -x \
     && apk add --no-cache \
         php7 \
         php7-ctype \
+        php7-json \
         php7-simplexml \
         php7-tokenizer \
         php7-xmlwriter \
@@ -22,7 +23,6 @@ RUN set -x \
     && apk add --no-cache -t .build-deps \
         curl \
         git \
-        php7-json \
         php7-openssl \
         php7-phar \
     && curl -Lo /usr/local/bin/composer https://getcomposer.org/composer.phar \
@@ -39,7 +39,9 @@ RUN set -x \
     && $VENDOR/bin/phpcs --config-set installed_paths $VENDOR/wp-coding-standards/wpcs,$VENDOR/phpcompatibility/php-compatibility,$VENDOR/phpcompatibility/phpcompatibility-wp,$VENDOR/phpcompatibility/phpcompatibility-passwordcompat,$VENDOR/phpcompatibility/phpcompatibility-paragonie,$VENDOR/phpcompatibility/phpcompatibility-symfony \
     && rm /usr/local/bin/composer \
     && apk del --purge .build-deps \
-    && mkdir -p /srv/data
+    && mkdir -p /srv/data \
+    && mkdir -p /usr/local/etc/php/conf.d \
+    && echo 'memory_limit = -1' >> /etc/php7/conf.d/memory-limit.ini
 
 ENV PATH=$PATH:$VENDOR/bin/
 

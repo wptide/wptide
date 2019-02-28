@@ -44,8 +44,8 @@ var (
 	// PHPCS service configuration (as var so that we can also override).
 	serviceConfig = getServiceConfig()
 
-	// PHPCompatibilityWPPath is the path to the WordPress specific php-compatibility ruleset.
-	PHPCompatibilityWPPath = "/root/.composer/vendor/phpcompatibility/phpcompatibility-wp/PHPCompatibilityWP/ruleset.xml"
+	// PHPCompatibilityWP is the WordPress specific php-compatibility ruleset.
+	PHPCompatibilityWP = "phpcompatibilitywp"
 
 	// TideClient represents the instance that will write to the Tide API.
 	TideClient tideApi.ClientInterface = &api.Client{}
@@ -117,13 +117,13 @@ func main() {
 
 	if bParseFlags {
 		// Is the -version flag being used?
-		bVersion = flag.Bool("version", false, "print program version details")
+		bVersion = flag.Bool("version", false, "Print program version details")
 
 		// An -output file to write results to. Will not send to API.
-		flagOutput = flag.String("output", "", "send results to output file (json format)")
+		flagOutput = flag.String("output", "", "Send results to output file (json format)")
 
 		// A -url to run a single audit. Will not poll a queue.
-		flagURL = flag.String("url", "", "audit single message from url")
+		flagURL = flag.String("url", "", "Audit single message from url")
 
 		// A -visibility to run a single audit. Will not poll a queue.
 		flagVisibility = flag.String("visibility", "public", `"private" or "public" - default "pubic"`)
@@ -131,8 +131,8 @@ func main() {
 		// The -client login name in Tide API.
 		flagClient = flag.String("client", "wporg", `Tide API client to attribute project to - default "wporg"`)
 
-		// -wp-phpcompat-ruleset sepcifies the WordPress specific ruleset to use for PHPCompatibility.
-		flagWPRuleset = flag.String("wp-phpcompat-ruleset", "", "path to WordPress specific PHPCompatibility ruleset")
+		// -wp-phpcompat-ruleset specifies the WordPress specific ruleset to use for PHPCompatibility.
+		flagWPRuleset = flag.String("wp-phpcompat-ruleset", "", "Path to, or name of, the WordPress specific PHPCompatibility ruleset")
 
 		// Parse all flags.
 		flag.Parse()
@@ -209,7 +209,7 @@ func main() {
 	// If -wp-phpcompat-ruleset was provided then override the ruleset path.
 	if *flagWPRuleset != "" {
 		if _, err := os.Stat(*flagWPRuleset); err == nil {
-			PHPCompatibilityWPPath = *flagWPRuleset
+			PHPCompatibilityWP = *flagWPRuleset
 		}
 	}
 
@@ -361,7 +361,7 @@ func executePHPCSProcessFunc(proc process.Processor, msg message.Message, result
 		for _, audit := range msg.Audits {
 			newAudit := audit
 			if audit.Type == "phpcs" && audit.Options.Standard == "phpcompatibility" {
-				newAudit.Options.StandardOverride = PHPCompatibilityWPPath
+				newAudit.Options.StandardOverride = PHPCompatibilityWP
 			}
 			newAuditsArray = append(newAuditsArray, newAudit)
 		}

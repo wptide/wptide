@@ -7,14 +7,14 @@ SYNC_PKG_PATH=./cmd/sync-server/...
 
 # Show available make commands.
 sync.usage:
-	@echo "\tsync.build.bin:\n\t\t- Build the Sync Server GO binary."
-	@echo "\tsync.clean.bin:\n\t\t- Clean the Sync Server GO binary."
+	@echo "\tsync.build.bin:\n\t\t- Build the Sync Server Go binary."
+	@echo "\tsync.clean.bin:\n\t\t- Clean the Sync Server Go binary."
 	@echo "\tsync.build.image:\n\t\t- Build the Sync Server Docker image."
-	@echo "\tsync.build.up:\n\t\t- Rebuild & run the Sync Server Docker image in isolation with docker-compose up."
-	@echo "\tsync.up:\n\t\t- Run the Sync Server Docker image in isolation with docker-compose up."
-	@echo "\tsync.down:\n\t\t- Take the isolated Sync Server Docker image down."
-	@echo "\tsync.stop:\n\t\t- Stop the isolated Sync Server Docker image with docker-compose stop."
-	@echo "\tsync.rm:\n\t\t- Remove the isolated Sync Server Docker image with docker-compose rm."
+	@echo "\tsync.build.up:\n\t\t- Rebuild the Sync Server Docker image & run the container in isolation with docker-compose up."
+	@echo "\tsync.up:\n\t\t- Run the Sync Server Docker container in isolation with docker-compose up."
+	@echo "\tsync.down:\n\t\t- Take the isolated Sync Server Docker container down."
+	@echo "\tsync.stop:\n\t\t- Stop the isolated Sync Server Docker container with docker-compose stop."
+	@echo "\tsync.rm:\n\t\t- Remove the stopped Sync Server Docker container with docker-compose rm."
 	@echo "\tsync.push.image:\n\t\t- Push the Sync Server Docker image to GCR."
 	@echo "\tsync.clean.image:\n\t\t- Clean the Sync Server Docker image from the host machine."
 	@echo "\tsync.build.disk:\n\t\t- Build the Sync Server GKE persistent disk."

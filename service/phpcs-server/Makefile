@@ -7,14 +7,14 @@ PHPCS_PKG_PATH=./cmd/phpcs-server/...
 
 # Show available make commands.
 phpcs.usage:
-	@echo "\tphpcs.build.bin:\n\t\t- Build the PHPCS Server GO binary."
-	@echo "\tphpcs.clean.bin:\n\t\t- Clean the PHPCS Server GO binary."
+	@echo "\tphpcs.build.bin:\n\t\t- Build the PHPCS Server Go binary."
+	@echo "\tphpcs.clean.bin:\n\t\t- Clean the PHPCS Server Go binary."
 	@echo "\tphpcs.build.image:\n\t\t- Build the PHPCS Server Docker image."
-	@echo "\tphpcs.build.up:\n\t\t- Rebuild & run the PHPCS Server Docker image in isolation with docker-compose up."
-	@echo "\tphpcs.up:\n\t\t- Run the PHPCS Server Docker image in isolation with docker-compose up."
-	@echo "\tphpcs.down:\n\t\t- Take the isolated PHPCS Server Docker image down."
-	@echo "\tphpcs.stop:\n\t\t- Stop the isolated PHPCS Server Docker image with docker-compose stop."
-	@echo "\tphpcs.rm:\n\t\t- Remove the isolated PHPCS Server Docker image with docker-compose rm."
+	@echo "\tphpcs.build.up:\n\t\t- Rebuild the PHPCS Server Docker image and run the container in isolation with docker-compose up."
+	@echo "\tphpcs.up:\n\t\t- Run the PHPCS Server Docker container in isolation with docker-compose up."
+	@echo "\tphpcs.down:\n\t\t- Take the isolated PHPCS Server Docker container down."
+	@echo "\tphpcs.stop:\n\t\t- Stop the isolated PHPCS Server Docker container with docker-compose stop."
+	@echo "\tphpcs.rm:\n\t\t- Remove the stopped PHPCS Server Docker container with docker-compose rm."
 	@echo "\tphpcs.push.image:\n\t\t- Push the PHPCS Server Docker image to GCR."
 	@echo "\tphpcs.clean.image:\n\t\t- Clean the PHPCS Server Docker image from the host machine."
 	@echo "\tphpcs.build.cluster:\n\t\t- Build the PHPCS Server GKE cluster."

@@ -7,14 +7,14 @@ LH_PKG_PATH=./cmd/lighthouse-server/...
 
 # Show available make commands.
 lighthouse.usage:
-	@echo "\tlighthouse.build.bin:\n\t\t- Build the Lighthouse Server GO binary."
-	@echo "\tlighthouse.clean.bin:\n\t\t- Clean the Lighthouse Server GO binary."
+	@echo "\tlighthouse.build.bin:\n\t\t- Build the Lighthouse Server Go binary."
+	@echo "\tlighthouse.clean.bin:\n\t\t- Clean the Lighthouse Server Go binary."
 	@echo "\tlighthouse.build.image:\n\t\t- Build the Lighthouse Server Docker image."
-	@echo "\tlighthouse.build.up:\n\t\t- Rebuild & run the Lighthouse Server Docker image in isolation with docker-compose up."
+	@echo "\tlighthouse.build.up:\n\t\t- Rebuild the Lighthouse Server Docker image and run the container in isolation with docker-compose up."
 	@echo "\tlighthouse.up:\n\t\t- Run the Lighthouse Server Docker image in isolation with docker-compose up."
-	@echo "\tlighthouse.down:\n\t\t- Take the isolated Lighthouse Server Docker image down."
-	@echo "\tlighthouse.stop:\n\t\t- Stop the isolated Lighthouse Server Docker image with docker-compose stop."
-	@echo "\tlighthouse.rm:\n\t\t- Remove the isolated Lighthouse Server Docker image with docker-compose rm."
+	@echo "\tlighthouse.down:\n\t\t- Take the isolated Lighthouse Server Docker container down."
+	@echo "\tlighthouse.stop:\n\t\t- Stop the isolated Lighthouse Server Docker container with docker-compose stop."
+	@echo "\tlighthouse.rm:\n\t\t- Remove the stopped Lighthouse Server Docker container with docker-compose rm."
 	@echo "\tlighthouse.push.image:\n\t\t- Push the Lighthouse Server Docker image to GCR."
 	@echo "\tlighthouse.clean.image:\n\t\t- Clean the Lighthouse Server Docker image from the host machine."
 	@echo "\tlighthouse.build.cluster:\n\t\t- Build the Lighthouse Server GKE cluster."
