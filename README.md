@@ -20,9 +20,9 @@ We believe the web can be better. With Tide, the code which underpins every webs
 * [Start Servers](#start-servers)
 * [Run Audits](#run-audits)
 * [Contributing](#contributing)
-* [Contact Us](#contact-us)
 * [Maintainers](#maintainers)
-* [Credits](#credits)
+* [Contributors](#contributors)
+* [Contact Us](#contact-us)
 * [License](#license)
 
 ### Introduction
@@ -229,35 +229,37 @@ For a full list of API Endpoints that can be used with Tide, see the [API Endpoi
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-### Contact Us
-
-Have questions? Don't open an Issue, come join us in the [`#tide` channel](https://wordpress.slack.com/messages/C7TK8FBUJ/) in [WordPress Slack](https://make.wordpress.org/chat/). Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
-
 ### Maintainers
 
 [Derek Herman (@valendesigns)](https://github.com/valendesigns), and
 [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul)
 
-### Credits
+### Contributors
 
-Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM), 
-[Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp), 
-[Daniel Louw (@danlouw)](https://github.com/danlouw), 
-[David Cramer (@davidcramer)](https://github.com/davidcramer), 
-[David Lonjon (@davidlonjon)](https://github.com/davidlonjon), 
-[Derek Herman (@valendesigns)](https://github.com/valendesigns), 
-[Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul), 
+Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
+[Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp),
+[Daniel Louw (@danlouw)](https://github.com/danlouw),
+[David Cramer (@davidcramer)](https://github.com/davidcramer),
+[David Lonjon (@davidlonjon)](https://github.com/davidlonjon),
+[Derek Herman (@valendesigns)](https://github.com/valendesigns),
+[Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul),
+[Jonathan Wold (@sirjonathan)](https://github.com/sirjonathan),
+[Joshua Wold (@jwold)](https://github.com/jwold),
 [Justin Kopepasah (@kopepasah)](https://github.com/kopepasah),
 [Keanan Koppenhaver (@kkoppenhaver)](https://github.com/kkoppenhaver),
-[Leo Postovoit (@postphotos)](https://github.com/postphotos), 
-[Lubos Kmetko (@luboskmetko)](https://github.com/luboskmetko), 
-[Luke Carbis (@lukecarbis)](https://github.com/lukecarbis), 
-[Miina Sikk (@miina)](https://github.com/miina), 
-[Mike Crantea (@mehigh)](https://github.com/mehigh), 
-[Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf), 
-[Rob Stinson (@robstino)](https://github.com/robstino), 
-[Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui), 
+[Leo Postovoit (@postphotos)](https://github.com/postphotos),
+[Lubos Kmetko (@luboskmetko)](https://github.com/luboskmetko),
+[Luke Carbis (@lukecarbis)](https://github.com/lukecarbis),
+[Miina Sikk (@miina)](https://github.com/miina),
+[Mike Crantea (@mehigh)](https://github.com/mehigh),
+[Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf),
+[Rob Stinson (@robstino)](https://github.com/robstino),
+[Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui),
 [Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
+
+### Contact Us
+
+Have questions? Don't open an Issue, come join us in the [`#tide` channel](https://wordpress.slack.com/messages/C7TK8FBUJ/) in [WordPress Slack](https://make.wordpress.org/chat/). Even though Slack is a chat service, sometimes it takes several hours for community members to respond — please be patient.
 
 ### License
 
