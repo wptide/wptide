@@ -65,8 +65,8 @@ api.deploy.sql:
 
 # Deploy the API to Google App Engine.
 api.deploy.app: api.tpl
-	@cp service-account.json service/api/service-account.json \
-	@cd service/api && gcloud app deploy --promote --stop-previous-version app.yaml cron.yaml && cd -- \
+	@cp service-account.json service/api/service-account.json
+	@cd service/api && gcloud app deploy --promote --stop-previous-version app.yaml cron.yaml && cd --
 	@rm service/api/service-account.json
 
 # Deploy the Google Cloud Memorystore Redis instance.
