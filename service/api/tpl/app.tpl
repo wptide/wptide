@@ -43,7 +43,7 @@ env_variables:
   GCF_QUEUE_LH: ${GCF_QUEUE_LH}
   GCF_QUEUE_PHPCS: ${GCF_QUEUE_PHPCS}
   GCP_PROJECT: ${GCP_PROJECT}
-  GOOGLE_APPLICATION_CREDENTIALS: "/service-account.json"
+  GOOGLE_APPLICATION_CREDENTIALS: "/app/service-account.json"
 
 skip_files:
 - docker/
