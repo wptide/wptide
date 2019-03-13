@@ -238,6 +238,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp),
+[Cathi Bosco (@cathibosco)](https://github.com/cathibosco),
 [Daniel Louw (@danlouw)](https://github.com/danlouw),
 [David Cramer (@davidcramer)](https://github.com/davidcramer),
 [David Lonjon (@davidlonjon)](https://github.com/davidlonjon),
