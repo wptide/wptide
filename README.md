@@ -41,7 +41,7 @@ The main focus of this documentation is to setup a local development environment
   - The latest development snapshot can be installed with go get. For example, `go get -u github.com/Masterminds/glide`. This is not a release version.
 * Install [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) _(Windows only)_
   - The `make` command is not available on Windows by default and you must install it to be able to use the Tide `make` commands.
-  - Add `C:\zlib\bin` to your `$PATH` once you've install the package.
+  - Add `C:\zlib\bin` to your `$PATH` once you've installed the package.
 
 ### Cloning
 
@@ -103,12 +103,12 @@ We typically update at minimum the following environment variables in the `.env`
 | Variable | Description |
 | :--- | :--- |
 | `API_ADMIN_EMAIL` | The email associated with the local admin account. Default is `admin@tide.local`. _Note: unless you setup the Gmail SMTP plugin, any generated emails will not get sent by WordPress._ |
-| `API_ADMIN_PASSWORD` | The password associated with the local admin account. Default is `wordpress`. |
+| `API_ADMIN_PASSWORD` | The password associated with the local admin account. Default is `WordPress`. |
 | `API_ADMIN_USER` | The username associated with the local admin account. Default is `admin`. |
 | `API_KEY` | The API key used both locally and on GCP to authenticate the `audit-server` user. Default is `uRhZgeYt$v5u0vR5fpcDSWcZU`. |
 | `API_SECRET` | The API secret used both locally and on GCP to authenticate the `audit-server` user. Default is `rVvUWQlPQr8trSEd2qdwmE4Eiua$MjLX`. |
 
-To make local development simple we have added default values for the `API_KEY` and `API_SECRET` associated with the `audit-server` user, which will automatically update the user meta values when `make api.setup` is ran. However, you are free to change these values and we encourage you to, especially if you plan on deploying to the cloud — in that case you should overwrite these values in the `.env.gcp` file.
+To make local development simple we have added default values for the `API_KEY` and `API_SECRET` associated with the `audit-server` user, which will automatically update the user meta values when `making api.setup` is ran. However, you are free to change these values and we encourage you to, especially if you plan on deploying to the cloud — in that case you should overwrite these values in the `.env.gcp` file.
 
 If you are running Tide in production, then you can access the auto generated key and secret from the `audit-server` user's profile after you setup the API and before you deploy the Kubernetes clusters.
 
