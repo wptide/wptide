@@ -31,7 +31,7 @@ class Advanced_Post_Cache {
 	/* Per query data */
 	var $cache_key = ''; // md5 of current SQL query
 	var $all_post_ids = false; // IDs of all posts current SQL query returns
-	var $cached_post_ids = array(); // subset of $all_post_ids whose posts are currently in cache
+	var $cached_post_ids = array(); // Subset of $all_post_ids whose posts are currently in cache
 	var $cached_posts = array();
 	var $found_posts = false; // The result of the FOUND_ROWS() query
 	var $cache_func = 'wp_cache_add'; // Turns to set if there seems to be inconsistencies
@@ -90,8 +90,8 @@ class Advanced_Post_Cache {
 		// We already flushed once this page load, and have not put anything into the cache since.
 		// OTHER processes may have put something into the cache!  In theory, this could cause stale caches.
 		// We do this since clean_post_cache() (which fires the action this method attaches to) is called RECURSIVELY for all descendants.
-//		if ( !$this->need_to_flush_cache )
-//			return;
+		// if ( !$this->need_to_flush_cache )
+		// return;
 
 		$this->cache_incr = wp_cache_incr( 'advanced_post_cache', 1, 'cache_incrementors' );
 		if ( 10 < strlen( $this->cache_incr ) ) {
