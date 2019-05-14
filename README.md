@@ -258,7 +258,7 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [Rob Stinson (@robstino)](https://github.com/robstino),
 [Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui),
 [Ulrich Pogson (@grappler)](https://github.com/grappler),
-[Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh), [Meet Makadia (@mrmakadia94)](https://github.com/mrmakadia94), [Janki Moradiya(@jankimoradiya)](https://github.com/jankimoradiya)
+[Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh), [Meet Makadia (@mrmakadia94)](https://github.com/mrmakadia94)
 
 ### Contact Us
 
