@@ -244,6 +244,7 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [David Lonjon (@davidlonjon)](https://github.com/davidlonjon),
 [Derek Herman (@valendesigns)](https://github.com/valendesigns),
 [Dušan D. Majkić (@dmajkic)](https://github.com/dmajkic),
+[Janki Moradiya (@jankimoradiya)](https://github.com/jankimoradiya),
 [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul),
 [Jonathan Wold (@sirjonathan)](https://github.com/sirjonathan),
 [Joshua Wold (@jwold)](https://github.com/jwold),
@@ -252,13 +253,14 @@ Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [Leo Postovoit (@postphotos)](https://github.com/postphotos),
 [Lubos Kmetko (@luboskmetko)](https://github.com/luboskmetko),
 [Luke Carbis (@lukecarbis)](https://github.com/lukecarbis),
+[Meet Makadia (@mrmakadia94)](https://github.com/mrmakadia94),
 [Miina Sikk (@miina)](https://github.com/miina),
 [Mike Crantea (@mehigh)](https://github.com/mehigh),
 [Rheinard Korf (@rheinardkorf)](https://github.com/rheinardkorf),
 [Rob Stinson (@robstino)](https://github.com/robstino),
 [Sayed Taqui (@sayedtaqui)](https://github.com/sayedtaqui),
 [Ulrich Pogson (@grappler)](https://github.com/grappler),
-[Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh), [Meet Makadia (@mrmakadia94)](https://github.com/mrmakadia94)
+[Utkarsh Patel (@PatelUtkarsh)](https://github.com/PatelUtkarsh)
 
 ### Contact Us
 
