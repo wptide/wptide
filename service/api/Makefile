@@ -64,7 +64,7 @@ api.deploy.sql:
 	@gcloud sql users create ${GCSQL_API_DB_USER} % --instance ${GCSQL_API_INSTANCE} --password "${GCSQL_API_DB_PASSWORD}"
 
 # Deploy the API to Google App Engine.
-api.deploy.app: api.tpl
+api.deploy.app: config api.tpl
 	@cp service-account.json service/api/service-account.json
 	@cd service/api && gcloud app deploy --promote --stop-previous-version app.yaml cron.yaml && cd --
 	@rm service/api/service-account.json
