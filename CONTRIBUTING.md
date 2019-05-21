@@ -23,7 +23,7 @@ to uphold this code. Please report unacceptable behavior to engage@xwp.co.
     - If you are not familiar with branching please read [_A successful Git branching model_](http://nvie.com/posts/a-successful-git-branching-model/) before you go any further.
 - If adding a new feature:
     - Add accompanying test case.
-    - Provide a convincing reason to add this feature. Ideally you should open a suggestion issue first and have it green-lit before working on it.
+    - Provide a convincing reason to add this feature. Ideally, you should open a suggestion issue first and have it green-lit before working on it.
 - If fixing a bug:
     - Provide a detailed description of the bug in the PR. Live demo preferred.
     - Add appropriate test coverage if applicable.
