@@ -12,13 +12,13 @@
     "ext-grpc": "*",
     "google/cloud": "0.67",
     "johnpbloch/wordpress-core-installer": "^1",
-    "johnpbloch/wordpress-core": "4.9.8",
-    "slowprog/composer-copy-file": "0.2.1",
+    "johnpbloch/wordpress-core": "5.2.0",
+    "slowprog/composer-copy-file": "0.3.1",
     "wpackagist-theme/twentyseventeen": "1.6",
-    "wpackagist-plugin/flush-opcache": "2.4.2",
-    "wpackagist-plugin/gmail-smtp": "1.1.7",
+    "wpackagist-plugin/flush-opcache": "2.4.3",
+    "wpackagist-plugin/gmail-smtp": "1.1.8",
     "wpackagist-plugin/pj-page-cache-red": "0.8.3",
-    "wpackagist-plugin/wp-redis": "0.7.0"
+    "wpackagist-plugin/wp-redis": "0.7.1"
   },
   "require-dev": {
     "wp-cli/wp-cli": "~1.5"
