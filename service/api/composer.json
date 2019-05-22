@@ -10,9 +10,9 @@
     "ext-redis": "*",
     "ext-mongodb": "*",
     "ext-grpc": "*",
-    "google/cloud": "0.67",
+    "google/cloud": "0.101.1",
     "johnpbloch/wordpress-core-installer": "^1",
-    "johnpbloch/wordpress-core": "5.2.0",
+    "johnpbloch/wordpress-core": "4.9.8",
     "slowprog/composer-copy-file": "0.3.1",
     "wpackagist-theme/twentyseventeen": "1.6",
     "wpackagist-plugin/flush-opcache": "2.4.3",
@@ -47,8 +47,8 @@
     "platform": {
       "php": "7.2",
       "ext-redis": "3.2",
-      "ext-mongodb": "1.4.3",
-      "ext-grpc": "1.12.0"
+      "ext-mongodb": "1.5.0",
+      "ext-grpc": "1.20.0"
     }
   }
 }
