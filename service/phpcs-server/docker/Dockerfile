@@ -3,8 +3,8 @@ FROM alpine:3.8
 MAINTAINER XWP <engage@xwp.co>
 
 ENV VENDOR                   /root/.composer/vendor
-ENV PHPCS                    3.4.0
-ENV WPCS                     2.0.0
+ENV PHPCS                    3.4.2
+ENV WPCS                     2.1.1
 ENV PHPCOMPAT                9.1.1
 ENV PHPCOMPAT_WP             2.0.0
 ENV PHPCOMPAT_PASSWORDCOMPAT 1.0.0
