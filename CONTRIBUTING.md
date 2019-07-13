@@ -8,7 +8,7 @@ Before submitting your contribution, please make sure to take a moment and read 
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [Tide Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to derek@wptide.org.
+This project and everyone participating in it is governed by the [Tide Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to support@wptide.org.
 
 ## Issue Reporting Guidelines
 
