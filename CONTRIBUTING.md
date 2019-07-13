@@ -37,13 +37,13 @@ As outlined in [the announcement post](https://make.wordpress.org/tide/2019/06/2
 
 ### Tide Team
 
-![](service/api/wp-content/themes/docs/docs/images/Tide-Team.png)
+![](https://raw.githubusercontent.com/wptide/docs/develop/docs/images/Tide-Team.png)
 
 The Tide Team badge will be manually assigned to all active Tide maintainers – i.e those who are listed as “Maintainers” on [this page](https://github.com/wptide/wptide#maintainers) (also [here](https://github.com/wptide/docs#maintainers)).
 
 ### Tide Contributor
 
-![](service/api/wp-content/themes/docs/docs/images/Tide-Contributor.png)
+![](https://raw.githubusercontent.com/wptide/docs/develop/docs/images/Tide-Contributor.png)
 
 The Tide Contributor badge will be manually assigned to those who provide valuable contributions to Tide -- i.e. those who are listed as “Contributors” on [this page](https://github.com/wptide/wptide#contributors) (also [here](https://github.com/wptide/docs#credits), [here](https://github.com/wptide/pkg#props), and [here](https://github.com/wptide/wp-tide-api#props)).
 
