@@ -1,4 +1,6 @@
 package: github.com/wptide/wptide
+excludeDirs:
+- data
 import:
 - package: github.com/nanobox-io/golang-scribble
 - package: github.com/wptide/pkg
