@@ -265,7 +265,7 @@ func processMessage(msg message.Message, wg *sync.WaitGroup) error {
 		TempFolder:      procCfg.phpcsTempFolder,
 		Config:          config,
 		StorageProvider: procCfg.phpcsStorageProvider,
-		Versions:        serviceConfig["phpcs_versions"],
+		Versions:        getPhpcsVersions(),
 	}
 	if err := doPHPCSProcess(phpcsProc, msg, results); err != nil {
 		return err
@@ -465,9 +465,19 @@ func getServiceConfig() map[string]map[string]string {
 			"protocol": env.GetEnv("API_PROTOCOL", ""),
 			"version":  env.GetEnv("API_VERSION", ""),
 		},
-		"phpcs_versions": {
-			"phpcompatibility": env.GetEnv("PHPCS", ""),
-			"wordpress":        env.GetEnv("WPCS", ""),
+	}
+}
+
+func getPhpcsVersions() map[string]map[string]string {
+	return map[string]map[string]string{
+		"phpcompatibility": {
+			"phpcs":               env.GetEnv("PHPCS", ""),
+			"phpcompatibility":    env.GetEnv("PHPCOMPAT", ""),
+			"phpcompatibility_wp": env.GetEnv("PHPCOMPAT_WP", ""),
+		},
+		"wordpress": {
+			"phpcs": env.GetEnv("PHPCS", ""),
+			"wpcs":  env.GetEnv("WPCS", ""),
 		},
 	}
 }
