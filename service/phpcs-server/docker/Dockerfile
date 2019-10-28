@@ -3,13 +3,13 @@ FROM alpine:3.9
 MAINTAINER XWP <engage@xwp.co>
 
 ENV VENDOR                   /root/.composer/vendor
-ENV PHPCS                    3.4.2
+ENV PHPCS                    3.5.2
 ENV WPCS                     2.1.1
-ENV PHPCOMPAT                9.2.0
-ENV PHPCOMPAT_WP             2.0.0
-ENV PHPCOMPAT_PASSWORDCOMPAT 1.0.0
-ENV PHPCOMPAT_PARAGONIE      1.0.1
-ENV PHPCOMPAT_SYMFONY        1.0.0
+ENV PHPCOMPAT                9.3.2
+ENV PHPCOMPAT_WP             2.1.0
+ENV PHPCOMPAT_PASSWORDCOMPAT 1.0.2
+ENV PHPCOMPAT_PARAGONIE      1.2.0
+ENV PHPCOMPAT_SYMFONY        1.1.1
 
 RUN set -x \
     && apk add --no-cache \
