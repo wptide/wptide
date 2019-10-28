@@ -23,6 +23,7 @@ sync.usage:
 	@echo "\tsync.tpl:\n\t\t- Generate the Sync Server GKE YAML template."
 	@echo "\tsync.deploy.cluster:\n\t\t- Deploy the Sync Server GKE cluster."
 	@echo "\tsync.get.cluster:\n\t\t- Get the Sync Server GKE cluster status."
+	@echo "\tsync.clean.deployment:\n\t\t- Clean the Sync Server GKE cluster deployment."
 	@echo "\tsync.clean.cluster:\n\t\t- Clean the Sync Server GKE cluster."
 
 # Build the Sync Server GO binary.
@@ -112,8 +113,11 @@ sync.deploy.cluster: config sync.creds sync.tpl
 sync.get.cluster: config sync.creds
 	@kubectl get deployment ${GKE_SYNC_CLUSTER} -o yaml
 
-# Clean the Sync Server GKE cluster.
-sync.clean.cluster: config sync.creds sync.tpl
+# Clean the Sync Server GKE cluster deployment.
+sync.clean.deployment: config sync.creds sync.tpl
 	@kubectl delete -f service/sync-server/kubernetes/deployment.yaml
+
+# Clean the Sync Server GKE cluster.
+sync.clean.cluster: sync.clean.deployment
 	@gcloud container clusters delete ${GKE_SYNC_CLUSTER} -q
 	@gcloud compute --project ${GCP_PROJECT} disks delete ${GKE_SYNC_CLUSTER}-disk
