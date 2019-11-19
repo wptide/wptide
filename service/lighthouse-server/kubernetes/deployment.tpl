@@ -4,10 +4,10 @@ metadata:
   name: ${GKE_LH_CLUSTER}-secret
 type: Opaque
 stringData:
-  API_KEY: ${API_KEY}
-  API_SECRET: ${API_SECRET}
-  AWS_API_KEY: ${AWS_API_KEY}
-  AWS_API_SECRET: ${AWS_API_SECRET}
+  API_KEY: "${API_KEY}"
+  API_SECRET: "${API_SECRET}"
+  AWS_API_KEY: "${AWS_API_KEY}"
+  AWS_API_SECRET: "${AWS_API_SECRET}"
 ---
 apiVersion: apps/v1
 kind: Deployment

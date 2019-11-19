@@ -4,8 +4,8 @@ metadata:
   name: ${GKE_SYNC_CLUSTER}-secret
 type: Opaque
 stringData:
-  AWS_API_KEY: $AWS_API_KEY
-  AWS_API_SECRET: $AWS_API_SECRET
+  AWS_API_KEY: "${AWS_API_KEY}"
+  AWS_API_SECRET: "${AWS_API_SECRET}"
 ---
 apiVersion: apps/v1
 kind: Deployment

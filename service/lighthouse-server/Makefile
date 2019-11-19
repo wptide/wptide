@@ -22,6 +22,7 @@ lighthouse.usage:
 	@echo "\tlighthouse.tpl:\n\t\t- Generate the Lighthouse Server GKE YAML template."
 	@echo "\tlighthouse.deploy.cluster:\n\t\t- Deploy the Lighthouse Server GKE cluster."
 	@echo "\tlighthouse.get.cluster:\n\t\t- Get the Lighthouse Server GKE cluster status."
+	@echo "\tlighthouse.clean.deployment:\n\t\t- Clean the Lighthouse Server GKE cluster deployment."
 	@echo "\tlighthouse.clean.cluster:\n\t\t- Clean the Lighthouse Server GKE cluster."
 
 # Build the Lighthouse Server GO binary.
@@ -107,7 +108,10 @@ lighthouse.deploy.cluster: config lighthouse.creds lighthouse.tpl
 lighthouse.get.cluster: config lighthouse.creds
 	@kubectl get deployment ${GKE_LH_CLUSTER} -o yaml
 
-# Clean the Lighthouse Server GKE cluster.
-lighthouse.clean.cluster: config lighthouse.creds lighthouse.tpl
+# Clean the Lighthouse Server GKE cluster deployment.
+lighthouse.clean.deployment: config lighthouse.creds lighthouse.tpl
 	@kubectl delete -f service/lighthouse-server/kubernetes/deployment.yaml
+
+# Clean the Lighthouse Server GKE cluster.
+lighthouse.clean.cluster: lighthouse.clean.deployment
 	@gcloud container clusters delete ${GKE_LH_CLUSTER} -q

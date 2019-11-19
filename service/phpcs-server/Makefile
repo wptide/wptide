@@ -22,6 +22,7 @@ phpcs.usage:
 	@echo "\tphpcs.tpl:\n\t\t- Generate the PHPCS Server GKE YAML template."
 	@echo "\tphpcs.deploy.cluster:\n\t\t- Deploy the PHPCS Server GKE cluster."
 	@echo "\tphpcs.get.cluster:\n\t\t- Get the PHPCS Server GKE cluster status."
+	@echo "\tphpcs.clean.deployment:\n\t\t- Clean the PHPCS Server GKE cluster deployment."
 	@echo "\tphpcs.clean.cluster:\n\t\t- Clean the PHPCS Server GKE cluster."
 
 # Build the PHPCS Server GO binary.
@@ -107,7 +108,10 @@ phpcs.deploy.cluster: config phpcs.creds phpcs.tpl
 phpcs.get.cluster: config phpcs.creds
 	@kubectl get deployment ${GKE_PHPCS_CLUSTER} -o yaml
 
-# Clean the PHPCS Server GKE cluster.
-phpcs.clean.cluster: config phpcs.creds phpcs.tpl
+# Clean the PHPCS Server GKE cluster deployment.
+phpcs.clean.deployment: config phpcs.creds phpcs.tpl
 	@kubectl delete -f service/phpcs-server/kubernetes/deployment.yaml
+
+# Clean the PHPCS Server GKE cluster.
+phpcs.clean.cluster: phpcs.clean.deployment
 	@gcloud container clusters delete ${GKE_PHPCS_CLUSTER} -q
