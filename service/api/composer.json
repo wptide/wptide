@@ -12,7 +12,7 @@
     "ext-grpc": "*",
     "google/cloud": "0.101.1",
     "johnpbloch/wordpress-core-installer": "^1",
-    "johnpbloch/wordpress-core": "5.2.4",
+    "johnpbloch/wordpress-core": "5.3.1",
     "slowprog/composer-copy-file": "0.3.1",
     "wpackagist-theme/twentyseventeen": "1.6",
     "wpackagist-plugin/flush-opcache": "2.4.3",
