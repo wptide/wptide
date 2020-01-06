@@ -11,14 +11,14 @@ notifications:
 go:
   - 1.9
 
+env:
+  - GO111MODULE=on
+
 install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
   - go get github.com/go-playground/overalls
-  - go get -v github.com/Masterminds/glide
-  - cd $GOPATH/src/github.com/Masterminds/glide && go install && cd -
-  - glide install
 
 script:
-  - overalls -project=github.com/wptide/wptide -covermode=count -ignore=.git,.glide,bin,data,service,vendor -debug
+  - overalls -project=github.com/wptide/wptide -covermode=count -ignore=.git,.glide,bin,data,service -debug
   - goveralls -coverprofile=overalls.coverprofile -service=travis-ci -repotoken=$COVERALLS_TOKEN
