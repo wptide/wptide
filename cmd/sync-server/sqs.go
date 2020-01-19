@@ -16,7 +16,7 @@ type sqsDispatcher struct {
 		Queue    string
 		Endpoint string
 		Active   bool
-		Accepts  string // "all" or "themes" or "plugins"
+		Accepts  string // "all" or "themes" or "plugins".
 	}
 	providers map[string]message.Provider
 }

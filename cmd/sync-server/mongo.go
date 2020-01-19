@@ -19,7 +19,7 @@ type mongoDispatcher struct {
 	Collections map[string]struct {
 		Collection string
 		Active     bool
-		Accepts    string // "all" or "themes" or "plugins"
+		Accepts    string // "all" or "themes" or "plugins".
 	}
 	providers map[string]message.Provider
 }

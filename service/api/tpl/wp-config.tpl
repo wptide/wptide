@@ -21,14 +21,14 @@
 // $is_gae is true on Google App Engine.
 $is_gae = ( getenv( 'GAE_VERSION' ) !== false );
 
-// Register GCS stream wrapper
+// Register GCS stream wrapper.
 if ( $is_gae || 'gcs' === getenv( 'API_UPLOAD_HANDLER' ) ) {
     require_once( __DIR__ . '/../vendor/autoload.php' );
     $storageClient = new Google\Cloud\Storage\StorageClient();
     $storageClient->registerStreamWrapper();
 }
 
-// Disable pseudo cron behavior
+// Disable pseudo cron behavior.
 define( 'DISABLE_WP_CRON', true );
 
 // Use HTTPS on production.
@@ -45,7 +45,7 @@ if ( isset( $_SERVER['HTTP_HOST'] ) ) {
 define( 'WP_HOME', $protocol . HTTP_HOST );
 define( 'WP_SITEURL', $protocol . HTTP_HOST );
 
-// Force SSL for admin pages
+// Force SSL for admin pages.
 define( 'FORCE_SSL_ADMIN', $is_gae );
 
 // Security settings.

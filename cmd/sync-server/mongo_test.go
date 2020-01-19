@@ -12,7 +12,7 @@ var (
 	mongoCollections = map[string]struct {
 		Collection string
 		Active     bool
-		Accepts    string // "all" or "themes" or "plugins"
+		Accepts    string // "all" or "themes" or "plugins".
 	}{
 		"queue1": {
 			"region1",

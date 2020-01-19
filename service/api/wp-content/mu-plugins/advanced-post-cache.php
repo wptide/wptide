@@ -15,29 +15,29 @@ if ( ! defined( 'WP_CACHE' ) || true !== WP_CACHE ) {
 class Advanced_Post_Cache {
 	var $CACHE_GROUP_PREFIX = 'advanced_post_cache_';
 
-	// Flag for temp (within one page load) turning invalidations on and off
-	// @see dont_clear_advanced_post_cache()
-	// @see do_clear_advanced_post_cache()
-	// Used to prevent invalidation during new comment
+	// Flag for temp (within one page load) turning invalidations on and off.
+	// @see dont_clear_advanced_post_cache().
+	// @see do_clear_advanced_post_cache().
+	// Used to prevent invalidation during new comment.
 	var $do_flush_cache = true;
 
 	// Flag for preventing multiple invalidations in a row: clean_post_cache() calls itself recursively for post children.
-	var $need_to_flush_cache = true; // Currently disabled
+	var $need_to_flush_cache = true; // Currently disabled.
 
 	/* Per cache-clear data */
 	var $cache_incr = 0; // Increments the cache group (advanced_post_cache_0, advanced_post_cache_1, ...)
-	var $cache_group = ''; // CACHE_GROUP_PREFIX . $cache_incr
+	var $cache_group = ''; // CACHE_GROUP_PREFIX . $cache_incr.
 
 	/* Per query data */
-	var $cache_key = ''; // md5 of current SQL query
-	var $all_post_ids = false; // IDs of all posts current SQL query returns
-	var $cached_post_ids = array(); // Subset of $all_post_ids whose posts are currently in cache
+	var $cache_key = ''; // md5 of current SQL query.
+	var $all_post_ids = false; // IDs of all posts current SQL query returns.
+	var $cached_post_ids = array(); // Subset of $all_post_ids whose posts are currently in cache.
 	var $cached_posts = array();
-	var $found_posts = false; // The result of the FOUND_ROWS() query
-	var $cache_func = 'wp_cache_add'; // Turns to set if there seems to be inconsistencies
+	var $found_posts = false; // The result of the FOUND_ROWS() query.
+	var $cache_func = 'wp_cache_add'; // Turns to set if there seems to be inconsistencies.
 
 	function __construct() {
-		// Specific to certain Memcached Object Cache plugins
+		// Specific to certain Memcached Object Cache plugins.
 		if ( function_exists( 'wp_cache_add_group_prefix_map' ) ) {
 			wp_cache_add_group_prefix_map( $this->CACHE_GROUP_PREFIX, 'advanced_post_cache' );
 		}
@@ -46,13 +46,13 @@ class Advanced_Post_Cache {
 
 		add_action( 'switch_blog', array( $this, 'setup_for_blog' ), 10, 2 );
 
-		add_filter( 'posts_request', array( &$this, 'posts_request' ) ); // Short circuits if cached
-		add_filter( 'posts_results', array( &$this, 'posts_results' ) ); // Collates if cached, primes cache if not
+		add_filter( 'posts_request', array( &$this, 'posts_request' ) ); // Short circuits if cached.
+		add_filter( 'posts_results', array( &$this, 'posts_results' ) ); // Collates if cached, primes cache if not.
 
-		add_filter( 'post_limits_request', array( &$this, 'post_limits_request' ), 999, 2 ); // Checks to see if we need to worry about found_posts
+		add_filter( 'post_limits_request', array( &$this, 'post_limits_request' ), 999, 2 ); // Checks to see if we need to worry about found_posts.
 
-		add_filter( 'found_posts_query', array( &$this, 'found_posts_query' ) ); // Short circuits if cached
-		add_filter( 'found_posts', array( &$this, 'found_posts' ) ); // Reads from cache if cached, primes cache if not
+		add_filter( 'found_posts_query', array( &$this, 'found_posts_query' ) ); // Short circuits if cached.
+		add_filter( 'found_posts', array( &$this, 'found_posts' ) ); // Reads from cache if cached, primes cache if not.
 	}
 
 	function setup_for_blog( $new_blog_id = false, $previous_blog_id = false ) {
@@ -60,7 +60,7 @@ class Advanced_Post_Cache {
 			return;
 		}
 
-		$this->cache_incr = wp_cache_get( 'advanced_post_cache', 'cache_incrementors' ); // Get and construct current cache group name
+		$this->cache_incr = wp_cache_get( 'advanced_post_cache', 'cache_incrementors' ); // Get and construct current cache group name.
 		if ( !is_numeric( $this->cache_incr ) ) {
 			$now = time();
 			wp_cache_set( 'advanced_post_cache', $now, 'cache_incrementors' );
@@ -75,15 +75,15 @@ class Advanced_Post_Cache {
 	 * Flushes the cache by incrementing the cache group
 	 */
 	function flush_cache() {
-		// Cache flushes have been disabled
+		// Cache flushes have been disabled.
 		if ( !$this->do_flush_cache )
 			return;
 
-		// Bail on post preview
+		// Bail on post preview.
 		if ( is_admin() && isset( $_POST['wp-preview'] ) && 'dopreview' == $_POST['wp-preview'] )
 			return;
 
-		// Bail on autosave
+		// Bail on autosave.
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
 			return;
 
@@ -113,7 +113,7 @@ class Advanced_Post_Cache {
 	function posts_request( $sql ) {
 		global $wpdb;
 
-		$this->cache_key = md5( $sql ); // init
+		$this->cache_key = md5( $sql ); // Init.
 		$this->all_post_ids = wp_cache_get( $this->cache_key, $this->cache_group );
 		if ( 'NA' !== $this->found_posts )
 			$this->found_posts = wp_cache_get( "{$this->cache_key}_found", $this->cache_group );
@@ -123,10 +123,10 @@ class Advanced_Post_Cache {
 		else
 			$this->cache_func = 'wp_cache_add';
 
-		$this->cached_post_ids = array(); // re-init
-		$this->cached_posts = array(); // re-init
+		$this->cached_post_ids = array(); // Re-init.
+		$this->cached_posts = array(); // Re-init.
 
-		// Query is cached
+		// Query is cached.
 		if ( $this->found_posts && is_array( $this->all_post_ids ) ) {
 			if ( function_exists( 'wp_cache_get_multi' ) ) {
 				$this->cached_posts = wp_cache_get_multi( array( 'posts' => $this->all_post_ids ) );
@@ -192,7 +192,7 @@ class Advanced_Post_Cache {
 		if ( empty( $limits ) || ( isset( $query->query_vars['no_found_rows'] ) && $query->query_vars['no_found_rows'] ) )
 			$this->found_posts = 'NA';
 		else
-			$this->found_posts = false; // re-init
+			$this->found_posts = false; // Re-init.
 		return $limits;
 	}
 
@@ -201,7 +201,7 @@ class Advanced_Post_Cache {
 	 * Otherwise: Returns query unchanged.
 	 */
 	function found_posts_query( $sql ) {
-		if ( $this->found_posts && is_array( $this->all_post_ids ) ) // is cached
+		if ( $this->found_posts && is_array( $this->all_post_ids ) ) // Is cached.
 			return '';
 		return $sql;
 	}
@@ -211,7 +211,7 @@ class Advanced_Post_Cache {
 	 * Otherwise: Returs result unchanged
 	 */
 	function found_posts( $found_posts ) {
-		if ( $this->found_posts && is_array( $this->all_post_ids ) ) // is cached
+		if ( $this->found_posts && is_array( $this->all_post_ids ) ) // Is cached.
 			return (int) $this->found_posts;
 
 		call_user_func( $this->cache_func, "{$this->cache_key}_found", (int) $found_posts, $this->cache_group );
@@ -240,7 +240,7 @@ function dont_clear_advanced_post_cache() {
 add_action( 'clean_term_cache', 'clear_advanced_post_cache' );
 add_action( 'clean_post_cache', 'clear_advanced_post_cache' );
 
-// Don't clear Advanced Post Cache for a new comment - temp core hack
-// http://core.trac.wordpress.org/ticket/15565
+// Don't clear Advanced Post Cache for a new comment - temp core hack.
+// http://core.trac.wordpress.org/ticket/15565.
 add_action( 'wp_updating_comment_count', 'dont_clear_advanced_post_cache' );
 add_action( 'wp_update_comment_count', 'do_clear_advanced_post_cache' );

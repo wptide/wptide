@@ -84,7 +84,7 @@ var (
 	// A single URL to process. Will not poll queue.
 	flagURL = &[]string{""}[0]
 
-	// Project visibility for URL. "private" or "public"
+	// Project visibility for URL. "private" or "public".
 	flagVisibility = &[]string{"private"}[0]
 
 	// The client login id in Tide API.
@@ -93,7 +93,7 @@ var (
 	// Send to Stdout rather than API?
 	flagOutput = &[]string{""}[0]
 
-	// Process Functions
+	// Process Functions.
 	doProcess = executeProcessFunc
 )
 
@@ -189,7 +189,7 @@ func main() {
 	for {
 		select {
 		case msg := <-cMessage:
-			// Process Message
+			// Process Message.
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			err := processMessage(msg, &wg)

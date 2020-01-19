@@ -28,20 +28,20 @@ var (
 		"API_SECRET":    "tideapisecret",
 		"API_VERSION":   "v1",
 		//
-		// AWS API settings
+		// AWS API settings.
 		"AWS_API_KEY":    "sqskey",
 		"AWS_API_SECRET": "sqssecret",
 		//
-		// AWS S3 settings
+		// AWS S3 settings.
 		"AWS_S3_BUCKET_NAME": "test-bucket",
 		"AWS_S3_REGION":      "us-west-2",
 		//
-		// AWS SQS settings
+		// AWS SQS settings.
 		"AWS_SQS_QUEUE_LH": "test-queue",
 		"AWS_SQS_REGION":   "us-west-2",
 		"AWS_SQS_VERSION":  "2012-11-05",
 		//
-		// LH Server settings
+		// LH Server settings.
 		"LH_CONCURRENT_AUDITS": "1",
 	}
 )
@@ -66,7 +66,7 @@ func Test_main(t *testing.T) {
 
 	resetServiceConfig()
 
-	// Use the mockTide for Tide
+	// Use the mockTide for Tide.
 	currentClient := TideClient
 	TideClient = &mockTide{}
 	defer func() { TideClient = currentClient }()
@@ -161,17 +161,17 @@ func Test_main(t *testing.T) {
 				}()
 			}
 
-			// -output
+			// -output.
 			if tt.args.flagOutput != nil && *tt.args.flagOutput != "" {
 				flagOutput = tt.args.flagOutput
 			}
 
-			// -url
+			// -url.
 			if tt.args.flagURL != nil && *tt.args.flagURL != "" {
 				flagURL = tt.args.flagURL
 			}
 
-			// -visibility
+			// -visibility.
 			if tt.args.flagVisibility != nil && *tt.args.flagVisibility != "" {
 				flagVisibility = tt.args.flagVisibility
 			}

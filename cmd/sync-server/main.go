@@ -295,7 +295,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 				Queue    string
 				Endpoint string
 				Active   bool
-				Accepts  string // "all" or "themes" or "plugins"
+				Accepts  string // "all" or "themes" or "plugins".
 			}{
 				"phpcs": {
 					conf["sqs_region"],
@@ -326,7 +326,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 			Collections: map[string]struct {
 				Collection string
 				Active     bool
-				Accepts    string // "all" or "themes" or "plugins"
+				Accepts    string // "all" or "themes" or "plugins".
 			}{
 				"phpcs": {
 					conf["phpcsCollection"],
@@ -354,7 +354,7 @@ func getDispatcher(c map[string]map[string]string) (sync.Dispatcher, error) {
 			Collections: map[string]struct {
 				Collection string
 				Active     bool
-				Accepts    string // "all" or "themes" or "plugins"
+				Accepts    string // "all" or "themes" or "plugins".
 			}{
 				"phpcs": {
 					conf["phpcsCollection"],

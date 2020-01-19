@@ -241,7 +241,7 @@ func Test_scribbleChecker_SetSyncTime(t *testing.T) {
 				"mock",
 				epoc,
 			},
-			"0", // Epoc is 0
+			"0", // Epoc is 0.
 		},
 	}
 	for _, tt := range tests {

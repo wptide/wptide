@@ -14,7 +14,7 @@ type firestoreDispatcher struct {
 	Collections map[string]struct {
 		Collection string
 		Active     bool
-		Accepts    string // "all" or "themes" or "plugins"
+		Accepts    string // "all" or "themes" or "plugins".
 	}
 	providers map[string]message.Provider
 }
@@ -26,7 +26,7 @@ func (fs firestoreDispatcher) Dispatch(project wporg.RepoProject) error {
 	for collectionID, collection := range fs.Collections {
 		queueProvider, ok := fs.providers[collectionID]
 		if !ok {
-			return errors.New("could not access queue: make sure the dispatcher is initialised")
+			return errors.New("could not access queue: make sure the dispatcher is initialized")
 		}
 		if collection.Active && (collection.Accepts == project.Type || collection.Accepts == "all") {
 			err := queueProvider.SendMessage(msg)

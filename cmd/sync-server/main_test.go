@@ -245,7 +245,7 @@ func Test_fetcher(t *testing.T) {
 				}()
 			}
 
-			// Initialise a token.
+			// Initialize a token.
 			go func() { token <- struct{}{} }()
 
 			projects := fetcher(tt.args.projectType, tt.args.category, tt.args.bufferSize, tt.args.token, tt.args.maxPages)
