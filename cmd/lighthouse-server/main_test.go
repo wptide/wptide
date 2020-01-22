@@ -311,7 +311,7 @@ func Test_processMessage(t *testing.T) {
 			true,
 		},
 		{
-			"Lighhouse - Success",
+			"Lighthouse - Success",
 			message.Message{
 				Slug: "lhSuccess",
 			},
