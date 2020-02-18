@@ -208,7 +208,7 @@ class Advanced_Post_Cache {
 
 	/**
 	 * If cached: Returns cached result of FOUND_ROWS() query.
-	 * Otherwise: Returs result unchanged
+	 * Otherwise: Returns result unchanged
 	 */
 	function found_posts( $found_posts ) {
 		if ( $this->found_posts && is_array( $this->all_post_ids ) ) // is cached
