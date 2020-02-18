@@ -236,7 +236,8 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ### Contributors
 
-Props: [Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
+Props: [Amit Dudhat (@wpamitkumar)](https://github.com/wpamitkumar),
+[Bartek Makoś (@MakiBM)](https://github.com/MakiBM),
 [Brendan Woods (@brendanwoods-xwp)](https://github.com/brendanwoods-xwp),
 [Cathi Bosco (@cathibosco)](https://github.com/cathibosco),
 [Daniel Louw (@danlouw)](https://github.com/danlouw),
