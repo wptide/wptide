@@ -9,16 +9,17 @@ notifications:
       secure: KOaiFxMW2zrz6MiFi2xRiz9tFYeoVfOFeAAOhsFk3n4ioys3/77QDmgpuVB3Jq6QVepNePtfIH+7JTlLYYdfgBIDLw2nqMmJ50NG3gIjYHctlFHzqAer02MQMFsldzApLf5C8a87IqE+k9/8t8IOZFdxT4wE0J0am7QPJfsp5HSaqghMQkCKuS6uCg2S86Q/eMCkWsOPPhISWMrd9Vo4LyMuRRjki83HRXVqU1ABf4yED51j7U+euoX6SXFu/k+Zg8W4I5fpCS6AY/Y05EybqL7ynG02cY+fpMee1O5dqNXXguh0CVKW8IcrQX/5cNYB4aSJTO2fcDzIOXXQjQRI6G3J5b9YKyl4xgSM9w8IVBB45VJeCy1bY0GWTAGreN9WGFs5h3FNbVuCm3Dj4xBppTmy6Yxv+kHKJSAE8nj9d1iruxdKwwbbgNzxlSZpjOijfTh0/0qXv2vnomyQSJPsJcWMsUzWwb/MSECwusV9c/dXyYWzHdwNwvHPLOtbzlP036Dm0+GaxeLg5z6z252goZazM5ctLxhGUkJZdYQEBg8Rba6mIhmY1zbigviBQLKOoKsH3pKBwUNNMmuzD46ghs27dEVEiAH7tLHwGpmPCYeCtrIlukXFmDJf+M4dsMz4AV1NRJ1L1l/ZcCctehmpeHxQAL279d1tx2tjIldSsp0=
 
 go:
-  - 1.9
+  - 1.11.x
+
+env:
+  - GO111MODULE=on
 
 install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
   - go get github.com/go-playground/overalls
-  - go get -v github.com/Masterminds/glide
-  - cd $GOPATH/src/github.com/Masterminds/glide && go install && cd -
-  - glide install
+  - go get -t -v ./...
 
 script:
-  - overalls -project=github.com/wptide/wptide -covermode=count -ignore=.git,.glide,bin,data,service,vendor -debug
+  - overalls -project=github.com/wptide/wptide -covermode=count -ignore=.git,.glide,bin,data,service -debug
   - goveralls -coverprofile=overalls.coverprofile -service=travis-ci -repotoken=$COVERALLS_TOKEN
