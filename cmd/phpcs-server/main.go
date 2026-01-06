@@ -126,7 +126,7 @@ func main() {
 		flagURL = flag.String("url", "", "Audit single message from url")
 
 		// A -visibility to run a single audit. Will not poll a queue.
-		flagVisibility = flag.String("visibility", "public", `"private" or "public" - default "pubic"`)
+		flagVisibility = flag.String("visibility", "public", `"private" or "public" - default "public"`)
 
 		// The -client login name in Tide API.
 		flagClient = flag.String("client", "wporg", `Tide API client to attribute project to - default "wporg"`)
@@ -408,7 +408,7 @@ func getStorageProvider(config map[string]map[string]string) storage.Provider {
 	}
 }
 
-// getStorageProvider returns a message/queue provider given the provided configurations
+// getMessageProvider returns a message/queue provider given the provided configurations
 // from the environment variables.
 func getMessageProvider(config map[string]map[string]string) message.Provider {
 	switch config["app"]["message_provider"] {

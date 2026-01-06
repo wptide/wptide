@@ -6,7 +6,7 @@ Do you want to ask a question? Are you looking for support? The [`#tide` channel
 
 BEFORE POSTING YOUR ISSUE:
 - These comments won't show up when you submit the issue.
-- Try to add as much detail as possible, please de specific.
+- Try to add as much detail as possible, please be specific.
 - If you're requesting a new feature, explain why you'd like it to be added.
 - Ensure you are using the latest code before logging bugs.
 
