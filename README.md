@@ -41,11 +41,14 @@ The main focus of this documentation is to setup a local development environment
   - The latest development snapshot can be installed with go get. For example, `go get -u github.com/Masterminds/glide`. This is not a release version.
 * Install [Make for Windows](http://gnuwin32.sourceforge.net/packages/make.htm) _(Windows only)_
   - The `make` command is not available on Windows by default and you must install it to be able to use the Tide `make` commands.
-  - Add `C:\zlib\bin` to your `$PATH` once you've installed the package.
+  - Add the directory that contains `make.exe`, such as `C:\Program Files (x86)\GnuWin32\bin`, to your `$PATH` once you've installed the package.
+  - If you are using legacy Docker Toolbox, make sure Docker's shared folders include the drive where your Go workspace lives.
 
 ### Cloning
 
 Tide needs to be cloned to a directory inside your Go workspace specified by the [`$GOPATH`](https://golang.org/doc/code#GOPATH) environment variable. Your `$GOPATH` defaults to a directory named `go` inside your home directory, so `$HOME/go` on Mac/Unix and `%USERPROFILE%\go` (usually `C:\Users\YourName\go`) on Windows.
+
+On Windows, cloning Tide into `%USERPROFILE%\go\src\github.com\wptide\wptide` helps Docker mount the project consistently, especially when using Docker Toolbox.
 
 Create the following directory inside your Go workspace:
 
@@ -84,6 +87,13 @@ Copy the `.env.dist` file to `.env`.
 ```
 cp .env.dist .env
 ```
+
+On Windows Command Prompt or PowerShell, use the native copy command instead:
+
+```
+copy .env.dist .env
+```
+
 _If you are running Tide locally, you do not need to change any of these `.env` values. If you are deploying this into the cloud, make sure to look at the full documentation for which variables you should update and their values._ 
 
 Create an empty `.env.gcp` file.
@@ -143,6 +153,13 @@ Add the following entry to your hosts file to make sure `tide.local` is pointed 
 ```
 127.0.0.1 tide.local
 ```
+
+When using Docker Toolbox on Windows, use the Docker machine IP address instead of `127.0.0.1`. The default is often:
+
+```
+192.168.99.100 tide.local
+```
+
 _You can change the `tide.local` URL to some other value by modifying the `API_AUTH_URL` and `API_HTTP_HOST` variables inside the `.env` file._
 
 ### Build Images
